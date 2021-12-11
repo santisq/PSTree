@@ -11,7 +11,7 @@ param(
     $outObject = {
         param($Nesting, $folder)
         
-        $files = Get-ChildItem $folder.FullName -File -Force
+        $files = Get-ChildItem -LiteralPath $folder.FullName -File -Force
         [long]$size = ($files | Measure-Object Length -Sum).Sum
         
         [pscustomobject]@{
@@ -28,7 +28,7 @@ param(
 
     if(-not $Nesting)
     {
-        $parent = Get-Item $Path
+        $parent = Get-Item -LiteralPath $Path
         & $outObject -Nesting $Nesting -Folder $parent
     }
 
@@ -36,11 +36,11 @@ param(
 
     $folders = if($Force.IsPresent)
     {
-        Get-ChildItem $Path -Directory -Force
+        Get-ChildItem -LiteralPath $Path -Directory -Force
     }
     else
     {
-        Get-ChildItem $Path -Directory
+        Get-ChildItem -LiteralPath $Path -Directory
     }
 
     foreach($folder in $folders)
