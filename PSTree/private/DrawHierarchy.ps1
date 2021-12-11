@@ -5,7 +5,7 @@ param(
     [string]$RecursionProperty
 )
     # Had to do this because of Windows PowerShell Default Encoding
-    # Sorry for the ugliness :(
+    # Not good at enconding stuff, probably a better way. Sorry for the ugliness :(
     $bytes = @(
         '226','148','148'
         '44','226','148'
