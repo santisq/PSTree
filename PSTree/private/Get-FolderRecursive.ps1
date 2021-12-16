@@ -12,12 +12,13 @@ param(
         param($Nesting, $folder)
         
         $files = Get-ChildItem -LiteralPath $folder.FullName -File -Force
-        [long]$size = ($files | Measure-Object Length -Sum).Sum
+        $size = ($files | Measure-Object Length -Sum).Sum
         
         [pscustomobject]@{
             Nesting        = $Nesting
             Hierarchy      = Indent -String $folder.Name -Indent $Nesting
             Size           = SizeConvert $size
+            RawSize        = $size
             FullName       = $folder.FullName
             Parent         = $folder.Parent
             CreationTime   = $folder.CreationTime
