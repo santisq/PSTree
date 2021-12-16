@@ -1,32 +1,13 @@
-function SizeConvert([long]$Size) {
-    switch($Size)
+function SizeConvert([double]$Size) {
+    $suffix = "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"
+    $index = 0
+    while ($Size -ge 1kb) 
     {
-        {$_ -lt 1Kb} {
-            [string]::Format(
-                '{0:0.#} Bytes',
-                $_
-            )
-            break
-        }
-        {$_ -lt 1Mb} {
-            [string]::Format(
-                '{0:0.#} Kb',
-                ($_ / 1Kb)
-            )            
-            break
-        }
-        {$_ -lt 1Gb} {
-            [string]::Format(
-                '{0:0.#} Mb',
-                ($_ / 1Mb)
-            )            
-            break
-        }
-        Default {
-            [string]::Format(
-                '{0:0.#} Gb',
-                ($_ / 1Gb)
-            )            
-        }
+        $Size /= 1kb
+        $index++
     }
+    [string]::Format(
+        '{0:0.##} {1}',
+        $Size, $suffix[$index]
+    )
 }
