@@ -22,6 +22,7 @@ Name           TypeNameOfValue
 Nesting        System.Int32
 Hierarchy      System.String
 Size           System.String
+RawSize        System.Double
 FullName       System.String
 Parent         System.IO.DirectoryInfo
 CreationTime   System.DateTime
@@ -47,44 +48,41 @@ PS /etc> $hierarchy | Select -First 20
 
 Hierarchy                              Size
 ---------                              ----
-etc                                    349.3 Kb
-├── acpi                               1.8 Kb
-│   └── events                         1.4 Kb
-├── alternatives                       5.1 Kb
-├── apache2                            0 Bytes
-│   ├── conf-available                 127 Bytes
-│   └── mods-available                 156 Bytes
-├── apm                                0 Bytes
-│   ├── event.d                        2.9 Kb
-│   ├── resume.d                       17 Bytes
-│   ├── scripts.d                      228 Bytes
-│   └── suspend.d                      17 Bytes
-├── apparmor                           3.4 Kb
-│   └── init                           0 Bytes
-│       └── network-interface-security 33 Bytes
-├── apparmor.d                         25.9 Kb
-│   ├── abstractions                   91.1 Kb
-│   │   ├── apparmor_api               2.4 Kb
-│   │   └── ubuntu-browsers.d          10.4 Kb
-│   ├── cache                          1.1 Mb
+etc                                    349.83 KB
+├── acpi                               1.83 KB
+│   └── events                         1.44 KB
+├── alternatives                       5.08 KB
+├── apache2                            0 B
+│   ├── conf-available                 127 B
+│   └── mods-available                 156 B
+├── apm                                0 B
+│   ├── event.d                        2.95 KB
+│   ├── resume.d                       17 B
+│   ├── scripts.d                      228 B
+│   └── suspend.d                      17 B
+├── apparmor                           3.36 KB
+│   └── init                           0 B
+│       └── network-interface-security 33 B
+├── apparmor.d                         25.92 KB
+│   ├── abstractions                   91.12 KB
+│   │   ├── apparmor_api               2.41 KB
+│   │   └── ubuntu-browsers.d          10.42 KB
+│   ├── cache                          1.08 MB
 
-PS /etc> $hierarchy[0] | Get-Member
+PS /etc> $hierarchy[0] | Get-Member -MemberType NoteProperty, MemberSet
 
-   TypeName: Selected.System.Management.Automation.PSCustomObject
+   TypeName: System.Management.Automation.PSCustomObject
 
 Name              MemberType   Definition
 ----              ----------   ----------
 PSStandardMembers MemberSet    PSStandardMembers {DefaultDisplayPropertySet}
-Equals            Method       bool Equals(System.Object obj)
-GetHashCode       Method       int GetHashCode()
-GetType           Method       type GetType()
-ToString          Method       string ToString()
-CreationTime      NoteProperty datetime CreationTime=12/9/2021 11:15:53 AM
+CreationTime      NoteProperty datetime CreationTime=12/14/2021 6:16:05 PM
 FullName          NoteProperty string FullName=/etc
 Hierarchy         NoteProperty string Hierarchy=etc
-LastAccessTime    NoteProperty datetime LastAccessTime=12/10/2021 11:18:27 PM
-LastWriteTime     NoteProperty datetime LastWriteTime=12/9/2021 11:15:53 AM
+LastAccessTime    NoteProperty datetime LastAccessTime=12/16/2021 12:40:41 AM
+LastWriteTime     NoteProperty datetime LastWriteTime=12/14/2021 6:16:05 PM
 Nesting           NoteProperty int Nesting=0
 Parent            NoteProperty DirectoryInfo Parent=/
-Size              NoteProperty string Size=349.3 Kb
+RawSize           NoteProperty double RawSize=358229
+Size              NoteProperty string Size=349.83 KB
 ```
