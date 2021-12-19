@@ -33,14 +33,19 @@ LastWriteTime  System.DateTime
 ### COMPATIBILITY
 - Tested and compatible with __PowerShell v5.1__ and __PowerShell Core__.
 
+### How to install?
 
-### EXAMPLES
+[`install.ps1`](https://github.com/santysq/PSTree/blob/main/install.ps1) can be used to download and install the Module, alternatively, you can `git clone` or download the `.zip` and extract the `PSTree` folder to your [`$env:PSModulePath`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_psmodulepath?view=powershell-7.2).
+
+### How to use?
 
 - __`Get-PSTree .`__ Gets the hierarchy and folder size of the current directory using __default Depth (3)__.
 - __`Get-PSTree C:\users\user -Depth 10 -Force`__ Gets the hierarchy and folder size, including hidden ones, of the `user` directory  with a maximum of __10__ levels of recursion.
 - __`Get-PSTree /home/user -Deep`:__ Gets the hierarchy and folder size of the `user` directory and all folders below.
 
 ---
+
+### Sample
 
 ```
 PS /etc> $hierarchy = gpstree . -ErrorAction SilentlyContinue -Depth 5
