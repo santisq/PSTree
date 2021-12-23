@@ -1,7 +1,7 @@
 # PSTree
 
 ### DESCRIPTION
-Cmdlet designed to emulate the [`tree`](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) command and also calculate the `Size` of each folder based of the files size of that folder (non-recursive).
+Cmdlet designed to emulate the [`tree`](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) command and also calculate the __folder's size__.
 
 
 ### PARAMETER
