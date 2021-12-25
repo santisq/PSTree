@@ -3,6 +3,42 @@
 ### DESCRIPTION
 Cmdlet designed to emulate the [`tree`](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) command and also calculate the __folder's size__.
 
+---
+### CHANGELOG
+
+- __12/25/2021__
+
+    - `-Files` switch has been added to the Module, now you can display files in the hierarchy tree if desired.
+    - `Type` property has been added to the output object and is now part of the _Default MemberSet_.
+
+```
+PS /etc> gpstree . -Deep -Files -EA 0 | Select-Object -First 20
+
+Type   Hierarchy                                Size
+----   ---------                                ----
+Folder etc                                      349.83 KB
+Folder ├── acpi                                 1.83 KB
+File   │   ├── asus-keyboard-backlight.sh       391 B
+File   │   ├── asus-wireless.sh                 180 B
+File   │   ├── ibm-wireless.sh                  608 B
+File   │   ├── tosh-wireless.sh                 455 B
+File   │   ├── undock.sh                        238 B
+Folder │   └── events                           1.44 KB
+File   │       ├── asus-keyboard-backlight-down 271 B
+File   │       ├── asus-keyboard-backlight-up   265 B
+File   │       ├── asus-wireless-off            73 B
+File   │       ├── asus-wireless-on             72 B
+File   │       ├── ibm-wireless                 223 B
+File   │       ├── lenovo-undock                67 B
+File   │       ├── thinkpad-cmos                277 B
+File   │       └── tosh-wireless                222 B
+Folder ├── alternatives                         5.08 KB
+File   │   ├── animate                          24 B
+File   │   ├── animate-im6                      24 B
+File   │   ├── animate-im6.1.gz                 40 B
+```
+---
+
 
 ### PARAMETER
 
@@ -12,6 +48,7 @@ Cmdlet designed to emulate the [`tree`](https://docs.microsoft.com/en-us/windows
 | `[-Depth <int>]` | Specifies the maximum level of recursion |
 | `[-Deep <switch>]` | Recursion until maximum level is reached |
 | `[-Force <switch>]` | Display hidden and system folders |
+| `[-Files <switch>]` | Files will be displayed in the Hierarchy tree |
 | `[<CommonParameters>]` | See [`about_CommonParameters`](https://go.microsoft.com/fwlink/?LinkID=113216) |
 
 ### OUTPUTS `Object[]`
@@ -19,6 +56,7 @@ Cmdlet designed to emulate the [`tree`](https://docs.microsoft.com/en-us/windows
 ```
 Name           TypeNameOfValue
 ----           ---------------
+Type           System.String
 Nesting        System.Int32
 Hierarchy      System.String
 Size           System.String
