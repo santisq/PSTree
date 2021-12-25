@@ -37,14 +37,17 @@ param(
         Position = 1
     )]
     [switch]$Deep,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Files
 )
 
     process
     {
-        [Environment]::CurrentDirectory = $pwd.ProviderPath
+        [Environment]::CurrentDirectory = $pwd.Path
         $PSBoundParameters.Path = ([System.IO.FileInfo]$Path).FullName
+        
         $DefaultProps = @(
+            'Type'
             'Hierarchy'
             'Size'
         )
@@ -68,8 +71,8 @@ param(
             $PSBoundParameters.Add('Depth', $Depth)
         }
 
-        $result = Get-FolderRecursive @PSBoundParameters
-
+        $result = @(Get-FolderRecursive @PSBoundParameters)
+        
         $drawProps = @{
             Array = $result
             PropertyName = 'Hierarchy'
