@@ -5,32 +5,34 @@ param(
     [int]$Nesting = 0,
     [int]$Depth,
     [switch]$Deep,
-    [switch]$Force
+    [switch]$Force,
+    [switch]$Files
 )
 
     $outObject = {
-        param($Nesting, $folder)
-        
-        $files = Get-ChildItem -LiteralPath $folder.FullName -File -Force
-        $size = ($files | Measure-Object Length -Sum).Sum
+        param($Nesting, $InputObject, $Size)
         
         [pscustomobject]@{
+            Type           = ('File', 'Folder')[$InputObject.PSIsContainer]
             Nesting        = $Nesting
-            Hierarchy      = Indent -String $folder.Name -Indent $Nesting
+            Hierarchy      = Indent -String $InputObject.Name -Indent $Nesting
             Size           = SizeConvert $size
-            RawSize        = $size
-            FullName       = $folder.FullName
-            Parent         = $folder.Parent
-            CreationTime   = $folder.CreationTime
-            LastAccessTime = $folder.LastAccessTime
-            LastWriteTime  = $folder.LastWriteTime
+            RawSize        = $Size
+            FullName       = $InputObject.FullName
+            Parent         = $InputObject.Parent
+            CreationTime   = $InputObject.CreationTime
+            LastAccessTime = $InputObject.LastAccessTime
+            LastWriteTime  = $InputObject.LastWriteTime
         }
     }
 
     if(-not $Nesting)
     {
         $parent = Get-Item -LiteralPath $Path
-        & $outObject -Nesting $Nesting -Folder $parent
+        $file = Get-ChildItem -LiteralPath $parent.FullName -File -Force
+        $size = ($file | Measure-Object Length -Sum).Sum
+
+        & $outObject -Nesting $Nesting -InputObject $parent -Size $size
     }
 
     $Nesting++
@@ -46,7 +48,18 @@ param(
 
     foreach($folder in $folders)
     {
-        & $outObject -Nesting $Nesting -Folder $folder
+        $file = Get-ChildItem -LiteralPath $folder.FullName -File -Force
+        $size = ($file | Measure-Object Length -Sum).Sum
+
+        & $outObject -Nesting $Nesting -InputObject $folder -Size $size
+        
+        if($Files.IsPresent)
+        {
+            foreach($f in $file)
+            {
+                & $outObject -Nesting ($Nesting+1) -InputObject $f -Size $f.Length
+            }
+        }
         
         $PSBoundParameters.Path = $folder.FullName
         $PSBoundParameters.Nesting = $Nesting
