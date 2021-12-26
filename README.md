@@ -47,7 +47,7 @@ File   │   ├── animate-im6.1.gz                 40 B
 | `-Path <string>` | Absolute or relative folder path. Alias: `FullName`, `PSPath` |
 | `[-Depth <int>]` | Specifies the maximum level of recursion |
 | `[-Deep <switch>]` | Recursion until maximum level is reached |
-| `[-Force <switch>]` | Display hidden and system folders |
+| `[-Force <switch>]` | Display hidden and system files and folders |
 | `[-Files <switch>]` | Files will be displayed in the Hierarchy tree |
 | `[<CommonParameters>]` | See [`about_CommonParameters`](https://go.microsoft.com/fwlink/?LinkID=113216) |
 
