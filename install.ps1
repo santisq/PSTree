@@ -18,7 +18,7 @@ if(-not(Test-Path $installPath))
 {
     Write-Verbose "Module folder could not be found. Creating it..."
 
-    $path = New-Item  -ItemType Directory -Force
+    $path = New-Item $installPath -ItemType Directory -Force
     Write-Verbose "Module folder has been created:"
     Write-Verbose "$($path.FullName)`n"
 }
