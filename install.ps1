@@ -65,7 +65,7 @@ if($shouldDownload)
     Write-Verbose "Extracting..."
     $expanded = Expand-Archive $download -DestinationPath $PWD.Path -Force -Verbose:$false -PassThru
     $expanded = $expanded.Where({$_.Name -eq 'PSTree.psm1'}).Directory
-    Move-Item $expanded -Destination $PSScriptRoot -Force -Verbose:$false
+    Move-Item $expanded -Destination $PWD.Path -Force -Verbose:$false
     Remove-Item $expanded.Parent -Force -Recurse -Confirm:$false -Verbose:$false
 }
 
