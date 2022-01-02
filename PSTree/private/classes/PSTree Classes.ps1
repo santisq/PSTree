@@ -97,7 +97,7 @@ class PSTreeStatic {
     static [void] SetDefaultMembers ([object[]]$InputObject)
     {
         $DefaultProps = @(
-            'Type'
+            'Attributes'
             'Hierarchy'
             'Size'
         )
@@ -120,7 +120,7 @@ class PSTreeStatic {
 }
 
 class PSTreeParent {
-    [string]$Type
+    [FileAttributes]$Attributes
     [string]$Hierarchy
     [string]$Size
     [int64]$RawSize
@@ -136,9 +136,9 @@ class PSTreeParent {
 
     PSTreeParent([DirectoryInfo]$Path)
     {        
+        $this.Attributes     = $Path.Attributes
         $this.Name           = $Path.Name
         $this.FullName       = $Path.FullName
-        $this.Type           = $Path.Attributes
         $this.Parent         = $Path.Parent
         $this.CreationTime   = $Path.CreationTime
         $this.LastAccessTime = $Path.LastAccessTime
@@ -173,7 +173,7 @@ class PSTreeDirectoryInfo : PSTreeParent {
 
     PSTreeDirectoryInfo([DirectoryInfo]$DirectoryInfo)
     {
-        $this.Type           = $DirectoryInfo.Attributes
+        $this.Attributes     = $DirectoryInfo.Attributes
         $this.Name           = $DirectoryInfo.Name
         $this.FullName       = $DirectoryInfo.FullName
         $this.Parent         = $DirectoryInfo.Parent
@@ -196,7 +196,7 @@ class PSTreeDirectoryInfo : PSTreeParent {
         if(-not $Force)
         {
             return $dirs.Where({
-                -not ($_.Type -band [FileAttributes]'Hidden, System')
+                -not ($_.Attributes -band [FileAttributes]'Hidden, System')
             })
         }
         return $dirs
@@ -207,11 +207,11 @@ class PSTreeFileInfo : PSTreeParent {
     
     PSTreeFileInfo([FileInfo]$FileInfo)
     {
-        $this.Type           = $FileInfo.Attributes
-        $this.RawSize        = $FileInfo.Length
-        $this.Size           = [PSTreeStatic]::SizeConvert($FileInfo.Length)
+        $this.Attributes     = $FileInfo.Attributes
         $this.Name           = $FileInfo.Name
         $this.FullName       = $FileInfo.FullName
+        $this.RawSize        = $FileInfo.Length
+        $this.Size           = [PSTreeStatic]::SizeConvert($FileInfo.Length)
         $this.CreationTime   = $FileInfo.CreationTime
         $this.LastAccessTime = $FileInfo.LastAccessTime
         $this.LastWriteTime  = $FileInfo.LastWriteTime
@@ -231,7 +231,7 @@ class PSTreeFileInfo : PSTreeParent {
         if(-not $Force)
         {
             return $files.Where({
-                -not ($_.Type -band [FileAttributes]'Hidden, System')
+                -not ($_.Attributes -band [FileAttributes]'Hidden, System')
             })
         }
         return $files
