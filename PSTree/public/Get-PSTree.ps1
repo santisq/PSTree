@@ -41,28 +41,14 @@ param(
     [switch]$Files
 )
 
-    process
+    begin
     {
         [Environment]::CurrentDirectory = $pwd.Path
         $PSBoundParameters.Path = ([System.IO.FileInfo]$Path).FullName
-        
-        $DefaultProps = @(
-            'Type'
-            'Hierarchy'
-            'Size'
-        )
-        [Management.Automation.PSMemberInfo[]]$standardMembers =
-            [System.Management.Automation.PSPropertySet]::new(
-                'DefaultDisplayPropertySet',
-                [string[]]$DefaultProps
-            )
-        
-        $hash = @{
-            Name = 'PSStandardMembers'
-            MemberType = 'MemberSet'
-            Value = $standardMembers
-        }
-        
+    }
+
+    process
+    {        
         $isDepthParam = $PSCmdlet.ParameterSetName -eq 'Depth'
         $containsDepth = $PSBoundParameters.ContainsKey('Depth')
         
@@ -71,19 +57,10 @@ param(
             $PSBoundParameters.Add('Depth', $Depth)
         }
 
-        $result = @(Get-FolderRecursive @PSBoundParameters)
-        
-        $drawProps = @{
-            Array = $result
-            PropertyName = 'Hierarchy'
-            RecursionProperty = 'Nesting'
-        }
-
-        DrawHierarchy @drawProps | ForEach-Object {
-            $hash.InputObject = $_
-            Add-Member @hash
-        }
-
-        $result
+        [PSTreeStatic]::DrawHierarchy(
+            (Get-FolderRecursive @PSBoundParameters),
+            'Hierarchy',
+            'Nesting'
+        )
     }
 }
