@@ -9,24 +9,23 @@ Cmdlet designed to emulate the [`tree`](https://docs.microsoft.com/en-us/windows
 - __01/02/2022__
     
     - __PSTree Module__ now has it's own classes, functionality remains the same however a lot has been improved. Recursion is now done through static methods [`[System.IO.Directory]::GetDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getdirectories?view=net-6.0) and [`[System.IO.Directory]::GetFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-6.0) instead of [`Get-ChildItem`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem), which improves efficiency greatly
-    - Inaccessible folders are now skipped, there shouldn't be a need to use `-ErrorAction SilentlyContinue` anymore.
+
 ```
 PS /home/user/.local/share/powershell/Modules> gpstree . -Files -Deep 
 
-
-Type      Hierarchy                               Size
-----      ---------                               ----
-Directory Modules                                 0 B
-Directory └── PSTree                              4.34 KB
-Normal        ├── PSTree.psd1                     4 KB
-Normal        ├── PSTree.psm1                     352 B
-Directory     ├── public                          1.44 KB
-Normal        │   └── Get-PSTree.ps1              1.44 KB
-Directory     └── private                         0 B
-Directory         ├── classes                     6.89 KB
-Normal            │   └── PSTree Classes.ps1      6.89 KB
-Directory         └── functions                   1012 B
-Normal                └── Get-FolderRecursive.ps1 1012 B
+Attributes Hierarchy                               Size
+---------- ---------                               ----
+ Directory Modules                                 0 B
+ Directory └── PSTree                              4.34 KB
+    Normal     ├── PSTree.psd1                     4 KB
+    Normal     ├── PSTree.psm1                     352 B
+ Directory     ├── public                          1.44 KB
+    Normal     │   └── Get-PSTree.ps1              1.44 KB
+ Directory     └── private                         0 B
+ Directory         ├── classes                     6.91 KB
+    Normal         │   └── PSTree Classes.ps1      6.91 KB
+ Directory         └── functions                   1012 B
+    Normal             └── Get-FolderRecursive.ps1 1012 B
 ```
 - __12/25/2021__
 
@@ -51,7 +50,7 @@ Normal                └── Get-FolderRecursive.ps1 1012 B
 ```
 Name           TypeNameOfValue
 ----           ---------------
-Type           System.String
+Attributes     System.IO.FileAttributes
 Hierarchy      System.String
 Size           System.String
 RawSize        System.Int64
@@ -87,32 +86,34 @@ Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main-2.0.0/in
 ### Sample
 
 ```
-PS /etc> $hierarchy = gpstree . -Depth 5    
+PS /etc> $hierarchy = gpstree . -Depth 5 -EA 0
 PS /etc> $hierarchy | Select-Object -First 20
 
-Type                    Hierarchy                            Size
-----                    ---------                            ----
-ReadOnly, Directory     etc                                  294.45 KB
-ReadOnly, Directory     ├── netplan                          104 B
-ReadOnly, Directory     ├── libgda-5.0                       100 B
-ReadOnly, Directory     ├── dconf                            0 B
-ReadOnly, Directory     │   ├── profile                      28 B
-ReadOnly, Directory     │   └── db                           2.85 KB
-ReadOnly, Directory     │       └── ibus.d                   1.49 KB
-ReadOnly, Directory     ├── logrotate.d                      2.94 KB
-ReadOnly, Directory     ├── xdg                              832 B
-ReadOnly, Directory     │   ├── autostart                    27.1 KB
-ReadOnly, Directory     │   ├── tumbler                      2.22 KB
-ReadOnly, Directory     │   ├── menus                        15.54 KB
-ReadOnly, Directory     │   ├── systemd                      0 B
-Directory, ReparsePoint │   │   └── user                     0 B
-ReadOnly, Directory     │   │       ├── default.target.wants 40 B
-ReadOnly, Directory     │   │       └── sockets.target.wants 291 B
-ReadOnly, Directory     │   └── Xwayland-session.d           215 B
-ReadOnly, Directory     ├── cron.weekly                      1.49 KB
-ReadOnly, Directory     ├── cron.monthly                     313 B
-ReadOnly, Directory     ├── pki                              0 B
+PS /etc> $hierarchy | Select-Object -First 20 
 
+             Attributes Hierarchy                            Size
+             ---------- ---------                            ----
+    ReadOnly, Directory etc                                  294.45 KB
+    ReadOnly, Directory ├── netplan                          104 B
+    ReadOnly, Directory ├── libgda-5.0                       100 B
+    ReadOnly, Directory ├── dconf                            0 B
+    ReadOnly, Directory │   ├── profile                      28 B
+    ReadOnly, Directory │   └── db                           2.85 KB
+    ReadOnly, Directory │       └── ibus.d                   1.49 KB
+    ReadOnly, Directory ├── logrotate.d                      2.94 KB
+    ReadOnly, Directory ├── xdg                              832 B
+    ReadOnly, Directory │   ├── autostart                    27.1 KB
+    ReadOnly, Directory │   ├── tumbler                      2.22 KB
+    ReadOnly, Directory │   ├── menus                        15.54 KB
+    ReadOnly, Directory │   ├── systemd                      0 B
+Directory, ReparsePoint │   │   └── user                     0 B
+    ReadOnly, Directory │   │       ├── default.target.wants 40 B
+    ReadOnly, Directory │   │       └── sockets.target.wants 291 B
+    ReadOnly, Directory │   └── Xwayland-session.d           215 B
+    ReadOnly, Directory ├── cron.weekly                      1.49 KB
+    ReadOnly, Directory ├── cron.monthly                     313 B
+    ReadOnly, Directory ├── pki                              0 B
+    
 PS /etc> $hierarchy[0] | Get-Member -MemberType Properties, MemberSet
 
    TypeName: PSTreeParent
@@ -120,6 +121,7 @@ PS /etc> $hierarchy[0] | Get-Member -MemberType Properties, MemberSet
 Name              MemberType Definition
 ----              ---------- ----------
 PSStandardMembers MemberSet  PSStandardMembers {DefaultDisplayPropertySet}
+Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
 CreationTime      Property   datetime CreationTime {get;set;}
 FullName          Property   string FullName {get;set;}
 Hierarchy         Property   string Hierarchy {get;set;}
@@ -129,5 +131,4 @@ Name              Property   string Name {get;set;}
 Parent            Property   System.IO.DirectoryInfo Parent {get;set;}
 RawSize           Property   long RawSize {get;set;}
 Size              Property   string Size {get;set;}
-Type              Property   string Type {get;set;}
 ```
