@@ -54,7 +54,7 @@ $shouldDownload = foreach($file in $structure)
     }
 }
 
-$sourcePath = Join-Path $PSScriptRoot -ChildPath PSTree
+$sourcePath = Join-Path $PWD.Path -ChildPath PSTree
 
 if($shouldDownload)
 {
