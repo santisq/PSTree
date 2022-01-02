@@ -58,7 +58,7 @@ $sourcePath = Join-Path $PWD.Path -ChildPath PSTree
 
 if($shouldDownload)
 {
-    $download = Join-Path $PWD.Path -ChildPath "main.zip"
+    $download = Join-Path $PWD.Path -ChildPath "PSTree-main.zip"
     Write-Verbose "Missing dependencies, attempting to download the module..."
     Invoke-WebRequest 'https://github.com/santysq/PSTree/archive/refs/heads/main.zip' -OutFile $download 4>$null
     Write-Verbose "Download successful... Preparing to install..."
