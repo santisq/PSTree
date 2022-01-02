@@ -6,37 +6,32 @@ Cmdlet designed to emulate the [`tree`](https://docs.microsoft.com/en-us/windows
 ---
 ### CHANGELOG
 
+- __01/02/2022__
+    
+    - __PSTree Module__ now has it's own classes, functionality remains the same however a lot has been improved. Recursion is now done through static methods [`[System.IO.Directory]::GetDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getdirectories?view=net-6.0) and [`[System.IO.Directory]::GetFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-6.0) instead of [`Get-ChildItem`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem), which improves efficiency greatly
+    - Inaccessible folders are now skipped, there shouldn't be a need to use `-ErrorAction SilentlyContinue` anymore.
+```
+PS /home/user/.local/share/powershell/Modules> gpstree . -Files -Deep 
+
+
+Type      Hierarchy                               Size
+----      ---------                               ----
+Directory Modules                                 0 B
+Directory └── PSTree                              4.34 KB
+Normal        ├── PSTree.psd1                     4 KB
+Normal        ├── PSTree.psm1                     352 B
+Directory     ├── public                          1.44 KB
+Normal        │   └── Get-PSTree.ps1              1.44 KB
+Directory     └── private                         0 B
+Directory         ├── classes                     6.89 KB
+Normal            │   └── PSTree Classes.ps1      6.89 KB
+Directory         └── functions                   1012 B
+Normal                └── Get-FolderRecursive.ps1 1012 B
+```
 - __12/25/2021__
 
     - `-Files` switch has been added to the Module, now you can display files in the hierarchy tree if desired.
     - `Type` property has been added to the output object and is now part of the _Default MemberSet_.
-
-```
-PS /etc> gpstree . -Deep -Files -EA 0 | Select-Object -First 20
-
-Type   Hierarchy                                Size
-----   ---------                                ----
-Folder etc                                      349.83 KB
-Folder ├── acpi                                 1.83 KB
-File   │   ├── asus-keyboard-backlight.sh       391 B
-File   │   ├── asus-wireless.sh                 180 B
-File   │   ├── ibm-wireless.sh                  608 B
-File   │   ├── tosh-wireless.sh                 455 B
-File   │   ├── undock.sh                        238 B
-Folder │   └── events                           1.44 KB
-File   │       ├── asus-keyboard-backlight-down 271 B
-File   │       ├── asus-keyboard-backlight-up   265 B
-File   │       ├── asus-wireless-off            73 B
-File   │       ├── asus-wireless-on             72 B
-File   │       ├── ibm-wireless                 223 B
-File   │       ├── lenovo-undock                67 B
-File   │       ├── thinkpad-cmos                277 B
-File   │       └── tosh-wireless                222 B
-Folder ├── alternatives                         5.08 KB
-File   │   ├── animate                          24 B
-File   │   ├── animate-im6                      24 B
-File   │   ├── animate-im6.1.gz                 40 B
-```
 ---
 
 
@@ -57,10 +52,10 @@ File   │   ├── animate-im6.1.gz                 40 B
 Name           TypeNameOfValue
 ----           ---------------
 Type           System.String
-Nesting        System.Int32
 Hierarchy      System.String
 Size           System.String
-RawSize        System.Double
+RawSize        System.Int64
+Name           System.String
 FullName       System.String
 Parent         System.IO.DirectoryInfo
 CreationTime   System.DateTime
@@ -73,7 +68,13 @@ LastWriteTime  System.DateTime
 
 ### How to install?
 
-[`install.ps1`](https://github.com/santysq/PSTree/blob/main/install.ps1) can be used to download and install the Module, alternatively, you can `git clone` or download the `.zip` and extract the `PSTree` folder to your [`$env:PSModulePath`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_psmodulepath?view=powershell-7.2).
+- [`install.ps1`](https://raw.githubusercontent.com/santysq/PSTree/main-2.0.0/install.ps1) can be used to download and install the Module automatically:
+
+```
+Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main-2.0.0/install.ps1 | Invoke-Expression
+```
+
+- Alternatively, you can `git clone` or download the `.zip` and extract the `PSTree` folder to your [`$env:PSModulePath`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_psmodulepath?view=powershell-7.2).
 
 ### How to use?
 
@@ -86,46 +87,47 @@ LastWriteTime  System.DateTime
 ### Sample
 
 ```
-PS /etc> $hierarchy = gpstree . -ErrorAction SilentlyContinue -Depth 5
-PS /etc> $hierarchy | Select -First 20                                
+PS /etc> $hierarchy = gpstree . -Depth 5    
+PS /etc> $hierarchy | Select-Object -First 20
 
-Hierarchy                              Size
----------                              ----
-etc                                    349.83 KB
-├── acpi                               1.83 KB
-│   └── events                         1.44 KB
-├── alternatives                       5.08 KB
-├── apache2                            0 B
-│   ├── conf-available                 127 B
-│   └── mods-available                 156 B
-├── apm                                0 B
-│   ├── event.d                        2.95 KB
-│   ├── resume.d                       17 B
-│   ├── scripts.d                      228 B
-│   └── suspend.d                      17 B
-├── apparmor                           3.36 KB
-│   └── init                           0 B
-│       └── network-interface-security 33 B
-├── apparmor.d                         25.92 KB
-│   ├── abstractions                   91.12 KB
-│   │   ├── apparmor_api               2.41 KB
-│   │   └── ubuntu-browsers.d          10.42 KB
-│   ├── cache                          1.08 MB
+Type                    Hierarchy                            Size
+----                    ---------                            ----
+ReadOnly, Directory     etc                                  294.45 KB
+ReadOnly, Directory     ├── netplan                          104 B
+ReadOnly, Directory     ├── libgda-5.0                       100 B
+ReadOnly, Directory     ├── dconf                            0 B
+ReadOnly, Directory     │   ├── profile                      28 B
+ReadOnly, Directory     │   └── db                           2.85 KB
+ReadOnly, Directory     │       └── ibus.d                   1.49 KB
+ReadOnly, Directory     ├── logrotate.d                      2.94 KB
+ReadOnly, Directory     ├── xdg                              832 B
+ReadOnly, Directory     │   ├── autostart                    27.1 KB
+ReadOnly, Directory     │   ├── tumbler                      2.22 KB
+ReadOnly, Directory     │   ├── menus                        15.54 KB
+ReadOnly, Directory     │   ├── systemd                      0 B
+Directory, ReparsePoint │   │   └── user                     0 B
+ReadOnly, Directory     │   │       ├── default.target.wants 40 B
+ReadOnly, Directory     │   │       └── sockets.target.wants 291 B
+ReadOnly, Directory     │   └── Xwayland-session.d           215 B
+ReadOnly, Directory     ├── cron.weekly                      1.49 KB
+ReadOnly, Directory     ├── cron.monthly                     313 B
+ReadOnly, Directory     ├── pki                              0 B
 
-PS /etc> $hierarchy[0] | Get-Member -MemberType NoteProperty, MemberSet
+PS /etc> $hierarchy[0] | Get-Member -MemberType Properties, MemberSet
 
-   TypeName: System.Management.Automation.PSCustomObject
+   TypeName: PSTreeParent
 
-Name              MemberType   Definition
-----              ----------   ----------
-PSStandardMembers MemberSet    PSStandardMembers {DefaultDisplayPropertySet}
-CreationTime      NoteProperty datetime CreationTime=12/14/2021 6:16:05 PM
-FullName          NoteProperty string FullName=/etc
-Hierarchy         NoteProperty string Hierarchy=etc
-LastAccessTime    NoteProperty datetime LastAccessTime=12/16/2021 12:40:41 AM
-LastWriteTime     NoteProperty datetime LastWriteTime=12/14/2021 6:16:05 PM
-Nesting           NoteProperty int Nesting=0
-Parent            NoteProperty DirectoryInfo Parent=/
-RawSize           NoteProperty double RawSize=358229
-Size              NoteProperty string Size=349.83 KB
+Name              MemberType Definition
+----              ---------- ----------
+PSStandardMembers MemberSet  PSStandardMembers {DefaultDisplayPropertySet}
+CreationTime      Property   datetime CreationTime {get;set;}
+FullName          Property   string FullName {get;set;}
+Hierarchy         Property   string Hierarchy {get;set;}
+LastAccessTime    Property   datetime LastAccessTime {get;set;}
+LastWriteTime     Property   datetime LastWriteTime {get;set;}
+Name              Property   string Name {get;set;}
+Parent            Property   System.IO.DirectoryInfo Parent {get;set;}
+RawSize           Property   long RawSize {get;set;}
+Size              Property   string Size {get;set;}
+Type              Property   string Type {get;set;}
 ```
