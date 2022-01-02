@@ -43,7 +43,7 @@ $structure = @(
         'PSTree', 'PSTree.psd1'
     )
 
-).ForEach({ Join-Path $PSScriptRoot -ChildPath $_ })
+).ForEach({ Join-Path $PWD.Path -ChildPath $_ })
 
 $shouldDownload = foreach($file in $structure)
 {
@@ -58,12 +58,12 @@ $sourcePath = Join-Path $PSScriptRoot -ChildPath PSTree
 
 if($shouldDownload)
 {
-    $download = Join-Path $PSScriptRoot -ChildPath "main.zip"
+    $download = Join-Path $PWD.Path -ChildPath "main.zip"
     Write-Verbose "Missing dependencies, attempting to download the module..."
     Invoke-WebRequest 'https://github.com/santysq/PSTree/archive/refs/heads/main.zip' -OutFile $download 4>$null
     Write-Verbose "Download successful... Preparing to install..."
     Write-Verbose "Extracting..."
-    $expanded = Expand-Archive $download -DestinationPath $PSScriptRoot -Force -Verbose:$false -PassThru
+    $expanded = Expand-Archive $download -DestinationPath $PWD.Path -Force -Verbose:$false -PassThru
     $expanded = $expanded.Where({$_.Name -eq 'PSTree.psm1'}).Directory
     Move-Item $expanded -Destination $PSScriptRoot -Force -Verbose:$false
     Remove-Item $expanded.Parent -Force -Recurse -Confirm:$false -Verbose:$false
