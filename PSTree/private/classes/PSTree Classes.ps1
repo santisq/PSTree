@@ -184,22 +184,20 @@ class PSTreeDirectoryInfo : PSTreeParent {
 
     static [PSTreeDirectoryInfo[]]
     GetFolders ([string]$Path, [int64]$Nesting, [bool]$Force)
-    {
-        $enum = [EnumerationOptions]::new()
-
-        if($Force)
-        {
-            $enum.AttributesToSkip = 0
-        }
-    
-        $dirs = [PSTreeDirectoryInfo[]][DirectoryInfo[]][Directory]::GetDirectories(
-            $Path, '*', $enum
-        )
+    {    
+        $dirs = [PSTreeDirectoryInfo[]][DirectoryInfo[]][Directory]::GetDirectories($Path)
     
         foreach($dir in $dirs)
         {
             $dir.Hierarchy = [PSTreeStatic]::Indent($dir.Name, $Nesting)
             $dir.Nesting   = $Nesting
+        }
+        
+        if(-not $Force)
+        {
+            return $dirs.Where({
+                -not ($_.Type -band [FileAttributes]'Hidden, System')
+            })
         }
         return $dirs
     }
@@ -222,21 +220,19 @@ class PSTreeFileInfo : PSTreeParent {
     static [PSTreeFileInfo[]]
     GetFiles ([string]$Path, [int64]$Nesting, [bool]$Force)
     {
-        $enum = [EnumerationOptions]::new()
-        
-        if($Force)
-        {
-            $enum.AttributesToSkip = 0
-        }
-    
-        $files = [PSTreeFileInfo[]][FileInfo[]][Directory]::GetFiles(
-            $Path, '*', $enum
-        )
+        $files = [PSTreeFileInfo[]][FileInfo[]][Directory]::GetFiles($Path)
     
         foreach($file in $files)
         {
             $file.Hierarchy = [PSTreeStatic]::Indent($file.Name, $Nesting)
             $file.Nesting   = $Nesting
+        }
+        
+        if(-not $Force)
+        {
+            return $files.Where({
+                -not ($_.Type -band [FileAttributes]'Hidden, System')
+            })
         }
         return $files
     }
