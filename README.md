@@ -8,7 +8,8 @@ Cmdlet designed to emulate the [`tree`](https://docs.microsoft.com/en-us/windows
 
 - __01/02/2022__
     
-    - __PSTree Module__ now has it's own classes, functionality remains the same however a lot has been improved. Recursion is now done through static methods [`[System.IO.Directory]::GetDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getdirectories?view=net-6.0) and [`[System.IO.Directory]::GetFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-6.0) instead of [`Get-ChildItem`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem), which improves efficiency greatly
+    - __PSTree Module__ now has it's own classes, functionality remains the same however a lot has been improved.
+    - Recursion is now done through static methods [`[System.IO.Directory]::GetDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getdirectories?view=net-6.0) and [`[System.IO.Directory]::GetFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-6.0) instead of [`Get-ChildItem`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem), which improves efficiency greatly.
 
 ```
 PS /home/user/.local/share/powershell/Modules> gpstree . -Files -Deep 
