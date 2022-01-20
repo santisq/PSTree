@@ -90,8 +90,6 @@ Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main-2.0.0/in
 PS /etc> $hierarchy = gpstree . -Depth 5 -EA 0
 PS /etc> $hierarchy | Select-Object -First 20
 
-PS /etc> $hierarchy | Select-Object -First 20 
-
              Attributes Hierarchy                            Size
              ---------- ---------                            ----
     ReadOnly, Directory etc                                  294.45 KB
