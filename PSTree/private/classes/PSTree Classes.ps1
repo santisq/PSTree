@@ -9,11 +9,6 @@ class PSTreeStatic {
     static [string] Indent ([string]$String, [object]$Indentation)
     {
         $i = ' ' * 4
-        if(-not $Indentation)
-        {
-            return $String
-        }
-        
         return [string]::Format(
             "{0}$String", ($i * $Indentation)
         )
