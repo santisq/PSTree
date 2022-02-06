@@ -26,7 +26,7 @@ class PSTreeStatic {
             $index++
         }
         return [string]::Format(
-            '{0:G3} {1}',
+            '{0} {1}',
             [math]::Round($Length, 2), $suffix[$index]
         )
     }
