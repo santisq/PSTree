@@ -14,7 +14,7 @@ class PSTreeStatic {
         )
     }
 
-    static [string] SizeConvert ([decimal]$Length)
+    static [string] SizeConvert ([object]$Length)
     {
         # Inspired from https://stackoverflow.com/a/40887001/15339544
         
