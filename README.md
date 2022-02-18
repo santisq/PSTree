@@ -80,7 +80,7 @@ Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main-2.0.0/in
 
 - __`Get-PSTree .`__ Gets the hierarchy and folder size of the current directory using __default Depth (3)__.
 - __`Get-PSTree C:\users\user -Depth 10 -Force`__ Gets the hierarchy and folder size, including hidden ones, of the `user` directory  with a maximum of __10__ levels of recursion.
-- __`Get-PSTree /home/user -Deep`:__ Gets the hierarchy and folder size of the `user` directory and all folders below.
+- __`Get-PSTree /home/user -Deep`__ Gets the hierarchy and folder size of the `user` directory and all folders below.
 
 ---
 
