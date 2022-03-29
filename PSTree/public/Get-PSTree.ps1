@@ -98,14 +98,11 @@ param(
     [switch]$Files
 )
 
-    begin
-    {
-        [Environment]::CurrentDirectory = $pwd.Path
-        $PSBoundParameters.Path = ([System.IO.FileInfo]$Path).FullName
+    begin {
+        $PSBoundParameters.Path = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($Path)
     }
 
-    process
-    {        
+    process {
         $isDepthParam = $PSCmdlet.ParameterSetName -eq 'Depth'
         $containsDepth = $PSBoundParameters.ContainsKey('Depth')
         
