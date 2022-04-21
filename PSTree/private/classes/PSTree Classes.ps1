@@ -5,23 +5,19 @@ using namespace System.Management.Automation
 using namespace System.Text
 
 class PSTreeStatic {
-
-    static [string] Indent ([string]$String, [object]$Indentation)
-    {
+    static [string] Indent ([string] $String, [object] $Indentation) {
         $i = ' ' * 4
         return [string]::Format(
             "{0}$String", ($i * $Indentation)
         )
     }
 
-    static [string] SizeConvert ([object]$Length)
-    {
+    static [string] SizeConvert ([object] $Length) {
         # Inspired from https://stackoverflow.com/a/40887001/15339544
-        
+
         $suffix = "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"
         $index = 0
-        while ($Length -ge 1kb)
-        {
+        while ($Length -ge 1kb) {
             $Length /= 1kb
             $index++
         }
@@ -31,17 +27,14 @@ class PSTreeStatic {
         )
     }
 
-    static [int64] GetTotalSize ([int64[]]$Length)
-    {
-        if(-not $Length.Count)
-        {
+    static [int64] GetTotalSize ([int64[]] $Length) {
+        if(-not $Length.Count) {
             return 0
         }
         return [Enumerable]::Sum($Length)
     }
-    
-    static [object[]] DrawHierarchy ([object[]]$InputObject, [string]$Property, [string]$Rec)
-    {
+
+    static [object[]] DrawHierarchy ([object[]] $InputObject, [string] $Property, [string] $Rec) {
         # Had to do this because of Windows PowerShell Default Encoding
         # Not good at enconding stuff, probably a better way. Sorry for the ugliness :(
         $bytes = @(
@@ -54,31 +47,25 @@ class PSTreeStatic {
 
         $corner, $horizontal, $pipe, $connector = [Encoding]::UTF8.GetString($bytes).Split(',')
         $cornerConnector = "${corner}$(${horizontal}*2) "
-    
-        foreach($group in $InputObject | Group-Object $Rec | Select-Object -Skip 1)
-        {
-            foreach($item in $group.Group)
-            {
+
+        foreach($group in $InputObject | Group-Object $Rec | Select-Object -Skip 1) {
+            foreach($item in $group.Group) {
                 $item.$Property = $item.$Property -replace '\s{4}(?=\S)', $cornerConnector
             }
         }
-    
-        for($i = 1; $i -lt $InputObject.Count; $i++)
-        {
+
+        for($i = 1; $i -lt $InputObject.Count; $i++) {
             $index = $InputObject[$i].$Property.IndexOf($corner)
-            if($index -ge 0)
-            {
+            if($index -ge 0) {
                 $z = $i - 1
-                while($InputObject[$z].$Property[$index] -notmatch "$corner|\S")
-                {
+                while($InputObject[$z].$Property[$index] -notmatch "$corner|\S") {
                     $replace = $InputObject[$z].$Property.ToCharArray()
                     $replace[$Index] = $pipe
                     $InputObject[$z].$Property = -join $replace
                     $z--
                 }
-            
-                if($InputObject[$z].$Property[$index] -eq $corner)
-                {
+
+                if($InputObject[$z].$Property[$index] -eq $corner) {
                     $replace = $InputObject[$z].$Property.ToCharArray()
                     $replace[$Index] = $connector
                     $InputObject[$z].$Property = -join $replace
@@ -89,8 +76,7 @@ class PSTreeStatic {
         return $InputObject
     }
 
-    static [void] SetDefaultMembers ([object[]]$InputObject)
-    {
+    static [void] SetDefaultMembers ([object[]]$InputObject) {
         $DefaultProps = @(
             'Attributes'
             'Hierarchy'
@@ -102,8 +88,7 @@ class PSTreeStatic {
             [string[]]$DefaultProps
         )
 
-        foreach($object in $InputObject)
-        {
+        foreach($object in $InputObject) {
             $object.PSObject.Members.Add(
                 [PSMemberSet]::new(
                     'PSStandardMembers',
@@ -115,22 +100,21 @@ class PSTreeStatic {
 }
 
 class PSTreeParent {
-    [FileAttributes]$Attributes
-    [string]$Hierarchy
-    [string]$Size
-    [int64]$RawSize
-    [string]$Name
-    [string]$FullName
-    [DirectoryInfo]$Parent
-    [datetime]$CreationTime
-    [datetime]$LastAccessTime
-    [datetime]$LastWriteTime
-    hidden [int64]$Nesting
+    [FileAttributes] $Attributes
+    [string] $Hierarchy
+    [string] $Size
+    [int64] $RawSize
+    [string] $Name
+    [string] $FullName
+    [DirectoryInfo] $Parent
+    [datetime] $CreationTime
+    [datetime] $LastAccessTime
+    [datetime] $LastWriteTime
+    hidden [int64] $Nesting
 
     PSTreeParent() { }
 
-    PSTreeParent([DirectoryInfo]$Path)
-    {        
+    PSTreeParent([DirectoryInfo] $Path) {
         $this.Attributes     = $Path.Attributes
         $this.Name           = $Path.Name
         $this.FullName       = $Path.FullName
@@ -142,32 +126,29 @@ class PSTreeParent {
         [PSTreeStatic]::SetDefaultMembers($this)
     }
 
-    [PSTreeDirectoryInfo[]] GetFolders ([bool]$Force)
+    [PSTreeDirectory[]] GetFolders ([bool] $Force)
     {
-        $folders = [PSTreeDirectoryInfo]::GetFolders($this.FullName, $this.Nesting + 1, $Force)
+        $folders = [PSTreeDirectory]::GetFolders($this.FullName, $this.Nesting + 1, $Force)
         [PSTreeStatic]::SetDefaultMembers($folders)
         return $folders
     }
 
-    [PSTreeFileInfo[]] GetFiles ([bool]$Force)
-    {
-        $files        = [PSTreeFileInfo]::GetFiles($this.FullName, $this.Nesting + 1, $Force)
+    [PSTreeFile[]] GetFiles ([bool] $Force) {
+        $files        = [PSTreeFile]::GetFiles($this.FullName, $this.Nesting + 1, $Force)
         $this.RawSize = [PSTreeStatic]::GetTotalSize($files.RawSize)
         $this.Size    = [PSTreeStatic]::SizeConvert($this.RawSize)
         [PSTreeStatic]::SetDefaultMembers($files)
         return $files
     }
 
-    [void] SetHierarchy ()
-    {
+    [void] SetHierarchy () {
         $this.Hierarchy = [PSTreeStatic]::Indent($this.Name, $this.Nesting)
     }
 }
 
-class PSTreeDirectoryInfo : PSTreeParent {
+class PSTreeDirectory : PSTreeParent {
 
-    PSTreeDirectoryInfo([DirectoryInfo]$DirectoryInfo)
-    {
+    PSTreeDirectory([DirectoryInfo] $DirectoryInfo) {
         $this.Attributes     = $DirectoryInfo.Attributes
         $this.Name           = $DirectoryInfo.Name
         $this.FullName       = $DirectoryInfo.FullName
@@ -177,31 +158,24 @@ class PSTreeDirectoryInfo : PSTreeParent {
         $this.LastWriteTime  = $DirectoryInfo.LastWriteTime
     }
 
-    static [PSTreeDirectoryInfo[]]
-    GetFolders ([string]$Path, [int64]$Nesting, [bool]$Force)
-    {    
-        $dirs = [PSTreeDirectoryInfo[]][DirectoryInfo[]][Directory]::GetDirectories($Path)
-    
-        foreach($dir in $dirs)
-        {
+    static [PSTreeDirectory[]] GetFolders ([string] $Path, [int64] $Nesting, [bool] $Force) {
+        $dirs = [PSTreeDirectory[]] [DirectoryInfo[]] [Directory]::GetDirectories($Path)
+
+        foreach($dir in $dirs) {
             $dir.Hierarchy = [PSTreeStatic]::Indent($dir.Name, $Nesting)
             $dir.Nesting   = $Nesting
         }
-        
-        if(-not $Force)
-        {
-            return $dirs.Where({
-                -not ($_.Attributes -band [FileAttributes]'Hidden, System')
-            })
+
+        if(-not $Force) {
+            return $dirs.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
         }
         return $dirs
     }
 }
 
-class PSTreeFileInfo : PSTreeParent {
-    
-    PSTreeFileInfo([FileInfo]$FileInfo)
-    {
+class PSTreeFile : PSTreeParent {
+
+    PSTreeFile([FileInfo] $FileInfo) {
         $this.Attributes     = $FileInfo.Attributes
         $this.Name           = $FileInfo.Name
         $this.FullName       = $FileInfo.FullName
@@ -212,22 +186,16 @@ class PSTreeFileInfo : PSTreeParent {
         $this.LastWriteTime  = $FileInfo.LastWriteTime
     }
 
-    static [PSTreeFileInfo[]]
-    GetFiles ([string]$Path, [int64]$Nesting, [bool]$Force)
-    {
-        $files = [PSTreeFileInfo[]][FileInfo[]][Directory]::GetFiles($Path)
-    
-        foreach($file in $files)
-        {
+    static [PSTreeFile[]] GetFiles ([string] $Path, [int64] $Nesting, [bool] $Force) {
+        $files = [PSTreeFile[]] [FileInfo[]] [Directory]::GetFiles($Path)
+
+        foreach($file in $files) {
             $file.Hierarchy = [PSTreeStatic]::Indent($file.Name, $Nesting)
             $file.Nesting   = $Nesting
         }
-        
-        if(-not $Force)
-        {
-            return $files.Where({
-                -not ($_.Attributes -band [FileAttributes]'Hidden, System')
-            })
+
+        if(-not $Force) {
+            return $files.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
         }
         return $files
     }
