@@ -24,7 +24,7 @@ $downloadDestination = Join-Path $PWD.Path -ChildPath tempPSTree
 $null = New-Item $downloadDestination -ItemType Directory -Force
 $downloadZip = Join-Path $downloadDestination -ChildPath "PSTree-main.zip"
 Write-Verbose "Downloading PSTree Module..."
-Invoke-WebRequest 'https://github.com/santysq/PSTree/archive/refs/heads/main-2.0.0.zip' -OutFile $downloadZip 4>$null
+Invoke-WebRequest 'https://github.com/santysq/PSTree/archive/refs/heads/main.zip' -OutFile $downloadZip 4>$null
 Write-Verbose "Download successful... Preparing to install..."
 Write-Verbose "Extracting..."
 Expand-Archive $downloadZip -DestinationPath $downloadDestination -Force -Verbose:$false
