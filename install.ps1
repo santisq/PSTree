@@ -5,11 +5,8 @@ $ProgressPreference = 'SilentlyContinue'
 Write-Verbose "Installing PSTree Module... Please wait a moment."
 Write-Verbose "PSTree default Scope is 'CurrentUser'.`n" 
 
-$installPath = (
-    "$HOME/.local/share/powershell/Modules",
-    "$HOME\Documents\PowerShell\Modules"
-)[$IsWindows]
-
+$installPath = $env:PSModulePath -split [System.IO.Path]::PathSeparator |
+Where-Object { $_ -match [regex]::Escape($HOME) } | Select-Object -First 1
 
 Write-Verbose "Module will be installed on:"
 Write-Verbose "$installPath`n"
@@ -23,55 +20,18 @@ if(-not(Test-Path $installPath))
     Write-Verbose "$($path.FullName)`n"
 }
 
-Write-Verbose "Checking dependencies..."
-
-$structure = @(
-    'DrawHierarchy.ps1',
-    'Get-FolderRecursive.ps1',
-    'Indent.ps1',
-    'SizeConvert.ps1' | ForEach-Object {
-        [System.IO.Path]::Combine('PSTree', 'private', $_)
-    }
-    
-    [System.IO.Path]::Combine(
-        'PSTree', 'public' , 'Get-PSTree.ps1'
-    )
-    [System.IO.Path]::Combine(
-        'PSTree', 'PSTree.psm1'
-    )
-    [System.IO.Path]::Combine(
-        'PSTree', 'PSTree.psd1'
-    )
-
-).ForEach({ Join-Path $PWD.Path -ChildPath $_ })
-
-$shouldDownload = foreach($file in $structure)
-{
-    if(-not (Test-Path $file))
-    {
-        $true
-        break
-    }
-}
-
-$sourcePath = Join-Path $PWD.Path -ChildPath PSTree
-
-if($shouldDownload)
-{
-    $download = Join-Path $PWD.Path -ChildPath "PSTree-main.zip"
-    Write-Verbose "Missing dependencies, attempting to download the module..."
-    Invoke-WebRequest 'https://github.com/santysq/PSTree/archive/refs/heads/main.zip' -OutFile $download 4>$null
-    Write-Verbose "Download successful... Preparing to install..."
-    Write-Verbose "Extracting..."
-    $expanded = Expand-Archive $download -DestinationPath $PWD.Path -Force -Verbose:$false -PassThru
-    $expanded = $expanded.Where({$_.Name -eq 'PSTree.psm1'}).Directory
-    Move-Item $expanded -Destination $PWD.Path -Force -Verbose:$false
-    Remove-Item $expanded.Parent -Force -Recurse -Confirm:$false -Verbose:$false
-}
-
+$downloadDestination = Join-Path $PWD.Path -ChildPath tempPSTree
+$null = New-Item $downloadDestination -ItemType Directory -Force
+$downloadZip = Join-Path $downloadDestination -ChildPath "PSTree-main.zip"
+Write-Verbose "Downloading PSTree Module..."
+Invoke-WebRequest 'https://github.com/santysq/PSTree/archive/refs/heads/main-2.0.0.zip' -OutFile $downloadZip 4>$null
+Write-Verbose "Download successful... Preparing to install..."
+Write-Verbose "Extracting..."
+Expand-Archive $downloadZip -DestinationPath $downloadDestination -Force -Verbose:$false
 Write-Verbose "Installing...`n"
-Copy-Item $sourcePath -Destination $installPath -Verbose:$false -Force -Recurse
-
+$modulePath = Get-ChildItem $downloadDestination -Filter PSTree -Directory -Recurse
+Copy-Item $modulePath.FullName -Destination $installPath -Verbose:$false -Force -Recurse
+Remove-Item $downloadDestination -Force -Recurse 4>$null
 Import-Module PSTree -Force | Out-Host
 Start-Sleep -Seconds 1
 Write-Verbose "Installation Completed. 'Get-PSTree' is now ready for use!"
