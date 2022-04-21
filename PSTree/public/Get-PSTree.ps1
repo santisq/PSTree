@@ -56,47 +56,46 @@ https://github.com/santysq/PSTree
 #>
 
 function Get-PSTree {
-[cmdletbinding(DefaultParameterSetName = 'Depth')]
-[alias('gpstree')]
-param(
-    [parameter(
-        Mandatory,
-        ParameterSetName = 'Path',
-        Position = 0
-    )]
-    [parameter(
-        Mandatory,
-        ParameterSetName = 'Depth',
-        Position = 0
-    )]
-    [parameter(
-        Mandatory,
-        ParameterSetName = 'Max',
-        Position = 0
-    )]
-    [alias('FullName', 'PSPath')]
-    [ValidateScript({ 
-        if(Test-Path $_ -PathType Container)
-        {
-            return $true
-        }
-        throw 'Invalid Folder Path'
-    })]
-    [string]$Path,
-    [ValidateRange(1, [int]::MaxValue)]
-    [parameter(
-        ParameterSetName = 'Depth',
-        Position = 1
-    )]
-    [int]$Depth = 3,
-    [parameter(
-        ParameterSetName = 'Max',
-        Position = 1
-    )]
-    [switch]$Deep,
-    [switch]$Force,
-    [switch]$Files
-)
+    [cmdletbinding(DefaultParameterSetName = 'Depth')]
+    [alias('gpstree')]
+    param(
+        [parameter(
+            Mandatory,
+            ParameterSetName = 'Path',
+            Position = 0
+        )]
+        [parameter(
+            Mandatory,
+            ParameterSetName = 'Depth',
+            Position = 0
+        )]
+        [parameter(
+            Mandatory,
+            ParameterSetName = 'Max',
+            Position = 0
+        )]
+        [alias('FullName', 'PSPath')]
+        [ValidateScript({
+            if(Test-Path $_ -PathType Container) {
+                return $true
+            }
+            throw 'Invalid Folder Path'
+        })]
+        [string] $Path,
+        [ValidateRange(1, [int]::MaxValue)]
+        [parameter(
+            ParameterSetName = 'Depth',
+            Position = 1
+        )]
+        [int] $Depth = 3,
+        [parameter(
+            ParameterSetName = 'Max',
+            Position = 1
+        )]
+        [switch] $Deep,
+        [switch] $Force,
+        [switch] $Files
+    )
 
     begin {
         $PSBoundParameters.Path = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($Path)
@@ -105,16 +104,38 @@ param(
     process {
         $isDepthParam = $PSCmdlet.ParameterSetName -eq 'Depth'
         $containsDepth = $PSBoundParameters.ContainsKey('Depth')
-        
-        if($isDepthParam -and -not $containsDepth)
-        {
+
+        if($isDepthParam -and -not $containsDepth) {
             $PSBoundParameters.Add('Depth', $Depth)
         }
 
-        [PSTreeStatic]::DrawHierarchy(
-            (Get-FolderRecursive @PSBoundParameters),
-            'Hierarchy',
-            'Nesting'
+        [PSTreeStatic]::DrawHierarchy(@(
+            $stack  = [System.Collections.Stack]::new()
+            $parent = [PSTreeParent]::new($Path)
+            $file   = $parent.GetFiles($Force.IsPresent)
+            $parent
+            if($Files.IsPresent) {
+                $file
+            }
+            $stack.Push($parent)
+
+            while($stack.Count) {
+                $next = $stack.Pop()
+                
+                if($next.Nesting -gt $Depth -and $PSBoundParameters.ContainsKey('Depth')) {
+                    break
+                }
+
+                foreach($folder in $next.GetFolders($Force.IsPresent)) {
+                    $folder
+                    $file = $folder.GetFiles($Force.IsPresent)
+                    if($Files.IsPresent) {
+                        $file
+                    }
+                    $stack.Push($folder)
+                }
+            }),
+            'Hierarchy', 'Nesting'
         )
     }
 }
