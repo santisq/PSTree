@@ -6,6 +6,10 @@ Cmdlet that intends to emulate the [`tree`](https://docs.microsoft.com/en-us/win
 ---
 ### CHANGELOG
 
+- __04/21/2022__
+    
+    - __PSTree Module__ now uses [`System.Collections.Stack`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.stack?view=net-6.0) instead of recursion, perfomance should be much better now and functionality remains the same. Special thanks to [IISResetMe](https://github.com/IISResetMe).
+
 - __01/02/2022__
     
     - __PSTree Module__ now has it's own classes, functionality remains the same however a lot has been improved.
