@@ -72,10 +72,10 @@ LastWriteTime  System.DateTime
 
 ### How to install?
 
-- [`install.ps1`](https://raw.githubusercontent.com/santysq/PSTree/main-2.0.0/install.ps1) can be used to download and install the Module automatically:
+- [`install.ps1`](https://github.com/santysq/PSTree/blob/main/install.ps1) can be used to download and install the Module automatically:
 
 ```
-Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main-2.0.0/install.ps1 | Invoke-Expression
+Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main/install.ps1 | Invoke-Expression
 ```
 
 - Alternatively, you can `git clone` or download the `.zip` and extract the `PSTree` folder to your [`$env:PSModulePath`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_psmodulepath?view=powershell-7.2).
