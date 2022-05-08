@@ -76,16 +76,16 @@ class PSTreeStatic {
         return $InputObject
     }
 
-    static [void] SetDefaultMembers ([object[]]$InputObject) {
+    static [void] SetDefaultMembers ([object[]] $InputObject) {
         $DefaultProps = @(
             'Attributes'
             'Hierarchy'
             'Size'
         )
 
-        [PSMemberInfo[]]$standardMembers = [PSPropertySet]::new(
+        [PSMemberInfo[]] $standardMembers = [PSPropertySet]::new(
             'DefaultDisplayPropertySet',
-            [string[]]$DefaultProps
+            [string[]] $DefaultProps
         )
 
         foreach($object in $InputObject) {
