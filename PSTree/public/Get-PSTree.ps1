@@ -18,26 +18,13 @@ Display hidden and system files and folders
 Files will be displayed in the Hierarchy tree
 
 .INPUTS
-String.
+String
 
 You can pipe a string that contains a path to Get-PSTree.
 Can take pipeline input from cmdlets that outputs System.IO.DirectoryInfo.
 
 .OUTPUTS
-Object.
-
-Name           TypeNameOfValue
-----           ---------------
-Attributes     System.IO.FileAttributes
-Hierarchy      System.String
-Size           System.String
-RawSize        System.Int64
-Name           System.String
-FullName       System.String
-Parent         System.IO.DirectoryInfo
-CreationTime   System.DateTime
-LastAccessTime System.DateTime
-LastWriteTime  System.DateTime
+Object[], PSTreeDirectory, PSTreeFile
 
 .EXAMPLE
 PS /> Get-PSTree .
@@ -59,21 +46,7 @@ function Get-PSTree {
     [cmdletbinding(DefaultParameterSetName = 'Depth')]
     [alias('gpstree')]
     param(
-        [parameter(
-            Mandatory,
-            ParameterSetName = 'Path',
-            Position = 0
-        )]
-        [parameter(
-            Mandatory,
-            ParameterSetName = 'Depth',
-            Position = 0
-        )]
-        [parameter(
-            Mandatory,
-            ParameterSetName = 'Max',
-            Position = 0
-        )]
+        [parameter(Mandatory, Position = 0, ValueFromPipeline)]
         [alias('FullName', 'PSPath')]
         [ValidateScript({
             if(Test-Path $_ -PathType Container) {
@@ -82,23 +55,26 @@ function Get-PSTree {
             throw 'Invalid Folder Path'
         })]
         [string] $Path,
+
         [ValidateRange(1, [int]::MaxValue)]
         [parameter(
             ParameterSetName = 'Depth',
             Position = 1
         )]
         [int] $Depth = 3,
+
         [parameter(
             ParameterSetName = 'Max',
             Position = 1
         )]
         [switch] $Deep,
+
         [switch] $Force,
         [switch] $Files
     )
 
     begin {
-        $PSBoundParameters.Path = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($Path)
+        $Path = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($Path)
     }
 
     process {
@@ -110,30 +86,40 @@ function Get-PSTree {
         }
 
         [PSTreeStatic]::DrawHierarchy(@(
-            $stack  = [System.Collections.Stack]::new()
-            $parent = [PSTreeParent]::new($Path)
-            $file   = $parent.GetFiles($Force.IsPresent)
-            $parent
-            if($Files.IsPresent) {
-                $file
-            }
-            $stack.Push($parent)
-
-            while($stack.Count) {
-                $next = $stack.Pop()
-                
-                if($next.Nesting -gt $Depth -and $PSBoundParameters.ContainsKey('Depth')) {
-                    break
+            try {
+                $stack  = [Collections.Generic.Stack[PSTreeDirectory]]::new()
+                $parent = [PSTreeDirectory] $Path
+                $file   = $parent.GetFiles($Force.IsPresent)
+                $parent
+                if($Files.IsPresent) {
+                    $file
                 }
+                $stack.Push($parent)
 
-                foreach($folder in $next.GetFolders($Force.IsPresent)) {
-                    $folder
-                    $file = $folder.GetFiles($Force.IsPresent)
-                    if($Files.IsPresent) {
-                        $file
+                while($stack.Count) {
+                    $next = $stack.Pop()
+
+                    if($next.Nesting -gt $Depth -and $PSBoundParameters.ContainsKey('Depth')) {
+                        break
                     }
-                    $stack.Push($folder)
+
+                    foreach($folder in $next.GetFolders($Force.IsPresent)) {
+                        $folder
+                        try {
+                            $file = $folder.GetFiles($Force.IsPresent)
+                            if($Files.IsPresent) {
+                                $file
+                            }
+                            $stack.Push($folder)
+                        }
+                        catch {
+                            $PSCmdlet.WriteError($_)
+                        }
+                    }
                 }
+            }
+            catch {
+                $PSCmdlet.WriteError($_)
             }),
             'Hierarchy', 'Nesting'
         )
