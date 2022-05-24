@@ -6,7 +6,8 @@ Write-Verbose "Installing PSTree Module... Please wait a moment."
 Write-Verbose "PSTree default Scope is 'CurrentUser'.`n" 
 
 $installPath = $env:PSModulePath -split [System.IO.Path]::PathSeparator |
-Where-Object { $_ -match [regex]::Escape($HOME) } | Select-Object -First 1
+    Where-Object { $_.StartsWith([Environment]::GetFolderPath('MyDocuments')) } |
+        Select-Object -First 1
 
 Write-Verbose "Module will be installed on:"
 Write-Verbose "$installPath`n"
@@ -39,4 +40,4 @@ Write-Verbose "Installation Completed. 'Get-PSTree' is now ready for use!"
 Get-PSTree $installPath -Depth 2 | Format-Table -AutoSize | Out-Host
 
 'Press any Key to continue...'
-$null = [console]::ReadKey()
+$Host.UI.ReadLine()
