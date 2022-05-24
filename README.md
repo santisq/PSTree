@@ -6,6 +6,10 @@ Cmdlet that intends to emulate the [`tree`](https://docs.microsoft.com/en-us/win
 ---
 ### CHANGELOG
 
+- __05/24/2022__
+
+    - Lots of code improvements have been done to the Module. Now uses [`System.IO.DirectoryInfo`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo?view=net-6.0) to get files and directories. Each `PSTreeDirectory` instance now holds an instance of `DirectoryInfo`. [`System.Collections.Stack`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.stack?view=net-6.0) has been changed for [`System.Collections.Generic.Stack<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.stack-1?view=net-6.0).
+
 - __04/21/2022__
     
     - __PSTree Module__ now uses [`System.Collections.Stack`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.stack?view=net-6.0) instead of recursion, perfomance should be much better now and functionality remains the same. Special thanks to [IISResetMe](https://github.com/IISResetMe).
@@ -52,19 +56,56 @@ Attributes Hierarchy                               Size
 
 ### OUTPUTS `Object[]`
 
+### `PSTreeDirectory` Class
+
 ```
-Name           TypeNameOfValue
-----           ---------------
-Attributes     System.IO.FileAttributes
-Hierarchy      System.String
-Size           System.String
-RawSize        System.Int64
-Name           System.String
-FullName       System.String
-Parent         System.IO.DirectoryInfo
-CreationTime   System.DateTime
-LastAccessTime System.DateTime
-LastWriteTime  System.DateTime
+   TypeName: PSTreeDirectory
+
+Name              MemberType Definition
+----              ---------- ----------
+PSStandardMembers MemberSet  PSStandardMembers {DefaultDisplayPropertySet}
+Equals            Method     bool Equals(System.Object obj)
+GetFiles          Method     PSTreeFile[] GetFiles(bool Force), PSTreeFile[] GetFiles(string Path, long Nesting, bool Force)
+GetFolders        Method     PSTreeDirectory[] GetFolders(bool Force), PSTreeDirectory[] GetFolders(string Path, long Nesting, bool Force)
+GetHashCode       Method     int GetHashCode()
+GetType           Method     type GetType()
+SetHierarchy      Method     void SetHierarchy()
+ToString          Method     string ToString()
+Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
+CreationTime      Property   datetime CreationTime {get;set;}
+FullName          Property   string FullName {get;set;}
+Hierarchy         Property   string Hierarchy {get;set;}
+IOInstance        Property   System.IO.DirectoryInfo IOInstance {get;set;}
+LastAccessTime    Property   datetime LastAccessTime {get;set;}
+LastWriteTime     Property   datetime LastWriteTime {get;set;}
+Name              Property   string Name {get;set;}
+Parent            Property   System.IO.DirectoryInfo Parent {get;set;}
+RawSize           Property   long RawSize {get;set;}
+Size              Property   string Size {get;set;}
+```
+
+### `PSTreeFile` Class
+
+```
+   TypeName: PSTreeFile
+
+Name              MemberType Definition
+----              ---------- ----------
+PSStandardMembers MemberSet  PSStandardMembers {DefaultDisplayPropertySet}
+Equals            Method     bool Equals(System.Object obj)
+GetHashCode       Method     int GetHashCode()
+GetType           Method     type GetType()
+ToString          Method     string ToString()
+Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
+CreationTime      Property   datetime CreationTime {get;set;}
+FullName          Property   string FullName {get;set;}
+Hierarchy         Property   string Hierarchy {get;set;}
+LastAccessTime    Property   datetime LastAccessTime {get;set;}
+LastWriteTime     Property   datetime LastWriteTime {get;set;}
+Name              Property   string Name {get;set;}
+Parent            Property   System.IO.DirectoryInfo Parent {get;set;}
+RawSize           Property   long RawSize {get;set;}
+Size              Property   string Size {get;set;}
 ```
 
 ### COMPATIBILITY
