@@ -99,7 +99,94 @@ class PSTreeStatic {
     }
 }
 
-class PSTreeParent {
+class PSTreeDirectory {
+    [FileAttributes] $Attributes
+    [string] $Hierarchy
+    [string] $Size
+    [int64] $RawSize
+    [string] $Name
+    [string] $FullName
+    [DirectoryInfo] $Parent
+    [datetime] $CreationTime
+    [datetime] $LastAccessTime
+    [datetime] $LastWriteTime
+    [DirectoryInfo] $IOInstance
+    hidden [int64] $Nesting
+
+    PSTreeDirectory() { }
+
+    PSTreeDirectory([string] $Path) {
+        $this.IOInstance     = $Path
+        $this.Attributes     = $this.IOInstance.Attributes
+        $this.Name           = $this.IOInstance.Name
+        $this.FullName       = $this.IOInstance.FullName
+        $this.Parent         = $this.IOInstance.Parent
+        $this.CreationTime   = $this.IOInstance.CreationTime
+        $this.LastAccessTime = $this.IOInstance.LastAccessTime
+        $this.LastWriteTime  = $this.IOInstance.LastWriteTime
+        $this.SetHierarchy()
+        [PSTreeStatic]::SetDefaultMembers($this)
+    }
+
+    PSTreeDirectory([DirectoryInfo] $DirectoryInfo) {
+        $this.Attributes     = $DirectoryInfo.Attributes
+        $this.Name           = $DirectoryInfo.Name
+        $this.FullName       = $DirectoryInfo.FullName
+        $this.Parent         = $DirectoryInfo.Parent
+        $this.CreationTime   = $DirectoryInfo.CreationTime
+        $this.LastAccessTime = $DirectoryInfo.LastAccessTime
+        $this.LastWriteTime  = $DirectoryInfo.LastWriteTime
+        $this.IOInstance     = $DirectoryInfo
+    }
+
+    [PSTreeDirectory[]] GetFolders ([bool] $Force) {
+        $folders = $this.GetFolders($this.FullName, $this.Nesting + 1, $Force)
+        [PSTreeStatic]::SetDefaultMembers($folders)
+        return $folders
+    }
+
+    [PSTreeDirectory[]] GetFolders ([string] $Path, [int64] $Nesting, [bool] $Force) {
+        $dirs = [PSTreeDirectory[]] $this.IOInstance.GetDirectories()
+
+        foreach($dir in $dirs) {
+            $dir.Hierarchy = [PSTreeStatic]::Indent($dir.Name, $Nesting)
+            $dir.Nesting   = $Nesting
+        }
+
+        if(-not $Force) {
+            return $dirs.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
+        }
+        return $dirs
+    }
+
+    [PSTreeFile[]] GetFiles ([bool] $Force) {
+        $files        = $this.GetFiles($this.FullName, $this.Nesting + 1, $Force)
+        $this.RawSize = [PSTreeStatic]::GetTotalSize($files.RawSize)
+        $this.Size    = [PSTreeStatic]::SizeConvert($this.RawSize)
+        [PSTreeStatic]::SetDefaultMembers($files)
+        return $files
+    }
+
+    [PSTreeFile[]] GetFiles ([string] $Path, [int64] $Nesting, [bool] $Force) {
+        $files = [PSTreeFile[]] $this.IOInstance.GetFiles()
+
+        foreach($file in $files) {
+            $file.Hierarchy = [PSTreeStatic]::Indent($file.Name, $Nesting)
+            $file.Nesting   = $Nesting
+        }
+
+        if(-not $Force) {
+            return $files.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
+        }
+        return $files
+    }
+
+    [void] SetHierarchy () {
+        $this.Hierarchy = [PSTreeStatic]::Indent($this.Name, $this.Nesting)
+    }
+}
+
+class PSTreeFile {
     [FileAttributes] $Attributes
     [string] $Hierarchy
     [string] $Size
@@ -112,69 +199,6 @@ class PSTreeParent {
     [datetime] $LastWriteTime
     hidden [int64] $Nesting
 
-    PSTreeParent() { }
-
-    PSTreeParent([DirectoryInfo] $Path) {
-        $this.Attributes     = $Path.Attributes
-        $this.Name           = $Path.Name
-        $this.FullName       = $Path.FullName
-        $this.Parent         = $Path.Parent
-        $this.CreationTime   = $Path.CreationTime
-        $this.LastAccessTime = $Path.LastAccessTime
-        $this.LastWriteTime  = $Path.LastWriteTime
-        $this.SetHierarchy()
-        [PSTreeStatic]::SetDefaultMembers($this)
-    }
-
-    [PSTreeDirectory[]] GetFolders ([bool] $Force)
-    {
-        $folders = [PSTreeDirectory]::GetFolders($this.FullName, $this.Nesting + 1, $Force)
-        [PSTreeStatic]::SetDefaultMembers($folders)
-        return $folders
-    }
-
-    [PSTreeFile[]] GetFiles ([bool] $Force) {
-        $files        = [PSTreeFile]::GetFiles($this.FullName, $this.Nesting + 1, $Force)
-        $this.RawSize = [PSTreeStatic]::GetTotalSize($files.RawSize)
-        $this.Size    = [PSTreeStatic]::SizeConvert($this.RawSize)
-        [PSTreeStatic]::SetDefaultMembers($files)
-        return $files
-    }
-
-    [void] SetHierarchy () {
-        $this.Hierarchy = [PSTreeStatic]::Indent($this.Name, $this.Nesting)
-    }
-}
-
-class PSTreeDirectory : PSTreeParent {
-
-    PSTreeDirectory([DirectoryInfo] $DirectoryInfo) {
-        $this.Attributes     = $DirectoryInfo.Attributes
-        $this.Name           = $DirectoryInfo.Name
-        $this.FullName       = $DirectoryInfo.FullName
-        $this.Parent         = $DirectoryInfo.Parent
-        $this.CreationTime   = $DirectoryInfo.CreationTime
-        $this.LastAccessTime = $DirectoryInfo.LastAccessTime
-        $this.LastWriteTime  = $DirectoryInfo.LastWriteTime
-    }
-
-    static [PSTreeDirectory[]] GetFolders ([string] $Path, [int64] $Nesting, [bool] $Force) {
-        $dirs = [PSTreeDirectory[]] [DirectoryInfo[]] [Directory]::GetDirectories($Path)
-
-        foreach($dir in $dirs) {
-            $dir.Hierarchy = [PSTreeStatic]::Indent($dir.Name, $Nesting)
-            $dir.Nesting   = $Nesting
-        }
-
-        if(-not $Force) {
-            return $dirs.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
-        }
-        return $dirs
-    }
-}
-
-class PSTreeFile : PSTreeParent {
-
     PSTreeFile([FileInfo] $FileInfo) {
         $this.Attributes     = $FileInfo.Attributes
         $this.Name           = $FileInfo.Name
@@ -184,19 +208,5 @@ class PSTreeFile : PSTreeParent {
         $this.CreationTime   = $FileInfo.CreationTime
         $this.LastAccessTime = $FileInfo.LastAccessTime
         $this.LastWriteTime  = $FileInfo.LastWriteTime
-    }
-
-    static [PSTreeFile[]] GetFiles ([string] $Path, [int64] $Nesting, [bool] $Force) {
-        $files = [PSTreeFile[]] [FileInfo[]] [Directory]::GetFiles($Path)
-
-        foreach($file in $files) {
-            $file.Hierarchy = [PSTreeStatic]::Indent($file.Name, $Nesting)
-            $file.Nesting   = $Nesting
-        }
-
-        if(-not $Force) {
-            return $files.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
-        }
-        return $files
     }
 }
