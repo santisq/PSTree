@@ -189,7 +189,7 @@ class PSTreeDirectory {
         return $files
     }
 
-    [void] SetHierarchy () {
+    hidden [void] SetHierarchy () {
         $this.Hierarchy = [PSTreeStatic]::Indent($this.Name, $this.Nesting)
     }
 }
