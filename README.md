@@ -58,19 +58,14 @@ Attributes Hierarchy                               Size
 
 ### `PSTreeDirectory` Class
 
+#### Properties
+
 ```
    TypeName: PSTreeDirectory
 
 Name              MemberType Definition
 ----              ---------- ----------
 PSStandardMembers MemberSet  PSStandardMembers {DefaultDisplayPropertySet}
-Equals            Method     bool Equals(System.Object obj)
-GetFiles          Method     PSTreeFile[] GetFiles(bool Force), PSTreeFile[] GetFiles(string Path, long Nesting, bool Force)
-GetFolders        Method     PSTreeDirectory[] GetFolders(bool Force), PSTreeDirectory[] GetFolders(string Path, long Nesting, bool Force)
-GetHashCode       Method     int GetHashCode()
-GetType           Method     type GetType()
-SetHierarchy      Method     void SetHierarchy()
-ToString          Method     string ToString()
 Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
 CreationTime      Property   datetime CreationTime {get;set;}
 FullName          Property   string FullName {get;set;}
@@ -84,7 +79,27 @@ RawSize           Property   long RawSize {get;set;}
 Size              Property   string Size {get;set;}
 ```
 
+#### Methods
+
+```
+TypeName   : PSTreeDirectory
+Name       : GetFiles
+MemberType : Method
+Definition : PSTreeFile[] GetFiles(),
+             PSTreeFile[] GetFiles(bool Force),
+             PSTreeFile[] GetFiles(string Path, long Nesting, bool Force)      
+
+TypeName   : PSTreeDirectory
+Name       : GetFolders
+MemberType : Method
+Definition : PSTreeDirectory[] GetFolders(),
+             PSTreeDirectory[] GetFolders(bool Force),
+             PSTreeDirectory[] GetFolders(string Path, long Nesting, bool Force)
+```
+
 ### `PSTreeFile` Class
+
+#### Properties
 
 ```
    TypeName: PSTreeFile
@@ -92,10 +107,6 @@ Size              Property   string Size {get;set;}
 Name              MemberType Definition
 ----              ---------- ----------
 PSStandardMembers MemberSet  PSStandardMembers {DefaultDisplayPropertySet}
-Equals            Method     bool Equals(System.Object obj)
-GetHashCode       Method     int GetHashCode()
-GetType           Method     type GetType()
-ToString          Method     string ToString()
 Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
 CreationTime      Property   datetime CreationTime {get;set;}
 FullName          Property   string FullName {get;set;}
