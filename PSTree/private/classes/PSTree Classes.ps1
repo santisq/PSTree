@@ -158,13 +158,7 @@ class PSTreeDirectory {
         }
 
         if(-not $Force) {
-            return $dirs | & {
-                process {
-                    if(-not $_.Attributes.HasFlag([FileAttributes]'Hidden, System')) {
-                        $_
-                    }
-                }
-            }
+            return $dirs.Where{ -not $_.Attributes.HasFlag([FileAttributes]'Hidden, System') }
         }
         return $dirs
     }
@@ -190,13 +184,7 @@ class PSTreeDirectory {
         }
 
         if(-not $Force) {
-            return $files | & {
-                process {
-                    if(-not $_.Attributes.HasFlag([FileAttributes]'Hidden, System')) {
-                        $_
-                    }
-                }
-            }
+            return $files.Where{ -not $_.Attributes.HasFlag([FileAttributes]'Hidden, System') }
         }
         return $files
     }
