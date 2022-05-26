@@ -139,6 +139,10 @@ class PSTreeDirectory {
         $this.IOInstance     = $DirectoryInfo
     }
 
+    [PSTreeDirectory[]] GetFolders () {
+        return $this.GetFolders($false)
+    }
+
     [PSTreeDirectory[]] GetFolders ([bool] $Force) {
         $folders = $this.GetFolders($this.FullName, $this.Nesting + 1, $Force)
         [PSTreeStatic]::SetDefaultMembers($folders)
@@ -154,9 +158,19 @@ class PSTreeDirectory {
         }
 
         if(-not $Force) {
-            return $dirs.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
+            return $dirs | & {
+                process {
+                    if(-not $_.Attributes.HasFlag([FileAttributes]'Hidden, System')) {
+                        $_
+                    }
+                }
+            }
         }
         return $dirs
+    }
+
+    [PSTreeFile[]] GetFiles () {
+        return $this.GetFiles($false)
     }
 
     [PSTreeFile[]] GetFiles ([bool] $Force) {
@@ -176,7 +190,13 @@ class PSTreeDirectory {
         }
 
         if(-not $Force) {
-            return $files.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
+            return $files | & {
+                process {
+                    if(-not $_.Attributes.HasFlag([FileAttributes]'Hidden, System')) {
+                        $_
+                    }
+                }
+            }
         }
         return $files
     }
