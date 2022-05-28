@@ -126,7 +126,7 @@ Size              Property   string Size {get;set;}
 
 - [`install.ps1`](https://github.com/santysq/PSTree/blob/main/install.ps1) can be used to download and install the Module automatically:
 
-```
+```powershell
 Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main/install.ps1 | Invoke-Expression
 ```
 
