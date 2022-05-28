@@ -60,7 +60,7 @@ Attributes Hierarchy                               Size
 
 #### Properties
 
-```
+```powershell
    TypeName: PSTreeDirectory
 
 Name              MemberType Definition
@@ -81,7 +81,7 @@ Size              Property   string Size {get;set;}
 
 #### Methods
 
-```
+```powershell
 TypeName   : PSTreeDirectory
 Name       : GetFiles
 MemberType : Method
@@ -101,7 +101,7 @@ Definition : PSTreeDirectory[] GetFolders(),
 
 #### Properties
 
-```
+```powershell
    TypeName: PSTreeFile
 
 Name              MemberType Definition
@@ -140,7 +140,7 @@ Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main/install.
 
 ---
 
-### Sample
+### Example
 
 ```
 PS /etc> $hierarchy = gpstree . -Depth 5 -EA 0
@@ -168,22 +168,4 @@ Directory, ReparsePoint │   │   └── user                     0 B
     ReadOnly, Directory ├── cron.weekly                      1.49 KB
     ReadOnly, Directory ├── cron.monthly                     313 B
     ReadOnly, Directory ├── pki                              0 B
-    
-PS /etc> $hierarchy[0] | Get-Member -MemberType Properties, MemberSet
-
-   TypeName: PSTreeParent
-
-Name              MemberType Definition
-----              ---------- ----------
-PSStandardMembers MemberSet  PSStandardMembers {DefaultDisplayPropertySet}
-Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
-CreationTime      Property   datetime CreationTime {get;set;}
-FullName          Property   string FullName {get;set;}
-Hierarchy         Property   string Hierarchy {get;set;}
-LastAccessTime    Property   datetime LastAccessTime {get;set;}
-LastWriteTime     Property   datetime LastWriteTime {get;set;}
-Name              Property   string Name {get;set;}
-Parent            Property   System.IO.DirectoryInfo Parent {get;set;}
-RawSize           Property   long RawSize {get;set;}
-Size              Property   string Size {get;set;}
 ```
