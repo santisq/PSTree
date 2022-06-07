@@ -11,16 +11,16 @@ Cmdlet that intends to emulate the [`tree`](https://docs.microsoft.com/en-us/win
     - Lots of code improvements have been done to the Module and improved error handling. Now uses the [`GetDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.getdirectories?view=net-6.0#system-io-directoryinfo-getdirectories) and [`GetFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.getfiles?view=net-6.0#system-io-directoryinfo-getfiles) methods from [`System.IO.DirectoryInfo`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo?view=net-6.0). Each `PSTreeDirectory` instance now holds an instance of `DirectoryInfo`. [`System.Collections.Stack`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.stack?view=net-6.0) has been changed for [`System.Collections.Generic.Stack<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.stack-1?view=net-6.0).
 
 - __04/21/2022__
-    
+
     - __PSTree Module__ now uses [`System.Collections.Stack`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.stack?view=net-6.0) instead of recursion, perfomance should be much better now and functionality remains the same. Special thanks to [IISResetMe](https://github.com/IISResetMe).
 
 - __01/02/2022__
-    
+
     - __PSTree Module__ now has it's own classes, functionality remains the same however a lot has been improved.
     - Recursion is now done using the static methods [`[System.IO.Directory]::GetDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getdirectories?view=net-6.0) and [`[System.IO.Directory]::GetFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-6.0) instead of [`Get-ChildItem`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem).
 
 ```
-PS /home/user/.local/share/powershell/Modules> gpstree . -Files -Deep 
+PS /home/user/.local/share/powershell/Modules> gpstree . -Files -Deep
 
 Attributes Hierarchy                               Size
 ---------- ---------                               ----
@@ -85,16 +85,12 @@ Size              Property   string Size {get;set;}
 TypeName   : PSTreeDirectory
 Name       : GetFiles
 MemberType : Method
-Definition : PSTreeFile[] GetFiles(),
-             PSTreeFile[] GetFiles(bool Force),
-             PSTreeFile[] GetFiles(string Path, long Nesting, bool Force)      
+Definition : PSTreeFile[] GetFiles(), PSTreeFile[] GetFiles(bool Force)
 
 TypeName   : PSTreeDirectory
 Name       : GetFolders
 MemberType : Method
-Definition : PSTreeDirectory[] GetFolders(),
-             PSTreeDirectory[] GetFolders(bool Force),
-             PSTreeDirectory[] GetFolders(string Path, long Nesting, bool Force)
+Definition : System.IO.DirectoryInfo[] GetFolders(), System.IO.DirectoryInfo[] GetFolders(bool Force)
 ```
 
 ### `PSTreeFile` Class

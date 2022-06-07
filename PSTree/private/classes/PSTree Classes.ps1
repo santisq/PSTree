@@ -143,11 +143,6 @@ class PSTreeDirectory {
     }
 
     [DirectoryInfo[]] GetFolders ([bool] $Force) {
-        return $this.GetFolders($this.FullName, $Force)
-
-    }
-
-    [DirectoryInfo[]] GetFolders ([string] $Path, [bool] $Force) {
         $dirs = $this.IOInstance.GetDirectories()
 
         if(-not $Force) {
@@ -161,20 +156,17 @@ class PSTreeDirectory {
     }
 
     [PSTreeFile[]] GetFiles ([bool] $Force) {
-        $files        = $this.GetFiles($this.FullName, $this.Nesting + 1, $Force)
+        $files = [PSTreeFile[]] $this.IOInstance.GetFiles()
+        $level = $this.Nesting + 1
+
+        foreach($file in $files) {
+            $file.Hierarchy = [PSTreeStatic]::Indent($file.Name, $level)
+            $file.Nesting   = $level
+        }
+
         $this.RawSize = [PSTreeStatic]::GetTotalSize($files.RawSize)
         $this.Size    = [PSTreeStatic]::SizeConvert($this.RawSize)
         [PSTreeStatic]::SetDefaultMembers($files)
-        return $files
-    }
-
-    [PSTreeFile[]] GetFiles ([string] $Path, [int64] $Nesting, [bool] $Force) {
-        $files = [PSTreeFile[]] $this.IOInstance.GetFiles()
-
-        foreach($file in $files) {
-            $file.Hierarchy = [PSTreeStatic]::Indent($file.Name, $Nesting)
-            $file.Nesting   = $Nesting
-        }
 
         if(-not $Force) {
             return $files.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
