@@ -87,34 +87,31 @@ function Get-PSTree {
 
         [PSTreeStatic]::DrawHierarchy(@(
             try {
-                $stack  = [Collections.Generic.Stack[PSTreeDirectory]]::new()
+                $stack  = [Stack[PSTreeDirectory]]::new()
                 $parent = [PSTreeDirectory] $Path
-                $file   = $parent.GetFiles($Force.IsPresent)
-                $parent
-                if($Files.IsPresent) {
-                    $file
-                }
                 $stack.Push($parent)
 
                 while($stack.Count) {
                     $next = $stack.Pop()
 
                     if($next.Nesting -gt $Depth -and $PSBoundParameters.ContainsKey('Depth')) {
-                        break
+                        continue
+                    }
+
+                    try {
+                        $file = $next.GetFiles($Force.IsPresent)
+                        $next
+
+                        if($Files.IsPresent) {
+                            $file
+                        }
+                    }
+                    catch {
+                        $PSCmdlet.WriteError($_)
                     }
 
                     foreach($folder in $next.GetFolders($Force.IsPresent)) {
-                        $folder
-                        try {
-                            $file = $folder.GetFiles($Force.IsPresent)
-                            if($Files.IsPresent) {
-                                $file
-                            }
-                            $stack.Push($folder)
-                        }
-                        catch {
-                            $PSCmdlet.WriteError($_)
-                        }
+                        $stack.Push([PSTreeDirectory]::new($folder, $next.Nesting + 1))
                     }
                 }
             }

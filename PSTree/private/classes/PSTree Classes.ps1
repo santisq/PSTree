@@ -5,14 +5,12 @@ using namespace System.Management.Automation
 using namespace System.Text
 
 class PSTreeStatic {
-    static [string] Indent ([string] $String, [object] $Indentation) {
+    static [string] Indent ([string] $String, [Int64] $Indentation) {
         $i = ' ' * 4
-        return [string]::Format(
-            "{0}$String", ($i * $Indentation)
-        )
+        return "$($i * $Indentation)$String"
     }
 
-    static [string] SizeConvert ([object] $Length) {
+    static [string] SizeConvert ([int64] $Length) {
         # Inspired from https://stackoverflow.com/a/40887001/15339544
 
         $suffix = "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"
@@ -22,8 +20,7 @@ class PSTreeStatic {
             $index++
         }
         return [string]::Format(
-            '{0} {1}',
-            [math]::Round($Length, 2), $suffix[$index]
+            '{0} {1}', [math]::Round($Length, 2), $suffix[$index]
         )
     }
 
@@ -115,7 +112,7 @@ class PSTreeDirectory {
 
     PSTreeDirectory() { }
 
-    PSTreeDirectory([string] $Path) {
+    PSTreeDirectory([object] $Path) {
         $this.IOInstance     = $Path
         $this.Attributes     = $this.IOInstance.Attributes
         $this.Name           = $this.IOInstance.Name
@@ -128,7 +125,8 @@ class PSTreeDirectory {
         [PSTreeStatic]::SetDefaultMembers($this)
     }
 
-    PSTreeDirectory([DirectoryInfo] $DirectoryInfo) {
+    PSTreeDirectory([DirectoryInfo] $DirectoryInfo, [int64] $Nesting) {
+        $this.IOInstance     = $DirectoryInfo
         $this.Attributes     = $DirectoryInfo.Attributes
         $this.Name           = $DirectoryInfo.Name
         $this.FullName       = $DirectoryInfo.FullName
@@ -136,29 +134,24 @@ class PSTreeDirectory {
         $this.CreationTime   = $DirectoryInfo.CreationTime
         $this.LastAccessTime = $DirectoryInfo.LastAccessTime
         $this.LastWriteTime  = $DirectoryInfo.LastWriteTime
-        $this.IOInstance     = $DirectoryInfo
+        $this.Nesting        = $Nesting
+        $this.SetHierarchy()
     }
 
-    [PSTreeDirectory[]] GetFolders () {
-        return $this.GetFolders($false)
+    [DirectoryInfo[]] GetFolders () {
+        return $this.GetFolders($this.FullName, $false)
     }
 
-    [PSTreeDirectory[]] GetFolders ([bool] $Force) {
-        $folders = $this.GetFolders($this.FullName, $this.Nesting + 1, $Force)
-        [PSTreeStatic]::SetDefaultMembers($folders)
-        return $folders
+    [DirectoryInfo[]] GetFolders ([bool] $Force) {
+        return $this.GetFolders($this.FullName, $Force)
+
     }
 
-    [PSTreeDirectory[]] GetFolders ([string] $Path, [int64] $Nesting, [bool] $Force) {
-        $dirs = [PSTreeDirectory[]] $this.IOInstance.GetDirectories()
-
-        foreach($dir in $dirs) {
-            $dir.Hierarchy = [PSTreeStatic]::Indent($dir.Name, $Nesting)
-            $dir.Nesting   = $Nesting
-        }
+    [DirectoryInfo[]] GetFolders ([string] $Path, [bool] $Force) {
+        $dirs = $this.IOInstance.GetDirectories()
 
         if(-not $Force) {
-            return $dirs.Where{ -not $_.Attributes.HasFlag([FileAttributes]'Hidden, System') }
+            return $dirs.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
         }
         return $dirs
     }
@@ -184,7 +177,7 @@ class PSTreeDirectory {
         }
 
         if(-not $Force) {
-            return $files.Where{ -not $_.Attributes.HasFlag([FileAttributes]'Hidden, System') }
+            return $files.Where{ -not ($_.Attributes -band [FileAttributes]'Hidden, System') }
         }
         return $files
     }
