@@ -8,7 +8,33 @@ Cmdlet that intends to emulate the [`tree`](https://docs.microsoft.com/en-us/win
 
 - __06/19/2022__
 
-    -
+    - Added [format view](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_format.ps1xml?view=powershell-7.2&viewFallbackFrom=powershell-6) for the Module - [`PSTree.Format.ps1xml`](https://github.com/santysq/PSTree/blob/main/PSTree/Format/PSTree.Format.ps1xml).
+    - The module now uses [`EnumerateFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.enumeratefiles?view=net-6.0#system-io-directoryinfo-enumeratefiles) and [`EnumerateDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.enumeratedirectories?view=net-6.0#system-io-directoryinfo-enumeratedirectories) instance methods.
+    - Improved error handling (a lot).
+    - `-Files` parameter has been replaced with `-Directory` parameter, now the module displays files by default.
+    - `-Deep` parameter has been replaced with `-Recurse` parameter, same functionality.
+    - `PSTreeDirectory` and `PSTreeFile` instances now only include 2 visible properties, `Hierarchy` and `Length`, the rest is done with format view.
+
+```
+PS /home/user/.local/share/powershell/Modules> gpstree . -Recurse
+
+Mode     Hierarchy                                                          Size
+----     ---------                                                          ----
+d----    PSTree                                                             11.5 KB
+-a---    ├── install.ps1                                                    1.82 KB
+-a---    ├── LICENSE                                                        1.07 KB
+-a---    ├── README.md                                                      8.61 KB
+d----    └── PSTree                                                         4.52 KB
+-a---        ├── PSTree.psd1                                                4.16 KB
+-a---        ├── PSTree.psm1                                                372 B
+d----        ├── public                                                     3.74 KB
+-a---        │   └── Get-PSTree.ps1                                         3.74 KB
+d----        ├── private                                                    0 B
+d----        │   └── classes                                                3.01 KB
+-a---        │       └── PSTree Classes.ps1                                 3.01 KB
+d----        └── Format                                                     1.81 KB
+-a---            └── PSTree.Format.ps1xml                                   1.81 KB
+```
 
 - __05/24/2022__
 
@@ -23,27 +49,11 @@ Cmdlet that intends to emulate the [`tree`](https://docs.microsoft.com/en-us/win
     - __PSTree Module__ now has it's own classes, functionality remains the same however a lot has been improved.
     - Recursion is now done using the static methods [`[System.IO.Directory]::GetDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getdirectories?view=net-6.0) and [`[System.IO.Directory]::GetFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-6.0) instead of [`Get-ChildItem`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem).
 
-```
-PS /home/user/.local/share/powershell/Modules> gpstree . -Files -Deep
-
-Attributes Hierarchy                               Size
----------- ---------                               ----
- Directory Modules                                 0 B
- Directory └── PSTree                              4.34 KB
-    Normal     ├── PSTree.psd1                     4 KB
-    Normal     ├── PSTree.psm1                     352 B
- Directory     ├── public                          1.44 KB
-    Normal     │   └── Get-PSTree.ps1              1.44 KB
- Directory     └── private                         0 B
- Directory         ├── classes                     6.91 KB
-    Normal         │   └── PSTree Classes.ps1      6.91 KB
- Directory         └── functions                   1012 B
-    Normal             └── Get-FolderRecursive.ps1 1012 B
-```
 - __12/25/2021__
 
     - `-Files` switch has been added to the Module, now you can display files in the hierarchy tree if desired.
     - `Type` property has been added to the output object and is now part of the _Default MemberSet_.
+
 ---
 
 
@@ -51,52 +61,32 @@ Attributes Hierarchy                               Size
 
 | Parameter Name | Description
 | --- | --- |
-| `-Path <string>` | Absolute or relative folder path. Alias: `FullName`, `PSPath` |
+| `-Path <string>` | Absolute or relative folder path. Alias: `FullName` |
 | `[-Depth <int>]` | Specifies the maximum level of recursion |
-| `[-Deep <switch>]` | Recursion until maximum level is reached |
+| `[-Recurse <switch>]` | Recursion until maximum level is reached |
 | `[-Force <switch>]` | Display hidden and system files and folders |
-| `[-Files <switch>]` | Files will be displayed in the Hierarchy tree |
+| `[-Directory <switch>]` | Display only Directories in the Hierarchy tree |
 | `[<CommonParameters>]` | See [`about_CommonParameters`](https://go.microsoft.com/fwlink/?LinkID=113216) |
 
 ### OUTPUTS `Object[]`
 
 ### `PSTreeDirectory` Class
 
-#### Properties
-
 ```powershell
    TypeName: PSTreeDirectory
 
-Name              MemberType Definition
-----              ---------- ----------
-PSStandardMembers MemberSet  PSStandardMembers {DefaultDisplayPropertySet}
-Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
-CreationTime      Property   datetime CreationTime {get;set;}
-FullName          Property   string FullName {get;set;}
-Hierarchy         Property   string Hierarchy {get;set;}
-IOInstance        Property   System.IO.DirectoryInfo IOInstance {get;set;}
-LastAccessTime    Property   datetime LastAccessTime {get;set;}
-LastWriteTime     Property   datetime LastWriteTime {get;set;}
-Name              Property   string Name {get;set;}
-Parent            Property   System.IO.DirectoryInfo Parent {get;set;}
-RawSize           Property   long RawSize {get;set;}
-Size              Property   string Size {get;set;}
+Name                     MemberType Definition
+----                     ---------- ----------
+EnumerateDirectories     Method     System.Collections.Generic.IEnumerable[System.IO.DirectoryInfo] EnumerateDirectories()
+EnumerateFiles           Method     System.Collections.Generic.IEnumerable[System.IO.FileInfo] EnumerateFiles()
+EnumerateFileSystemInfos Method     System.Collections.Generic.IEnumerable[System.IO.FileSystemInfo] EnumerateFileSystemInfos()
+Equals                   Method     bool Equals(System.Object obj)
+GetHashCode              Method     int GetHashCode()
+GetType                  Method     type GetType()
+ToString                 Method     string ToString()
+Hierarchy                Property   string Hierarchy {get;set;}
+Length                   Property   long Length {get;set;}
 ```
-
-#### Methods
-
-```powershell
-TypeName   : PSTreeDirectory
-Name       : GetFiles
-MemberType : Method
-Definition : PSTreeFile[] GetFiles(), PSTreeFile[] GetFiles(bool Force)
-
-TypeName   : PSTreeDirectory
-Name       : GetFolders
-MemberType : Method
-Definition : System.IO.DirectoryInfo[] GetFolders(), System.IO.DirectoryInfo[] GetFolders(bool Force)
-```
-
 ### `PSTreeFile` Class
 
 #### Properties
@@ -104,19 +94,14 @@ Definition : System.IO.DirectoryInfo[] GetFolders(), System.IO.DirectoryInfo[] G
 ```powershell
    TypeName: PSTreeFile
 
-Name              MemberType Definition
-----              ---------- ----------
-PSStandardMembers MemberSet  PSStandardMembers {DefaultDisplayPropertySet}
-Attributes        Property   System.IO.FileAttributes Attributes {get;set;}
-CreationTime      Property   datetime CreationTime {get;set;}
-FullName          Property   string FullName {get;set;}
-Hierarchy         Property   string Hierarchy {get;set;}
-LastAccessTime    Property   datetime LastAccessTime {get;set;}
-LastWriteTime     Property   datetime LastWriteTime {get;set;}
-Name              Property   string Name {get;set;}
-Parent            Property   System.IO.DirectoryInfo Parent {get;set;}
-RawSize           Property   long RawSize {get;set;}
-Size              Property   string Size {get;set;}
+Name        MemberType Definition
+----        ---------- ----------
+Equals      Method     bool Equals(System.Object obj)
+GetHashCode Method     int GetHashCode()
+GetType     Method     type GetType()
+ToString    Method     string ToString()
+Hierarchy   Property   string Hierarchy {get;set;}
+Length      Property   long Length {get;set;}
 ```
 
 ### COMPATIBILITY
@@ -136,36 +121,36 @@ Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main/install.
 
 - __`Get-PSTree .`__ Gets the hierarchy and folder size of the current directory using __default Depth (3)__.
 - __`Get-PSTree C:\users\user -Depth 10 -Force`__ Gets the hierarchy and folder size, including hidden ones, of the `user` directory  with a maximum of __10__ levels of recursion.
-- __`Get-PSTree /home/user -Deep`__ Gets the hierarchy and folder size of the `user` directory and all folders below.
+- __`Get-PSTree /home/user -Recurse`__ Gets the hierarchy and folder size of the `user` directory and all folders below.
 
 ---
 
 ### Example
 
 ```
-PS /etc> $hierarchy = gpstree . -Depth 5 -EA 0
-PS /etc> $hierarchy | Select-Object -First 20
+PS D:\> $tree = gpstree C:\Windows\System32\ -Directory -Depth 2 -EA 0
+PS D:\> $tree | Select-Object -First 20
 
-             Attributes Hierarchy                            Size
-             ---------- ---------                            ----
-    ReadOnly, Directory etc                                  294.45 KB
-    ReadOnly, Directory ├── netplan                          104 B
-    ReadOnly, Directory ├── libgda-5.0                       100 B
-    ReadOnly, Directory ├── dconf                            0 B
-    ReadOnly, Directory │   ├── profile                      28 B
-    ReadOnly, Directory │   └── db                           2.85 KB
-    ReadOnly, Directory │       └── ibus.d                   1.49 KB
-    ReadOnly, Directory ├── logrotate.d                      2.94 KB
-    ReadOnly, Directory ├── xdg                              832 B
-    ReadOnly, Directory │   ├── autostart                    27.1 KB
-    ReadOnly, Directory │   ├── tumbler                      2.22 KB
-    ReadOnly, Directory │   ├── menus                        15.54 KB
-    ReadOnly, Directory │   ├── systemd                      0 B
-Directory, ReparsePoint │   │   └── user                     0 B
-    ReadOnly, Directory │   │       ├── default.target.wants 40 B
-    ReadOnly, Directory │   │       └── sockets.target.wants 291 B
-    ReadOnly, Directory │   └── Xwayland-session.d           215 B
-    ReadOnly, Directory ├── cron.weekly                      1.49 KB
-    ReadOnly, Directory ├── cron.monthly                     313 B
-    ReadOnly, Directory ├── pki                              0 B
+Mode     Hierarchy                                                          Size
+----     ---------                                                          ----
+d----    System32                                                           2.1 GB
+d----    ├── zh-TW                                                          204.5 KB
+d----    ├── zh-CN                                                          234.49 KB
+d----    ├── winrm                                                          0 B
+d----    │   └── 0409                                                       100.12 KB
+d----    ├── WinMetadata                                                    6.13 MB
+d----    ├── winevt                                                         0 B
+d----    │   ├── TraceFormat                                                0 B
+d----    │   └── Logs                                                       261.52 MB
+d----    ├── WindowsPowerShell                                              0 B
+d----    │   └── v1.0                                                       1.73 MB
+d----    ├── WinBioPlugIns                                                  1.86 MB
+d----    │   ├── FaceDriver                                                 680.34 KB
+d----    │   └── en-US                                                      0 B
+d----    ├── WinBioDatabase                                                 1.12 KB
+d----    ├── WCN                                                            0 B
+d----    │   └── en-US                                                      0 B
+d----    ├── wbem                                                           66.35 MB
+d----    │   ├── xml                                                        99.87 KB
+d----    │   ├── tmf                                                        0 B
 ```

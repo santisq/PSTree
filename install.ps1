@@ -3,7 +3,7 @@ $VerbosePreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
 
 Write-Verbose "Installing PSTree Module... Please wait a moment."
-Write-Verbose "PSTree default Scope is 'CurrentUser'.`n" 
+Write-Verbose "PSTree default Scope is 'CurrentUser'.`n"
 
 $installPath = $env:PSModulePath -split [System.IO.Path]::PathSeparator |
     Where-Object { $_.StartsWith([Environment]::GetFolderPath('MyDocuments')) } |
@@ -12,10 +12,8 @@ $installPath = $env:PSModulePath -split [System.IO.Path]::PathSeparator |
 Write-Verbose "Module will be installed on:"
 Write-Verbose "$installPath`n"
 
-if(-not(Test-Path $installPath))
-{
+if(-not(Test-Path $installPath)) {
     Write-Verbose "Module folder could not be found. Creating it..."
-
     $path = New-Item $installPath -ItemType Directory -Force
     Write-Verbose "Module folder has been created:"
     Write-Verbose "$($path.FullName)`n"
