@@ -7,4 +7,4 @@ Get-ChildItem -LiteralPath $private -Filter *.ps1 -Recurse |
 Get-ChildItem -LiteralPath $public -Filter *.ps1 -Recurse |
     ForEach-Object { . $_.FullName }
 
-Export-ModuleMember -Function Get-PSTree -Alias gpstree
+# Export-ModuleMember -Function Get-PSTree -Alias gpstree

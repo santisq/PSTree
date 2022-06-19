@@ -1,3 +1,6 @@
+using namespace System.IO
+using namespace System.Collections.Generic
+
 <#
 .DESCRIPTION
 Cmdlet that intends to emulate the tree command and also calculate the folder's total size.
@@ -35,8 +38,12 @@ PS /> Get-PSTree C:\users\user -Depth 10 -Force
 Gets the hierarchy and folder size, including hidden ones, of the user directory with a maximum of 10 levels of recursion.
 
 .EXAMPLE
-PS /> Get-PSTree /home/user -Deep
+PS /> Get-PSTree /home/user -Recurse
 Gets the hierarchy and folder size of the user directory and all folders below.
+
+.EXAMPLE
+PS /> Get-PSTree /home/user -Recurse -Directory
+Gets the hierarchy (excluding files) and folder size of the user directory and all folders below.
 
 .LINK
 https://github.com/santysq/PSTree
@@ -47,7 +54,7 @@ function Get-PSTree {
     [alias('gpstree')]
     param(
         [parameter(Mandatory, Position = 0, ValueFromPipeline)]
-        [alias('FullName', 'PSPath')]
+        [alias('FullName')]
         [ValidateScript({
             if(Test-Path $_ -PathType Container) {
                 return $true
@@ -57,20 +64,17 @@ function Get-PSTree {
         [string] $Path,
 
         [ValidateRange(1, [int]::MaxValue)]
-        [parameter(
-            ParameterSetName = 'Depth',
-            Position = 1
-        )]
+        [parameter(ParameterSetName = 'Depth', Position = 1)]
         [int] $Depth = 3,
 
-        [parameter(
-            ParameterSetName = 'Max',
-            Position = 1
-        )]
-        [switch] $Deep,
+        [parameter(ParameterSetName = 'Max', Position = 1)]
+        [switch] $Recurse,
 
+        [parameter()]
         [switch] $Force,
-        [switch] $Files
+
+        [parameter()]
+        [switch] $Directory
     )
 
     begin {
@@ -78,47 +82,58 @@ function Get-PSTree {
     }
 
     process {
-        $isDepthParam = $PSCmdlet.ParameterSetName -eq 'Depth'
-        $containsDepth = $PSBoundParameters.ContainsKey('Depth')
+        $stack = [Stack[PSTreeDirectory]]::new()
+        $stack.Push([PSTreeDirectory]::new($Path, 0))
 
-        if($isDepthParam -and -not $containsDepth) {
-            $PSBoundParameters.Add('Depth', $Depth)
-        }
+        $output = while($stack.Count) {
+            $next  = $stack.Pop()
+            $level = $next.Depth + 1
+            $size  = 0
 
-        [PSTreeStatic]::DrawHierarchy(@(
+            if($PSBoundParameters.ContainsKey('Depth') -and $next.Depth -gt $Depth) {
+                continue
+            }
+
             try {
-                $stack  = [Stack[PSTreeDirectory]]::new()
-                $parent = [PSTreeDirectory] $Path
-                $stack.Push($parent)
-
-                while($stack.Count) {
-                    $next = $stack.Pop()
-
-                    if($next.Nesting -gt $Depth -and $PSBoundParameters.ContainsKey('Depth')) {
-                        continue
-                    }
-
-                    try {
-                        $file = $next.GetFiles($Force.IsPresent)
-                        $next
-
-                        if($Files.IsPresent) {
-                            $file
-                        }
-                    }
-                    catch {
-                        $PSCmdlet.WriteError($_)
-                    }
-
-                    foreach($folder in $next.GetFolders($Force.IsPresent)) {
-                        $stack.Push([PSTreeDirectory]::new($folder, $next.Nesting + 1))
-                    }
-                }
+                $enum = $next.EnumerateFiles()
             }
             catch {
                 $PSCmdlet.WriteError($_)
-            }),
-            'Hierarchy', 'Nesting'
-        )
+                continue
+            }
+
+            $files = foreach($file in $enum) {
+                $size += $file.Length
+                if($file.Attributes -band [FileAttributes]'Hidden, System' -and -not $Force.IsPresent) {
+                    continue
+                }
+                [PSTreeFile]::new($file, $level)
+
+            }
+
+            $next.Length = $size
+            $next
+
+            if(-not $Directory.IsPresent) {
+                $files
+            }
+
+            try {
+                $enum = $next.EnumerateDirectories()
+            }
+            catch {
+                $PSCmdlet.WriteError($_)
+                continue
+            }
+
+            foreach($folder in $enum) {
+                if($folder.Attributes -band [FileAttributes]'Hidden, System' -and -not $Force.IsPresent) {
+                    continue
+                }
+                $stack.Push([PSTreeDirectory]::new($folder, $level))
+            }
+        }
+        [PSTreeStatic]::DrawHierarchy($output, 'Hierarchy', 'Depth')
+        $output
     }
 }
