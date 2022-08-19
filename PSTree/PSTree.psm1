@@ -1,4 +1,4 @@
-$private = Join-Path $PSScriptRoot -ChildPath private
+﻿$private = Join-Path $PSScriptRoot -ChildPath private
 $public = Join-Path $PSScriptRoot -ChildPath public
 
 Get-ChildItem -LiteralPath $private -Filter *.ps1 -Recurse |
@@ -6,5 +6,3 @@ Get-ChildItem -LiteralPath $private -Filter *.ps1 -Recurse |
 
 Get-ChildItem -LiteralPath $public -Filter *.ps1 -Recurse |
     ForEach-Object { . $_.FullName }
-
-# Export-ModuleMember -Function Get-PSTree -Alias gpstree

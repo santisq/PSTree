@@ -1,4 +1,4 @@
-using namespace System.IO
+﻿using namespace System.IO
 using namespace System.Collections.Generic
 
 <#
@@ -95,20 +95,28 @@ function Get-PSTree {
             }
 
             try {
-                $enum = $next.EnumerateFiles()
+                $enum = $next.EnumerateFileSystemInfos()
             }
             catch {
                 $PSCmdlet.WriteError($_)
                 continue
             }
 
-            $files = foreach($file in $enum) {
-                $size += $file.Length
-                if($file.Attributes -band [FileAttributes]'Hidden, System' -and -not $Force.IsPresent) {
+            $files = foreach($item in $enum) {
+                if($item.Attributes -band [FileAttributes]'Hidden, System' -and -not $Force.IsPresent) {
+                    if($item -is [FileInfo]) {
+                        $size += $item.Length
+                    }
                     continue
                 }
-                [PSTreeFile]::new($file, $level)
 
+                if($item -is [FileInfo]) {
+                    $size += $item.Length
+                    [PSTreeFile]::new($item, $level)
+                    continue
+                }
+
+                $stack.Push([PSTreeDirectory]::new($item, $level))
             }
 
             $next.Length = $size
@@ -116,21 +124,6 @@ function Get-PSTree {
 
             if(-not $Directory.IsPresent) {
                 $files
-            }
-
-            try {
-                $enum = $next.EnumerateDirectories()
-            }
-            catch {
-                $PSCmdlet.WriteError($_)
-                continue
-            }
-
-            foreach($folder in $enum) {
-                if($folder.Attributes -band [FileAttributes]'Hidden, System' -and -not $Force.IsPresent) {
-                    continue
-                }
-                $stack.Push([PSTreeDirectory]::new($folder, $level))
             }
         }
         [PSTreeStatic]::DrawHierarchy($output, 'Hierarchy', 'Depth')

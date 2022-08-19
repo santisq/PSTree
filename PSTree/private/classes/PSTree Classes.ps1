@@ -1,27 +1,16 @@
-using namespace System.IO
+﻿using namespace System.IO
 using namespace System.Collections.Generic
 using namespace System.Text
 
 class PSTreeStatic {
     static [string] Indent ([string] $String, [Int64] $Indentation) {
-        $i = ' ' * 4
-        return "$($i * $Indentation)$String"
+        return "$('    ' * $Indentation)$String"
     }
 
     static [void] DrawHierarchy ([object[]] $InputObject, [string] $Property, [string] $Rec) {
-        # Had to do this because of Windows PowerShell Default Encoding
-        # Not good at enconding stuff, probably a better way. Sorry for the ugliness :(
-        $bytes = @(
-            '226','148','148'
-            '44','226','148'
-            '128','44','226'
-            '148','130','44'
-            '226','148','156'
-        )
+        $corner, $horizontal, $pipe, $connector = '└', '─', '│', '├'
 
-        $corner, $horizontal, $pipe, $connector = [Encoding]::UTF8.GetString($bytes).Split(',')
         $cornerConnector = "${corner}$(${horizontal}*2) "
-
         foreach($group in $InputObject | Group-Object $Rec | Select-Object -Skip 1) {
             foreach($item in $group.Group) {
                 $item.$Property = $item.$Property -replace '\s{4}(?=\S)', $cornerConnector

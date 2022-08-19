@@ -9,7 +9,7 @@ Cmdlet that intends to emulate the [`tree`](https://docs.microsoft.com/en-us/win
 - __06/19/2022__
 
     - Added [format view](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_format.ps1xml?view=powershell-7.2&viewFallbackFrom=powershell-6) for the Module - [`PSTree.Format.ps1xml`](https://github.com/santysq/PSTree/blob/main/PSTree/Format/PSTree.Format.ps1xml).
-    - The module now uses [`EnumerateFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.enumeratefiles?view=net-6.0#system-io-directoryinfo-enumeratefiles) and [`EnumerateDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.enumeratedirectories?view=net-6.0#system-io-directoryinfo-enumeratedirectories) instance methods.
+    - The module now uses [`EnumerateFileSystemInfos()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.enumeratefilesysteminfos?view=net-6.0#system-io-directoryinfo-enumeratefilesysteminfos) instance method.
     - Improved error handling (a lot).
     - `-Files` parameter has been replaced with `-Directory` parameter, now the module displays files by default.
     - `-Deep` parameter has been replaced with `-Recurse` parameter, same functionality.
