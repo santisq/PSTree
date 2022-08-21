@@ -1,6 +1,6 @@
-﻿$ErrorActionPreference = 'Stop'
-$VerbosePreference = 'Continue'
+﻿$VerbosePreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
+$ErrorActionPreference = 'Stop'
 
 Write-Verbose "Installing PSTree Module... Please wait a moment."
 Write-Verbose "PSTree default Scope is 'CurrentUser'.`n"
