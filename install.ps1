@@ -1,4 +1,4 @@
-﻿$VerbosePreference = 'Continue'
+$VerbosePreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
 $ErrorActionPreference = 'Stop'
 
