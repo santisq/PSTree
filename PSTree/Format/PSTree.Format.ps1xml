@@ -15,6 +15,7 @@
           </TableColumnHeader>
           <TableColumnHeader>
             <Label>Hierarchy</Label>
+            <Width>55</Width>
           </TableColumnHeader>
           <TableColumnHeader>
             <Label>Size</Label>
