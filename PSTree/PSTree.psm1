@@ -1,8 +1,7 @@
-﻿$private = Join-Path $PSScriptRoot -ChildPath private
-$public = Join-Path $PSScriptRoot -ChildPath public
+﻿Join-Path $PSScriptRoot -ChildPath 'private' |
+    Get-ChildItem -Filter *.ps1 -Recurse |
+        ForEach-Object { . $_.FullName }
 
-Get-ChildItem -LiteralPath $private -Filter *.ps1 -Recurse |
-    ForEach-Object { . $_.FullName }
-
-Get-ChildItem -LiteralPath $public -Filter *.ps1 -Recurse |
-    ForEach-Object { . $_.FullName }
+Join-Path $PSScriptRoot -ChildPath 'public' |
+    Get-ChildItem -Filter *.ps1 -Recurse |
+        ForEach-Object { . $_.FullName }

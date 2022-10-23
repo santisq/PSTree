@@ -1,13 +1,13 @@
 ﻿using namespace System.IO
-using namespace System.Collections.Generic
 using namespace System.Text
+using namespace System.Collections.Generic
 
 class PSTreeStatic {
     static [string] Indent ([string] $String, [Int64] $Indentation) {
         return "$('    ' * $Indentation)$String"
     }
 
-    static [void] DrawHierarchy ([object[]] $InputObject, [string] $Property, [string] $Rec) {
+    static [object[]] DrawHierarchy ([object[]] $InputObject, [string] $Property, [string] $Rec) {
         $corner, $horizontal, $pipe, $connector = '└', '─', '│', '├'
 
         $cornerConnector = "${corner}$(${horizontal}*2) "
@@ -24,17 +24,19 @@ class PSTreeStatic {
                 while($InputObject[$z].$Property[$index] -notmatch "$corner|\S") {
                     $replace = $InputObject[$z].$Property.ToCharArray()
                     $replace[$Index] = $pipe
-                    $InputObject[$z].$Property = -join $replace
+                    $InputObject[$z].$Property = [string]::new($replace)
                     $z--
                 }
 
                 if($InputObject[$z].$Property[$index] -eq $corner) {
                     $replace = $InputObject[$z].$Property.ToCharArray()
                     $replace[$Index] = $connector
-                    $InputObject[$z].$Property = -join $replace
+                    $InputObject[$z].$Property = [string]::new($replace)
                 }
             }
         }
+
+        return $InputObject
     }
 }
 
@@ -62,6 +64,31 @@ class PSTreeDirectory {
 
     [IEnumerable[FileInfo]] EnumerateFiles() {
         return $this.Instance.EnumerateFiles()
+    }
+
+    [string[]] GetParents([hashtable] $Index) {
+        $parent  = $this.Instance.Parent
+        $parents = while($parent -and $Index.ContainsKey($parent.FullName)) {
+            $parent.FullName
+            $parent = $parent.Parent
+        }
+        return $parents
+    }
+
+    [void] SetSize([Int64] $Length) {
+        $this.Length = $Length
+    }
+
+    [void] AddSize([Int64] $Length) {
+        $this.Length += $Length
+    }
+
+    [string] GetAbsolutePath() {
+        return $this.Instance.FullName
+    }
+
+    [FileAttributes] GetAttributes() {
+        return $this.Instance.Attributes
     }
 }
 

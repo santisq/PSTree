@@ -1,13 +1,38 @@
-# PSTree
+<h1 align="center">PSTree</h1>
 
-### DESCRIPTION
-Cmdlet that intends to emulate the [`tree`](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) command and also calculate the __folder's total size__.
+PowerShell function that intends to emulate the [`tree` command](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) with added functionality to calculate the __folders size__ as well as __recursive folders size__.
 
 ---
-### CHANGELOG
+## Changelog
+
+- __10/23/2022__
+    - __PSTree Module__ is now published to the [PowerShell Gallery](https://www.powershellgallery.com/)!
+    - Introducing `-RecursiveSize` switch parameter to `Get-PSTree`. By default, `Get-PSTree` only returns the size of folders __based on the sum of the files length in each Directory__.<br>
+    This parameter allows to calculate the recursive size of folders in the hierarchy, similar to how explorer does it. __It's important to note that this is a more expensive operation__, in order to calculate the recursive size, all folders in the hierarchy need to be traversed.
+
+```
+PS ..\PSTree> pstree -Directory -Depth 2
+
+Mode  Hierarchy          Size
+----  ---------          ----
+d---- PSTree          9.51 Kb
+d---- └── PSTree      4.83 Kb
+d----     ├── public   4.8 Kb
+d----     ├── private 0 Bytes
+d----     └── Format  1.83 Kb
+
+PS ..\PSTree> pstree -Directory -Depth 2 -RecursiveSize
+
+Mode  Hierarchy            Size
+----  ---------            ----
+d---- PSTree          180.38 Kb
+d---- └── PSTree       14.75 Kb
+d----     ├── public     4.8 Kb
+d----     ├── private   3.29 Kb
+d----     └── Format    1.83 Kb
+```
 
 - __06/19/2022__
-
     - Added [format view](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_format.ps1xml?view=powershell-7.2&viewFallbackFrom=powershell-6) for the Module - [`PSTree.Format.ps1xml`](https://github.com/santysq/PSTree/blob/main/PSTree/Format/PSTree.Format.ps1xml).
     - The module now uses [`EnumerateFileSystemInfos()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.enumeratefilesysteminfos?view=net-6.0#system-io-directoryinfo-enumeratefilesysteminfos) instance method.
     - Improved error handling (a lot).
@@ -16,24 +41,23 @@ Cmdlet that intends to emulate the [`tree`](https://docs.microsoft.com/en-us/win
     - `PSTreeDirectory` and `PSTreeFile` instances now only include 2 visible properties, `Hierarchy` and `Length`, the rest is done with format view.
 
 ```
-PS /home/user/.local/share/powershell/Modules> gpstree . -Recurse
+PS ..\PSTree> pstree -Recurse
 
-Mode     Hierarchy                                                          Size
-----     ---------                                                          ----
-d----    PSTree                                                             11.5 KB
--a---    ├── install.ps1                                                    1.82 KB
--a---    ├── LICENSE                                                        1.07 KB
--a---    ├── README.md                                                      8.61 KB
-d----    └── PSTree                                                         4.52 KB
--a---        ├── PSTree.psd1                                                4.16 KB
--a---        ├── PSTree.psm1                                                372 B
-d----        ├── public                                                     3.74 KB
--a---        │   └── Get-PSTree.ps1                                         3.74 KB
-d----        ├── private                                                    0 B
-d----        │   └── classes                                                3.01 KB
--a---        │       └── PSTree Classes.ps1                                 3.01 KB
-d----        └── Format                                                     1.81 KB
--a---            └── PSTree.Format.ps1xml                                   1.81 KB
+Mode  Hierarchy                             Size
+----  ---------                             ----
+d---- PSTree                            10.21 Kb
+-a--- ├── LICENSE                        1.07 Kb
+-a--- ├── README.md                      9.15 Kb
+d---- └── PSTree                         4.83 Kb
+-a---     ├── PSTree.psd1                4.57 Kb
+-a---     ├── PSTree.psm1              270 Bytes
+d----     ├── public                      4.8 Kb
+-a---     │   └── Get-PSTree.ps1          4.8 Kb
+d----     ├── private                    0 Bytes
+d----     │   └── classes                3.29 Kb
+-a---     │       └── classes.ps1        3.29 Kb
+d----     └── Format                     1.83 Kb
+-a---         └── PSTree.Format.ps1xml   1.83 Kb
 ```
 
 - __05/24/2022__
@@ -57,100 +81,110 @@ d----        └── Format                                                   
 ---
 
 
-### PARAMETER
+## Parameters
 
 | Parameter Name | Description
 | --- | --- |
-| `-Path <string>` | Absolute or relative folder path. Alias: `FullName` |
-| `[-Depth <int>]` | Specifies the maximum level of recursion |
-| `[-Recurse <switch>]` | Recursion until maximum level is reached |
-| `[-Force <switch>]` | Display hidden and system files and folders |
-| `[-Directory <switch>]` | Display only Directories in the Hierarchy tree |
+| `-Path <string>` | Absolute or relative Folder Path |
+| `[-Depth <int>]` | Controls the recursion limit |
+| `[-Recurse <switch>]` | Traverse all Directory hierarchy |
+| `[-Force <switch>]` | Displays hidden Files and Folders |
+| `[-Directory <switch>]` | Displays Folders only |
+| `[-RecursiveSize]` | Displays the recursive Folders Size |
 | `[<CommonParameters>]` | See [`about_CommonParameters`](https://go.microsoft.com/fwlink/?LinkID=113216) |
 
-### OUTPUTS `Object[]`
-
-### `PSTreeDirectory` Class
+## Installation
 
 ```powershell
-   TypeName: PSTreeDirectory
-
-Name                     MemberType Definition
-----                     ---------- ----------
-EnumerateDirectories     Method     System.Collections.Generic.IEnumerable[System.IO.DirectoryInfo] EnumerateDirectories()
-EnumerateFiles           Method     System.Collections.Generic.IEnumerable[System.IO.FileInfo] EnumerateFiles()
-EnumerateFileSystemInfos Method     System.Collections.Generic.IEnumerable[System.IO.FileSystemInfo] EnumerateFileSystemInfos()
-Equals                   Method     bool Equals(System.Object obj)
-GetHashCode              Method     int GetHashCode()
-GetType                  Method     type GetType()
-ToString                 Method     string ToString()
-Hierarchy                Property   string Hierarchy {get;set;}
-Length                   Property   long Length {get;set;}
-```
-### `PSTreeFile` Class
-
-#### Properties
-
-```powershell
-   TypeName: PSTreeFile
-
-Name        MemberType Definition
-----        ---------- ----------
-Equals      Method     bool Equals(System.Object obj)
-GetHashCode Method     int GetHashCode()
-GetType     Method     type GetType()
-ToString    Method     string ToString()
-Hierarchy   Property   string Hierarchy {get;set;}
-Length      Property   long Length {get;set;}
+Install-Module PSTree -Scope CurrentUser
 ```
 
-### COMPATIBILITY
-- Tested and compatible with __PowerShell v5.1__ and __PowerShell Core__.
+## Compatibility
 
-### How to install?
+- Tested and compatible with __PowerShell v5.1__ and __PowerShell Core 7+__.
 
-- [`install.ps1`](https://github.com/santysq/PSTree/blob/main/install.ps1) can be used to download and install the Module automatically:
+## Usage
 
-```powershell
-Invoke-RestMethod https://raw.githubusercontent.com/santysq/PSTree/main/install.ps1 | Invoke-Expression
-```
 
-- Alternatively, you can `git clone` or download the `.zip` and extract the `PSTree` folder to your [`$env:PSModulePath`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_psmodulepath?view=powershell-7.2).
-
-### How to use?
-
-- __`Get-PSTree .`__ Gets the hierarchy and folder size of the current directory using __default Depth (3)__.
-- __`Get-PSTree C:\users\user -Depth 10 -Force`__ Gets the hierarchy and folder size, including hidden ones, of the `user` directory  with a maximum of __10__ levels of recursion.
-- __`Get-PSTree /home/user -Recurse`__ Gets the hierarchy and folder size of the `user` directory and all folders below.
-
----
-
-### Example
+### Get hierarchy of the current Directory with default parameters (`-Depth 3`)
 
 ```
-PS D:\> $tree = gpstree C:\Windows\System32\ -Directory -Depth 2 -EA 0
-PS D:\> $tree | Select-Object -First 20
+PS ..\PSTree> Get-PSTree
 
-Mode     Hierarchy                                                          Size
-----     ---------                                                          ----
-d----    System32                                                           2.1 GB
-d----    ├── zh-TW                                                          204.5 KB
-d----    ├── zh-CN                                                          234.49 KB
-d----    ├── winrm                                                          0 B
-d----    │   └── 0409                                                       100.12 KB
-d----    ├── WinMetadata                                                    6.13 MB
-d----    ├── winevt                                                         0 B
-d----    │   ├── TraceFormat                                                0 B
-d----    │   └── Logs                                                       261.52 MB
-d----    ├── WindowsPowerShell                                              0 B
-d----    │   └── v1.0                                                       1.73 MB
-d----    ├── WinBioPlugIns                                                  1.86 MB
-d----    │   ├── FaceDriver                                                 680.34 KB
-d----    │   └── en-US                                                      0 B
-d----    ├── WinBioDatabase                                                 1.12 KB
-d----    ├── WCN                                                            0 B
-d----    │   └── en-US                                                      0 B
-d----    ├── wbem                                                           66.35 MB
-d----    │   ├── xml                                                        99.87 KB
-d----    │   ├── tmf                                                        0 B
+Mode  Hierarchy                             Size
+----  ---------                             ----
+d---- PSTree                             9.52 Kb
+-a--- ├── LICENSE                        1.07 Kb
+-a--- ├── README.md                      8.45 Kb
+d---- └── PSTree                         4.83 Kb
+-a---     ├── PSTree.psd1                4.57 Kb
+-a---     ├── PSTree.psm1              270 Bytes
+d----     ├── public                     5.96 Kb
+-a---     │   └── Get-PSTree.ps1         5.96 Kb
+d----     ├── private                    0 Bytes
+d----     │   └── classes                3.29 Kb
+-a---     │       └── classes.ps1        3.29 Kb
+d----     └── Format                     1.83 Kb
+-a---         └── PSTree.Format.ps1xml   1.83 Kb
+```
+
+### Get hierarchy of the current Directory recursively displaying only Folders
+
+```
+PS ..\PSTree> Get-PSTree -Directory -Recurse
+
+Mode  Hierarchy              Size
+----  ---------              ----
+d---- PSTree              9.52 Kb
+d---- └── PSTree          4.83 Kb
+d----     ├── public      5.72 Kb
+d----     ├── private     0 Bytes
+d----     │   └── classes 3.29 Kb
+d----     └── Format      1.83 Kb
+```
+
+### Get hierarchy of the current Directory 2 levels deep and displaying hidden Folders
+
+```
+PS ..\PSTree> Get-PSTree -Depth 2 -Force
+
+Mode  Hierarchy                   Size
+----  ---------                   ----
+d---- PSTree                   8.46 Kb
+-a--- ├── LICENSE              1.07 Kb
+-a--- ├── README.md             7.4 Kb
+d---- ├── PSTree               4.83 Kb
+-a--- │   ├── PSTree.psd1      4.57 Kb
+-a--- │   ├── PSTree.psm1    270 Bytes
+d---- │   ├── public           5.96 Kb
+d---- │   ├── private          0 Bytes
+d---- │   └── Format           1.83 Kb
+d--h- └── .git                 1.69 Kb
+-a---     ├── COMMIT_EDITMSG   2 Bytes
+-a---     ├── config         296 Bytes
+-a---     ├── description     73 Bytes
+-a---     ├── FETCH_HEAD     198 Bytes
+-a---     ├── HEAD            21 Bytes
+-a---     ├── index          926 Bytes
+-a---     ├── ORIG_HEAD       41 Bytes
+-a---     ├── packed-refs    177 Bytes
+d----     ├── refs             0 Bytes
+d----     ├── objects          0 Bytes
+d----     ├── logs              2.2 Kb
+d----     ├── info           240 Bytes
+d----     └── hooks           22.89 Kb
+```
+
+### Get hierarchy 2 levels deep displaying only Folders with their recursive size
+
+```
+PS ..\PSTree> Get-PSTree -Depth 2 -RecursiveSize -Directory
+
+Mode  Hierarchy            Size
+----  ---------            ----
+d---- PSTree          181.76 Kb
+d---- └── PSTree       15.91 Kb
+d----     ├── public    5.96 Kb
+d----     ├── private   3.29 Kb
+d----     └── Format    1.83 Kb
 ```

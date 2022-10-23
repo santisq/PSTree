@@ -11,13 +11,13 @@
         <TableHeaders>
           <TableColumnHeader>
             <Label>Mode</Label>
-            <Width>8</Width>
           </TableColumnHeader>
           <TableColumnHeader>
             <Label>Hierarchy</Label>
           </TableColumnHeader>
           <TableColumnHeader>
             <Label>Size</Label>
+            <Alignment>Right</Alignment>
           </TableColumnHeader>
         </TableHeaders>
         <TableRowEntries>
@@ -35,7 +35,7 @@
                 <ScriptBlock>
                     # Inspired from https://stackoverflow.com/a/40887001/15339544
 
-                    $suffix = "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"
+                    $suffix = "Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb"
                     $index  = 0
                     $length = [int64] $_.Length
 
