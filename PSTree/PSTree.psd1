@@ -11,7 +11,7 @@
     RootModule = 'PSTree.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.1.1'
+    ModuleVersion = '2.1.2'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
