@@ -36,49 +36,20 @@ Can take pipeline input from cmdlets that outputs System.IO.DirectoryInfo.
 Object[], PSTreeDirectory, PSTreeFile
 
 .EXAMPLE
-
-Get the hierarchy of the current Directory using default parameters (-Depth 3).
 Get-PSTree
-
-Mode  Hierarchy                             Size
-----  ---------                             ----
-d---- PSTree                             9.52 Kb
--a--- ├── LICENSE                        1.07 Kb
--a--- ├── README.md                      8.45 Kb
-d---- └── PSTree                         4.83 Kb
--a---     ├── PSTree.psd1                4.57 Kb
--a---     ├── PSTree.psm1              270 Bytes
-d----     ├── public                     4.91 Kb
--a---     │   └── Get-PSTree.ps1         4.91 Kb
-d----     ├── private                    0 Bytes
-d----     │   └── classes                3.29 Kb
--a---     │       └── classes.ps1        3.29 Kb
-d----     └── Format                     1.83 Kb
--a---         └── PSTree.Format.ps1xml   1.83 Kb
-
+Get hierarchy of the current Directory with default parameters (`-Depth 3`)
 
 .EXAMPLE
-Get the hierarchy of the current Directory displaying only Folders
-
-PS ..\PSTree> Get-PSTree -Directory
-
-Mode  Hierarchy              Size
-----  ---------              ----
-d---- PSTree              9.52 Kb
-d---- └── PSTree          4.83 Kb
-d----     ├── public      5.72 Kb
-d----     ├── private     0 Bytes
-d----     │   └── classes 3.29 Kb
-d----     └── Format      1.83 Kb
-
+Get-PSTree -Directory -Recurse
+Get hierarchy of the current Directory recursively displaying only Folders
 
 .EXAMPLE
-PS /> Get-PSTree /home/user -Recurse
-Gets the hierarchy and folder size of the user directory and all folders below.
+Get-PSTree -Depth 2 -Force
+Get hierarchy of the current Directory 2 levels deep and displaying hidden Folders
 
 .EXAMPLE
-PS /> Get-PSTree /home/user -Recurse -Directory
-Gets the hierarchy (excluding files) and folder size of the user directory and all folders below.
+Get hierarchy 2 levels deep displaying only Folders with their recursive size
+Get-PSTree -Depth 2 -RecursiveSize -Directory
 
 .LINK
 https://github.com/santysq/PSTree
