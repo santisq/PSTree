@@ -29,7 +29,7 @@
     Copyright = '(c) Santiago Squarzon. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description = 'tree like cmdlet for PowerShell'
+    Description = 'tree like function for PowerShell'
 
     # Minimum version of the PowerShell engine required by this module
     PowerShellVersion = '5.1'
@@ -96,10 +96,10 @@
             Tags = @('hierarchy', 'tree')
 
             # A URL to the license for this module.
-            LicenseUri = 'https://github.com/santysq/PSTree/blob/main/LICENSE'
+            LicenseUri = 'https://www.github.com/santysq/PSTree/blob/main/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/santysq/PSTree'
+            ProjectUri = 'https://www.github.com/santysq/PSTree'
 
             # A URL to an icon representing this module.
             # IconUri = ''
