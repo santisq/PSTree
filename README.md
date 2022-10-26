@@ -3,7 +3,7 @@
 PowerShell function that intends to emulate the [`tree` command](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) with added functionality to calculate the __folders size__ as well as __recursive folders size__.
 
 ---
-## Changelog
+## CHANGELOG
 
 - __10/23/2022__
     - __PSTree Module__ is now published to the [PowerShell Gallery](https://www.powershellgallery.com/)!
@@ -80,31 +80,131 @@ d----     └── Format                     1.83 Kb
 
 ---
 
-
-## Parameters
-
-| Parameter Name | Description
-| --- | --- |
-| `-Path <string>` | Absolute or relative Folder Path |
-| `[-Depth <int>]` | Controls the recursion limit |
-| `[-Recurse <switch>]` | Traverse all Directory hierarchy |
-| `[-Force <switch>]` | Displays hidden Files and Folders |
-| `[-Directory <switch>]` | Displays Folders only |
-| `[-RecursiveSize]` | Displays the recursive Folders Size |
-| `[<CommonParameters>]` | See [`about_CommonParameters`](https://go.microsoft.com/fwlink/?LinkID=113216) |
-
-## Installation
+## INSTALLATION
 
 ```powershell
 Install-Module PSTree -Scope CurrentUser
 ```
 
-## Compatibility
+## SYNTAX
 
-- Tested and compatible with __PowerShell v5.1__ and __PowerShell Core 7+__.
+### Depth (Default)
 
-## Usage
+```powershell
+Get-PSTree [[-Path] <String>] [[-Depth] <Int32>] [-Force] [-Directory] [-RecursiveSize] [<CommonParameters>]
+```
 
+### Recurse
+
+```powershell
+Get-PSTree [[-Path] <String>] [-Recurse] [-Force] [-Directory] [-RecursiveSize] [<CommonParameters>]
+```
+
+## PARAMETERS
+
+### -Path
+Absolute or relative folder path.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: FullName
+
+Required: False
+Position: 1
+Default value: $PWD
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
+### -Depth
+Controls the recursion limit
+
+```yaml
+Type: Int32
+Parameter Sets: Depth
+Aliases:
+
+Required: False
+Position: 2
+Default value: 3
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Recurse
+
+Traverse all Directory hierarchy
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: Recurse
+Aliases:
+
+Required: False
+Position: 2
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Force
+
+Displays hidden Files and Folders
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Directory
+
+Displays Folders only
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -RecursiveSize
+
+Displays the recursive Folders Size
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: False
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### CommonParameters
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+
+## REQUIREMENTS
+
+Compatible with __PowerShell v5.1__ and __PowerShell Core 7+__.
+
+## USAGE
 
 ### Get hierarchy of the current Directory with default parameters (`-Depth 3`)
 

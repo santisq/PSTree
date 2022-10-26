@@ -37,22 +37,26 @@ Object[], PSTreeDirectory, PSTreeFile
 
 .EXAMPLE
 Get-PSTree
+
 Get hierarchy of the current Directory with default parameters (`-Depth 3`)
 
 .EXAMPLE
 Get-PSTree -Directory -Recurse
+
 Get hierarchy of the current Directory recursively displaying only Folders
 
 .EXAMPLE
 Get-PSTree -Depth 2 -Force
+
 Get hierarchy of the current Directory 2 levels deep and displaying hidden Folders
 
 .EXAMPLE
-Get hierarchy 2 levels deep displaying only Folders with their recursive size
 Get-PSTree -Depth 2 -RecursiveSize -Directory
 
+Get hierarchy 2 levels deep displaying only Folders with their recursive size
+
 .LINK
-https://github.com/santysq/PSTree
+https://github.com/santisq/PSTree
 #>
 
 function Get-PSTree {
@@ -72,7 +76,7 @@ function Get-PSTree {
         [parameter(ParameterSetName = 'Depth', Position = 1)]
         [int] $Depth = 3,
 
-        [parameter(ParameterSetName = 'Max', Position = 1)]
+        [parameter(ParameterSetName = 'Recurse', Position = 1)]
         [switch] $Recurse,
 
         [parameter()]

@@ -11,7 +11,7 @@
     RootModule = 'PSTree.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.1.6'
+    ModuleVersion = '2.1.7'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -96,10 +96,10 @@
             Tags = @('hierarchy', 'tree')
 
             # A URL to the license for this module.
-            # LicenseUri = 'https://www.github.com/santysq/PSTree/blob/main/LICENSE'
+            LicenseUri = 'https://www.github.com/santisq/PSTree/blob/main/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://www.github.com/santysq/PSTree'
+            ProjectUri = 'https://www.github.com/santisq/PSTree'
 
             # A URL to an icon representing this module.
             # IconUri = ''
