@@ -24,13 +24,29 @@
         <TableRowEntry>
             <TableColumnItems>
             <TableColumnItem>
-              <PropertyName>Mode</PropertyName>
+                <ScriptBlock>
+                    return $_.Instance.Mode
+                </ScriptBlock>
             </TableColumnItem>
             <TableColumnItem>
-              <PropertyName>Hierarchy</PropertyName>
+                <PropertyName>Hierarchy</PropertyName>
             </TableColumnItem>
             <TableColumnItem>
-              <PropertyName>Size</PropertyName>
+                <ScriptBlock>
+                    # Inspired from https://stackoverflow.com/a/40887001/15339544
+
+                    $suffix = "Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb"
+                    $index  = 0
+                    $length = [int64] $_.Length
+
+                    while ($Length -ge 1kb) {
+                        $Length /= 1kb
+                        $index++
+                    }
+                    return [string]::Format(
+                        '{0} {1}', [math]::Round($Length, 2), $suffix[$index]
+                    )
+                </ScriptBlock>
             </TableColumnItem>
             </TableColumnItems>
         </TableRowEntry>

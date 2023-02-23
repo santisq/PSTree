@@ -3,11 +3,11 @@ using namespace System.Text
 using namespace System.Collections.Generic
 
 class PSTreeStatic {
-    static [string] Indent([string] $String, [Int64] $Indentation) {
+    static [string] Indent ([string] $String, [Int64] $Indentation) {
         return "$('    ' * $Indentation)$String"
     }
 
-    static [object[]] DrawTree([object[]] $InputObject, [string] $Property, [string] $Rec) {
+    static [object[]] DrawHierarchy ([object[]] $InputObject, [string] $Property, [string] $Rec) {
         $corner, $horizontal, $pipe, $connector = '└', '─', '│', '├'
 
         $cornerConnector = "${corner}$(${horizontal}*2) "
