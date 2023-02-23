@@ -4,133 +4,19 @@ PowerShell function that intends to emulate the [`tree` command](https://docs.mi
 
 ---
 
-## INSTALLATION
+## Installation
+
+The module is available through the [PowerShell Gallery](https://www.powershellgallery.com/packages/PSTree):
 
 ```powershell
 Install-Module PSTree -Scope CurrentUser
 ```
 
-## SYNTAX
+## Requirements
 
-### Depth (Default)
+Compatible with __Windows PowerShell v5.1__ and __PowerShell 7+__.
 
-```powershell
-Get-PSTree [[-LiteralPath] <String>] [[-Depth] <Int32>] [-Force] [-Directory] [-RecursiveSize] [<CommonParameters>]
-```
-
-### Recurse
-
-```powershell
-Get-PSTree [[-LiteralPath] <String>] [-Recurse] [-Force] [-Directory] [-RecursiveSize] [<CommonParameters>]
-```
-
-## PARAMETERS
-
-### -LiteralPath
-
-Absolute or relative folder path.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases: FullName
-
-Required: False
-Position: 1
-Default value: $PWD
-Accept pipeline input: True (ByValue)
-Accept wildcard characters: False
-```
-
-### -Depth
-
-Controls the recursion limit
-
-```yaml
-Type: Int32
-Parameter Sets: Depth
-Aliases:
-
-Required: False
-Position: 2
-Default value: 3
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Recurse
-
-Traverse all Directory hierarchy
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: Recurse
-Aliases:
-
-Required: False
-Position: 2
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Force
-
-Displays hidden Files and Folders
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -Directory
-
-Displays Folders only
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### -RecursiveSize
-
-Displays the recursive Folders Size
-
-```yaml
-Type: SwitchParameter
-Parameter Sets: (All)
-Aliases:
-
-Required: False
-Position: Named
-Default value: False
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
-### CommonParameters
-
-This cmdlet supports the common parameters. See [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
-
-## REQUIREMENTS
-
-__PowerShell v5.1__ or __PowerShell Core 7+__.
-
-## EXAMPLES
+## Examples
 
 ### Get hierarchy of the current Directory with default parameters (`-Depth 3`)
 
@@ -169,7 +55,7 @@ d----     │   └── classes 3.29 Kb
 d----     └── Format      1.83 Kb
 ```
 
-### Get hierarchy of the current Directory 2 levels deep and displaying hidden Folders
+### Get hierarchy of the current Directory 2 levels deep displaying hidden Folders
 
 ```
 PS ..\PSTree> Get-PSTree -Depth 2 -Force
@@ -214,3 +100,16 @@ d----     ├── public    5.96 Kb
 d----     ├── private   3.29 Kb
 d----     └── Format    1.83 Kb
 ```
+
+## Documentation
+
+See the [`Get-PSTree` doc](/docs/Get-PSTree.md) for parameter details and syntax.
+
+## Changelog
+
+- [CHANGELOG.md](CHANGELOG.md)
+- [Releases](https://github.com/santisq/PSTree/releases)
+
+## Contributing
+
+Contributions are more than welcome, if you wish to contribute, fork this repository and submit a pull request with the changes.

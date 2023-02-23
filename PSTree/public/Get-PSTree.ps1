@@ -8,7 +8,7 @@ using namespace System.Collections.Generic
     .DESCRIPTION
     PowerShell function that intends to emulate the tree command with added functionality to calculate the folders size as well as recursive folders size.
 
-    .PARAMETER Path
+    .PARAMETER LiteralPath
     Absolute or relative folder path.
 
     .PARAMETER Depth

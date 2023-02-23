@@ -1,5 +1,9 @@
 ## CHANGELOG
 
+- __02/23/2023__
+    - Fixed a bug that made `Get-PSTree` use `-Recurse` by default.
+    - Added [ETS properties](./PSTree/PSTree.Types.ps1xml) to `PSTreeDirectory` and `PSTreeFile` instances that would make exporting the output easier.
+
 - __10/23/2022__
     - __PSTree Module__ is now published to the [PowerShell Gallery](https://www.powershellgallery.com/)!
     - Introducing `-RecursiveSize` switch parameter to `Get-PSTree`. By default, `Get-PSTree` only returns the size of folders __based on the sum of the files length in each Directory__.<br>
