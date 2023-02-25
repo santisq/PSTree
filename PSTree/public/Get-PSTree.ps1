@@ -89,11 +89,16 @@ function Get-PSTree {
 
     process {
         try {
-            foreach($item in $PSCmdlet.InvokeProvider.Item.Get($LiteralPath, $Force.IsPresent, $true)) {
-                if($item -is [FileInfo]) {
-                    return [PSTreeFile]::new($item, 0)
-                }
+            $absolutePath = $PSCmdlet.GetUnresolvedProviderPathFromPSPath($LiteralPath)
+            if([File]::GetAttributes($absolutePath).HasFlag([FileAttributes]::Archive)) {
+                return [PSTreeFile]::new($absolutePath, 0)
+            }
 
+            if($absolutePath -ne [Path]::GetPathRoot($absolutePath)) {
+                $absolutePath = $absolutePath.TrimEnd([Path]::DirectorySeparatorChar)
+            }
+
+            foreach($item in $PSCmdlet.InvokeProvider.Item.Get($absolutePath, $Force.IsPresent, $true)) {
                 $indexer = @{}
                 $stack   = [Stack[PSTreeDirectory]]::new()
                 $stack.Push([PSTreeDirectory]::new($item, 0))
