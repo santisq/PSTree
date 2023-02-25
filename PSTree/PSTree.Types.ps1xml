@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+  <Type>
+    <Name>PSTreeDirectory</Name>
+    <Members>
+      <ScriptProperty>
+        <Name>Mode</Name>
+        <GetScriptBlock>
+          $this.Instance.Mode
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Size</Name>
+        <GetScriptBlock>
+          $suffix = "Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb"
+          $index  = 0
+          $Length = $this.Length
+
+          while($Length -ge 1kb) {
+              $Length /= 1kb
+              $index++
+          }
+
+          '{0} {1}' -f [math]::Round($Length, 2), $suffix[$index]
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Name</Name>
+        <GetScriptBlock>
+          $this.Instance.Name
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Parent</Name>
+        <GetScriptBlock>
+          $this.Instance.Parent
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Extension</Name>
+        <GetScriptBlock>
+          $this.Instance.Extension
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>CreationTime</Name>
+        <GetScriptBlock>
+          $this.Instance.CreationTime
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>CreationTimeUtc</Name>
+        <GetScriptBlock>
+          $this.Instance.CreationTimeUtc
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>LastAccessTime</Name>
+        <GetScriptBlock>
+          $this.Instance.LastAccessTime
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>LastAccessTimeUtc</Name>
+        <GetScriptBlock>
+          $this.Instance.LastAccessTimeUtc
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>LastWriteTime</Name>
+        <GetScriptBlock>
+          $this.Instance.LastWriteTime
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>LastWriteTimeUtc</Name>
+        <GetScriptBlock>
+          $this.Instance.LastWriteTimeUtc
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Attributes</Name>
+        <GetScriptBlock>
+          $this.Instance.Attributes
+        </GetScriptBlock>
+      </ScriptProperty>
+    </Members>
+  </Type>
+  <Type>
+    <Name>PSTreeFile</Name>
+    <Members>
+      <ScriptProperty>
+        <Name>Mode</Name>
+        <GetScriptBlock>
+          $this.Instance.Mode
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Size</Name>
+        <GetScriptBlock>
+          $suffix = "Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb"
+          $index  = 0
+          $Length = $this.Length
+
+          while($Length -ge 1kb) {
+              $Length /= 1kb
+              $index++
+          }
+
+          '{0} {1}' -f [math]::Round($Length, 2), $suffix[$index]
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Name</Name>
+        <GetScriptBlock>
+          $this.Instance.Name
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Directory</Name>
+        <GetScriptBlock>
+          $this.Instance.Directory
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Extension</Name>
+        <GetScriptBlock>
+          $this.Instance.Extension
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>CreationTime</Name>
+        <GetScriptBlock>
+          $this.Instance.CreationTime
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>CreationTimeUtc</Name>
+        <GetScriptBlock>
+          $this.Instance.CreationTimeUtc
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>LastAccessTime</Name>
+        <GetScriptBlock>
+          $this.Instance.LastAccessTime
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>LastAccessTimeUtc</Name>
+        <GetScriptBlock>
+          $this.Instance.LastAccessTimeUtc
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>LastWriteTime</Name>
+        <GetScriptBlock>
+          $this.Instance.LastWriteTime
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>LastWriteTimeUtc</Name>
+        <GetScriptBlock>
+          $this.Instance.LastWriteTimeUtc
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Attributes</Name>
+        <GetScriptBlock>
+          $this.Instance.Attributes
+        </GetScriptBlock>
+      </ScriptProperty>
+    </Members>
+  </Type>
+</Types>

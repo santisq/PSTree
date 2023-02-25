@@ -11,7 +11,7 @@
     RootModule = 'PSTree.psm1'
 
     # Version number of this module.
-    ModuleVersion = '2.1.7'
+    ModuleVersion = '2.1.8'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -59,7 +59,7 @@
     # ScriptsToProcess = @()
 
     # Type files (.ps1xml) to be loaded when importing this module
-    # TypesToProcess = @()
+    TypesToProcess = @('PSTree.Types.ps1xml')
 
     # Format files (.ps1xml) to be loaded when importing this module
     FormatsToProcess = @('PSTree.Format.ps1xml')
