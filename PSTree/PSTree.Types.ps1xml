@@ -37,12 +37,6 @@
         </GetScriptBlock>
       </ScriptProperty>
       <ScriptProperty>
-        <Name>FullName</Name>
-        <GetScriptBlock>
-          $this.Instance.FullName
-        </GetScriptBlock>
-      </ScriptProperty>
-      <ScriptProperty>
         <Name>Extension</Name>
         <GetScriptBlock>
           $this.Instance.Extension
@@ -82,6 +76,12 @@
         <Name>LastWriteTimeUtc</Name>
         <GetScriptBlock>
           $this.Instance.LastWriteTimeUtc
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Attributes</Name>
+        <GetScriptBlock>
+          $this.Instance.Attributes
         </GetScriptBlock>
       </ScriptProperty>
     </Members>
@@ -123,12 +123,6 @@
         </GetScriptBlock>
       </ScriptProperty>
       <ScriptProperty>
-        <Name>FullName</Name>
-        <GetScriptBlock>
-          $this.Instance.FullName
-        </GetScriptBlock>
-      </ScriptProperty>
-      <ScriptProperty>
         <Name>Extension</Name>
         <GetScriptBlock>
           $this.Instance.Extension
@@ -168,6 +162,12 @@
         <Name>LastWriteTimeUtc</Name>
         <GetScriptBlock>
           $this.Instance.LastWriteTimeUtc
+        </GetScriptBlock>
+      </ScriptProperty>
+      <ScriptProperty>
+        <Name>Attributes</Name>
+        <GetScriptBlock>
+          $this.Instance.Attributes
         </GetScriptBlock>
       </ScriptProperty>
     </Members>

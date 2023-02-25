@@ -43,6 +43,7 @@ class PSTreeStatic {
 class PSTreeDirectory {
     [string] $Hierarchy
     [int64] $Length
+    [string] $FullName
     hidden [DirectoryInfo] $Instance
     hidden [int64] $Depth
 
@@ -52,6 +53,7 @@ class PSTreeDirectory {
         $this.Instance  = $DirectoryInfo
         $this.Depth     = $Depth
         $this.Hierarchy = [PSTreeStatic]::Indent($DirectoryInfo.Name, $Depth)
+        $this.FullName  = $DirectoryInfo.FullName
     }
 
     [IEnumerable[FileSystemInfo]] EnumerateFileSystemInfos() {
@@ -66,9 +68,9 @@ class PSTreeDirectory {
         return $this.Instance.EnumerateFiles()
     }
 
-    [string[]] GetParents([hashtable] $Index) {
+    [string[]] GetParents([hashtable] $Map) {
         $parent  = $this.Instance.Parent
-        $parents = while($parent -and $Index.ContainsKey($parent.FullName)) {
+        $parents = while($parent -and $Map.ContainsKey($parent.FullName)) {
             $parent.FullName
             $parent = $parent.Parent
         }
@@ -83,18 +85,15 @@ class PSTreeDirectory {
         $this.Length += $Length
     }
 
-    [string] GetAbsolutePath() {
-        return $this.Instance.FullName
-    }
-
-    [FileAttributes] GetAttributes() {
-        return $this.Instance.Attributes
+    [bool] HasFlag([FileAttributes] $Flag) {
+        return $this.Instance.Attributes.HasFlag($Flag)
     }
 }
 
 class PSTreeFile {
     [string] $Hierarchy
     [int64] $Length
+    [string] $FullName
     hidden [FileInfo] $Instance
     hidden [int64] $Depth
 
@@ -103,5 +102,10 @@ class PSTreeFile {
         $this.Depth     = $Depth
         $this.Hierarchy = [PSTreeStatic]::Indent($FileInfo.Name, $Depth)
         $this.Length    = $FileInfo.Length
+        $this.FullName  = $FileInfo.FullName
+    }
+
+    [bool] HasFlag([FileAttributes] $Flag) {
+        return $this.Instance.Attributes.HasFlag($Flag)
     }
 }

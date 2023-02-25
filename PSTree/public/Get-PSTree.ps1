@@ -12,19 +12,19 @@ using namespace System.Collections.Generic
     Absolute or relative folder path.
 
     .PARAMETER Depth
-    Controls the recursion limit
+    Determines the number of subdirectory levels that are included in the recursion.
 
     .PARAMETER Recurse
-    Traverse all Directory hierarchy
+    Gets the items in the specified locations and in all child items of the locations.
 
     .PARAMETER Force
-    Displays hidden Files and Folders
+    Gets items that otherwise can't be accessed by the user, such as hidden or system files.
 
     .PARAMETER Directory
-    Displays Folders only
+    Displays Directories only.
 
     .PARAMETER RecursiveSize
-    Displays the recursive Folders Size
+    Displays the recursive Size of Folders.
 
     .INPUTS
     System.String
@@ -84,8 +84,7 @@ function Get-PSTree {
     )
 
     begin {
-        $withDepth = -not $Recurse.IsPresent
-        $hidden    = [FileAttributes] 'Hidden'
+        $isRecursive = $RecursiveSize.IsPresent -or $Recurse.IsPresent
     }
 
     process {
@@ -95,38 +94,38 @@ function Get-PSTree {
                     return [PSTreeFile]::new($item, 0)
                 }
 
-                $ignore  = [HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
                 $indexer = @{}
                 $stack   = [Stack[PSTreeDirectory]]::new()
                 $stack.Push([PSTreeDirectory]::new($item, 0))
 
-                $output = :outer while($stack.Count) {
+                $output = while($stack.Count) {
                     $next  = $stack.Pop()
                     $level = $next.Depth + 1
                     $size  = 0
-
-                    if(-not $RecursiveSize.IsPresent -and -not $Recurse.IsPresent -and $withDepth -and $next.Depth -gt $Depth) {
-                        continue
-                    }
 
                     try {
                         $enum = $next.EnumerateFileSystemInfos()
                     }
                     catch {
-                        $next
+                        if($Recurse.IsPresent -or $next.Depth -le $Depth) {
+                            $next
+                        }
+
                         $PSCmdlet.WriteError($_)
                         continue
                     }
 
-                    $files = foreach($item in $enum) {
+                    $keepProcessing = $isRecursive -or $level -le $Depth
+
+                    $items = foreach($item in $enum) {
+                        if(-not $Force.IsPresent -and $item.Attributes.HasFlag([FileAttributes]::Hidden)) {
+                            continue
+                        }
+
                         if($item -is [FileInfo]) {
                             $size += $item.Length
 
-                            if(-not $Force.IsPresent -and $item.Attributes.HasFlag($hidden)) {
-                                continue
-                            }
-
-                            if(-not $RecursiveSize.IsPresent -and -not $Recurse.IsPresent -and $withDepth -and $level -gt $Depth) {
+                            if($Directory.IsPresent) {
                                 continue
                             }
 
@@ -134,41 +133,26 @@ function Get-PSTree {
                             continue
                         }
 
-                        $stack.Push([PSTreeDirectory]::new($item, $level))
+                        if($keepProcessing) {
+                            $stack.Push([PSTreeDirectory]::new($item, $level))
+                        }
                     }
 
                     $next.SetSize($size)
-                    $absolutePath = $next.GetAbsolutePath()
-                    $indexer[$absolutePath] = $next
-                    $parents = $next.GetParents($indexer)
+                    $indexer[$next.FullName] = $next
 
                     if($RecursiveSize.IsPresent) {
-                        foreach($parent in $parents) {
+                        foreach($parent in $next.GetParents($indexer)) {
                             $indexer[$parent].AddSize($size)
                         }
                     }
 
-                    if($absolutePath -ne $LiteralPath) {
-                        if(-not $Force.IsPresent -and $next.GetAttributes().HasFlag($hidden)) {
-                            $null = $ignore.Add($absolutePath)
-                            continue
+                    if($Recurse.IsPresent -or $next.Depth -le $Depth) {
+                        $next
+
+                        if($items -and $Recurse.IsPresent -or $level -le $Depth) {
+                            $items
                         }
-                    }
-
-                    foreach($parent in $parents) {
-                        if($ignore.Contains($parent)) {
-                            continue outer
-                        }
-                    }
-
-                    if(-not $Recurse.IsPresent -and $next.Depth -gt $Depth) {
-                        continue
-                    }
-
-                    $next
-
-                    if(-not $Directory.IsPresent) {
-                        $files
                     }
                 }
 

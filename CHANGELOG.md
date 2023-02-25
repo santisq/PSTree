@@ -1,6 +1,6 @@
 ## CHANGELOG
 
-- __02/23/2023__
+- __02/25/2023__
     - Fixed a bug that made `Get-PSTree` use `-Recurse` by default.
     - Added [ETS properties](./PSTree/PSTree.Types.ps1xml) to `PSTreeDirectory` and `PSTreeFile` instances that would make exporting the output easier.
 

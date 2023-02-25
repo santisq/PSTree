@@ -32,7 +32,7 @@ Accept wildcard characters: False
 
 ### -Depth
 
-Controls the recursion limit
+Determines the number of subdirectory levels that are included in the recursion.
 
 ```yaml
 Type: Int32
@@ -48,7 +48,7 @@ Accept wildcard characters: False
 
 ### -Recurse
 
-Traverse all Directory hierarchy
+Gets the items in the specified locations and in all child items of the locations.
 
 ```yaml
 Type: SwitchParameter
@@ -64,7 +64,7 @@ Accept wildcard characters: False
 
 ### -Force
 
-Displays hidden Files and Folders
+Gets items that otherwise can't be accessed by the user, such as hidden or system files.
 
 ```yaml
 Type: SwitchParameter
@@ -80,7 +80,7 @@ Accept wildcard characters: False
 
 ### -Directory
 
-Displays Folders only
+Displays Directories only.
 
 ```yaml
 Type: SwitchParameter
@@ -96,7 +96,7 @@ Accept wildcard characters: False
 
 ### -RecursiveSize
 
-Displays the recursive Folders Size
+Displays the recursive Size of Folders.
 
 ```yaml
 Type: SwitchParameter
