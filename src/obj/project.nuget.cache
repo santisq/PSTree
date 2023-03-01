@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "7IyuAlcpFSwQARSUIv2QJh3uiIeerk8Wxyn2jCjooa3FSsYUJP53o603kOyKmxOaOZitIDaobwBnQG5VxXZ+3w==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Zen\\Documents\\pwsh\\PSTree\\src\\PSTree.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Zen\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.2\\microsoft.netframework.referenceassemblies.1.0.2.nupkg.sha512",
+    "C:\\Users\\Zen\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net472\\1.0.2\\microsoft.netframework.referenceassemblies.net472.1.0.2.nupkg.sha512",
+    "C:\\Users\\Zen\\.nuget\\packages\\powershellstandard.library\\5.1.0\\powershellstandard.library.5.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}
