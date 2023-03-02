@@ -13,7 +13,7 @@
                 "-NoExit",
                 "-NoProfile",
                 "-Command",
-                "Import-Module ./src/GetChildItemThingy.dll"
+                "Import-Module ./PSTree/PSTree.psd1"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

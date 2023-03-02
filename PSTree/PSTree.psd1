@@ -8,7 +8,7 @@
 
 @{
     # Script module or binary module file associated with this manifest.
-    RootModule = '/PSTree.psm1'
+    RootModule = 'PSTree.dll'
 
     # Version number of this module.
     ModuleVersion = '2.1.9'
@@ -68,16 +68,16 @@
     # NestedModules = @()
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = @('Get-PSTree')
+    FunctionsToExport = @()
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport = @()
+    CmdletsToExport = @('Get-PSTree')
 
     # Variables to export from this module
     VariablesToExport = @()
 
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport = @('gpstree', 'pstree')
+    AliasesToExport = @('pstree')
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()

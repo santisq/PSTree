@@ -1,0 +1,11 @@
+C:\Users\Zen\Documents\pwsh\PSTree\src\bin\release\net472\PSTree.dll
+C:\Users\Zen\Documents\pwsh\PSTree\src\bin\release\net472\PSTree.pdb
+C:\Users\Zen\Documents\pwsh\PSTree\src\bin\release\net472\System.Management.Automation.dll
+C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.csproj.AssemblyReference.cache
+C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.AssemblyInfoInputs.cache
+C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.AssemblyInfo.cs
+C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.csproj.CoreCompileInputs.cache
+C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.csproj.CopyComplete
+C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.dll
+C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.pdb

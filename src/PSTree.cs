@@ -22,38 +22,11 @@ internal static class PSTreeStatic
     // }
 }
 
-internal sealed class PSTreeFile
-{
-    internal readonly FileInfo _instance;
-
-    internal readonly int _depth;
-
-    public string Hierarchy { get; internal set; }
-
-    public long Length { get; internal set; }
-
-    public string FullName { get; }
-
-    internal PSTreeFile(FileInfo fileInfo, int depth)
-    {
-        _instance = fileInfo;
-        _depth    = depth;
-        Hierarchy = PSTreeStatic.Indent(fileInfo.Name, depth);
-        Length    = fileInfo.Length;
-        FullName  = fileInfo.FullName;
-    }
-
-    public bool HasFlag(FileAttributes flag)
-    {
-        return _instance.Attributes.HasFlag(flag);
-    }
-}
-
 internal sealed class PSTreeDirectory
 {
-    internal DirectoryInfo Instance;
+    internal DirectoryInfo Instance { get; }
 
-    internal int Depth;
+    internal int Depth { get; }
 
     public string Hierarchy { get; internal set; }
 
@@ -66,6 +39,13 @@ internal sealed class PSTreeDirectory
         Instance  = directoryInfo;
         Depth     = depth;
         Hierarchy = PSTreeStatic.Indent(directoryInfo.Name, depth);
+        FullName  = directoryInfo.FullName;
+    }
+
+    public PSTreeDirectory(DirectoryInfo directoryInfo)
+    {
+        Instance  = directoryInfo;
+        Hierarchy = directoryInfo.Name;
         FullName  = directoryInfo.FullName;
     }
 
@@ -100,8 +80,34 @@ internal sealed class PSTreeDirectory
     }
 }
 
-[CmdletBinding(DefaultParameterSetName = "Depth", PositionalBinding = false)]
-[Cmdlet(VerbsCommon.Get, "PSTree")]
+internal sealed class PSTreeFile
+{
+    internal FileInfo Instance { get; }
+
+    internal int Depth { get; }
+
+    public string Hierarchy { get; internal set; }
+
+    public long Length { get; internal set; }
+
+    public string FullName { get; }
+
+    internal PSTreeFile(FileInfo fileInfo, int depth)
+    {
+        Instance  = fileInfo;
+        Depth     = depth;
+        Hierarchy = PSTreeStatic.Indent(fileInfo.Name, depth);
+        Length    = fileInfo.Length;
+        FullName  = fileInfo.FullName;
+    }
+
+    public bool HasFlag(FileAttributes flag)
+    {
+        return Instance.Attributes.HasFlag(flag);
+    }
+}
+
+[Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Depth")]
 [Alias("pstree")]
 public sealed class PSTree : PSCmdlet
 {
@@ -109,22 +115,22 @@ public sealed class PSTree : PSCmdlet
 
     [Parameter(ValueFromPipeline = true, Position = 0)]
     [Alias("PSPath")]
-    public string LiteralPath { get; set; } = null!;
+    public string? LiteralPath { get; set; }
 
     [Parameter(ParameterSetName = "Depth")]
     public int Depth = 3;
 
     [Parameter(ParameterSetName = "Recurse")]
-    public SwitchParameter Recurse;
+    public SwitchParameter Recurse { get; set; }
 
     [Parameter]
-    public SwitchParameter Force;
+    public SwitchParameter Force { get; set; }
 
     [Parameter]
-    public SwitchParameter Directory;
+    public SwitchParameter Directory { get; set; }
 
     [Parameter]
-    public SwitchParameter RecursiveSize;
+    public SwitchParameter RecursiveSize { get; set; }
 
     protected override void BeginProcessing()
     {
@@ -133,25 +139,30 @@ public sealed class PSTree : PSCmdlet
 
     protected override void ProcessRecord()
     {
-        string absolutePath = GetUnresolvedProviderPathFromPSPath(LiteralPath);
+        string resolvedPath = GetUnresolvedProviderPathFromPSPath(LiteralPath);
 
         try
         {
-            if(!File.GetAttributes(LiteralPath).HasFlag(FileAttributes.Directory))
+            if(!File.GetAttributes(resolvedPath).HasFlag(FileAttributes.Directory))
             {
-                new PSTreeFile(new FileInfo(LiteralPath), 0);
+                new PSTreeFile(new FileInfo(resolvedPath), 0);
                 return;
             }
         }
-        catch(Exception e)
+        catch(Exception except)
         {
-            ThrowTerminatingError(new ErrorRecord(e, "PSTree.GetAttributes", ErrorCategory.NotSpecified, absolutePath));
+            ThrowTerminatingError(
+                new ErrorRecord(
+                    except,
+                    "PSTree.GetAttributes",
+                    ErrorCategory.NotSpecified,
+                    resolvedPath));
         }
 
         Dictionary<string, PSTreeDirectory> indexer = new();
         Stack<PSTreeDirectory> stack = new();
         List<PSTreeFile> files = new();
-        stack.Push(new PSTreeDirectory(new DirectoryInfo(absolutePath), 0));
+        stack.Push(new PSTreeDirectory(new DirectoryInfo(resolvedPath)));
 
         while(stack.Count > 0)
         {
@@ -217,13 +228,18 @@ public sealed class PSTree : PSCmdlet
             {
                 throw;
             }
-            catch(Exception e)
+            catch(Exception except)
             {
                 if(Recurse.IsPresent || next.Depth <= Depth) {
                     WriteObject(next);
                 }
 
-                WriteError(new ErrorRecord(e, "PSTree.Enumerate", ErrorCategory.NotSpecified, next));
+                WriteError(
+                    new ErrorRecord(
+                        except,
+                        "PSTree.Enumerate",
+                        ErrorCategory.NotSpecified,
+                        next));
             }
         }
     }
