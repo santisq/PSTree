@@ -442,11 +442,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Zen\\Documents\\pwsh\\PSTree\\src\\PSTree.csproj",
+      "projectUniqueName": "D:\\Zen\\Documents\\Scripts\\PSTree\\src\\PSTree.csproj",
       "projectName": "PSTree",
-      "projectPath": "C:\\Users\\Zen\\Documents\\pwsh\\PSTree\\src\\PSTree.csproj",
+      "projectPath": "D:\\Zen\\Documents\\Scripts\\PSTree\\src\\PSTree.csproj",
       "packagesPath": "C:\\Users\\Zen\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Zen\\Documents\\pwsh\\PSTree\\src\\obj\\",
+      "outputPath": "D:\\Zen\\Documents\\Scripts\\PSTree\\src\\obj\\",
       "projectStyle": "PackageReference",
       "crossTargeting": true,
       "configFilePaths": [
@@ -456,7 +456,8 @@
         "net472"
       ],
       "sources": {
-        "https://api.nuget.org/v3/index.json": {}
+        "https://api.nuget.org/v3/index.json": {},
+        "https://www.nuget.org/api/v2": {}
       },
       "frameworks": {
         "net472": {

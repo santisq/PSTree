@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
+using Microsoft.PowerShell.Commands;
 
 namespace PSTree;
 
@@ -22,37 +23,66 @@ internal static class PSTreeStatic
     // }
 }
 
-internal sealed class PSTreeDirectory
+public abstract class PSTreeFileSystemInfo<T>
+    where T : FileSystemInfo
 {
-    internal DirectoryInfo Instance { get; }
+    private PSObject? _pso;
 
-    internal int Depth { get; }
+    private PSObject InstancePso => _pso ??= PSObject.AsPSObject(Instance);
+
+    protected T Instance { get; }
+
+    internal int Depth { get; set; }
+
+    public string Mode => FileSystemProvider.Mode(InstancePso);
 
     public string Hierarchy { get; internal set; }
 
     public long Length { get; internal set; }
 
-    public string FullName { get; }
+    public string Name => Instance.Name;
 
-    internal PSTreeDirectory(DirectoryInfo directoryInfo, int depth)
+    public string FullName => Instance.FullName;
+
+    public string Extension => Instance.Extension;
+
+    public FileAttributes Attributes => Instance.Attributes;
+
+    public DateTime CreationTime => Instance.CreationTime;
+
+    public DateTime CreationTimeUtc => Instance.CreationTimeUtc;
+
+    public DateTime LastWriteTime => Instance.LastWriteTime;
+
+    public DateTime LastWriteTimeUtc => Instance.LastAccessTimeUtc;
+
+    public DateTime LastAccessTime => Instance.LastAccessTime;
+
+    public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
+
+    private protected PSTreeFileSystemInfo(T fileSystemInfo, int depth)
     {
-        Instance  = directoryInfo;
+        Instance  = fileSystemInfo;
         Depth     = depth;
-        Hierarchy = PSTreeStatic.Indent(directoryInfo.Name, depth);
-        FullName  = directoryInfo.FullName;
+        Hierarchy = PSTreeStatic.Indent(fileSystemInfo.Name, depth);
     }
 
-    public PSTreeDirectory(DirectoryInfo directoryInfo)
+    private protected PSTreeFileSystemInfo(T fileSystemInfo)
     {
-        Instance  = directoryInfo;
-        Hierarchy = directoryInfo.Name;
-        FullName  = directoryInfo.FullName;
+        Instance  = fileSystemInfo;
+        Hierarchy = fileSystemInfo.Name;
     }
 
-    public bool HasFlag(FileAttributes flag)
-    {
-        return Instance.Attributes.HasFlag(flag);
-    }
+    public bool HasFlag(FileAttributes flag) => Instance.Attributes.HasFlag(flag);
+}
+
+public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
+{
+    public DirectoryInfo Parent => Instance.Parent;
+
+    internal PSTreeDirectory(DirectoryInfo directoryInfo, int depth) : base(directoryInfo, depth) { }
+
+    internal PSTreeDirectory(DirectoryInfo directoryInfo) : base(directoryInfo) { }
 
     public IEnumerable<FileInfo> EnumerateFiles() =>
         Instance.EnumerateFiles();
@@ -80,30 +110,14 @@ internal sealed class PSTreeDirectory
     }
 }
 
-internal sealed class PSTreeFile
+public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
 {
-    internal FileInfo Instance { get; }
+    public DirectoryInfo Directory => Instance.Directory;
 
-    internal int Depth { get; }
+    public string DirectoryName => Instance.DirectoryName;
 
-    public string Hierarchy { get; internal set; }
-
-    public long Length { get; internal set; }
-
-    public string FullName { get; }
-
-    internal PSTreeFile(FileInfo fileInfo, int depth)
-    {
-        Instance  = fileInfo;
-        Depth     = depth;
-        Hierarchy = PSTreeStatic.Indent(fileInfo.Name, depth);
-        Length    = fileInfo.Length;
-        FullName  = fileInfo.FullName;
-    }
-
-    public bool HasFlag(FileAttributes flag)
-    {
-        return Instance.Attributes.HasFlag(flag);
+    internal PSTreeFile(FileInfo fileInfo, int depth) : base(fileInfo, depth) {
+        Length = fileInfo.Length;
     }
 }
 

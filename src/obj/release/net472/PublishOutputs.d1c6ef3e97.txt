@@ -1,0 +1,2 @@
+D:\Zen\Documents\Scripts\PSTree\PSTree\PSTree.dll
+D:\Zen\Documents\Scripts\PSTree\PSTree\PSTree.pdb

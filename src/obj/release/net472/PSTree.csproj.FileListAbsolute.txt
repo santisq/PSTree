@@ -9,3 +9,14 @@ C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.csproj.CoreComp
 C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.csproj.CopyComplete
 C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.dll
 C:\Users\Zen\Documents\pwsh\PSTree\src\obj\release\net472\PSTree.pdb
+D:\Zen\Documents\Scripts\PSTree\src\bin\Release\net472\PSTree.dll
+D:\Zen\Documents\Scripts\PSTree\src\bin\Release\net472\PSTree.pdb
+D:\Zen\Documents\Scripts\PSTree\src\bin\Release\net472\System.Management.Automation.dll
+D:\Zen\Documents\Scripts\PSTree\src\obj\Release\net472\PSTree.csproj.AssemblyReference.cache
+D:\Zen\Documents\Scripts\PSTree\src\obj\Release\net472\PSTree.GeneratedMSBuildEditorConfig.editorconfig
+D:\Zen\Documents\Scripts\PSTree\src\obj\Release\net472\PSTree.AssemblyInfoInputs.cache
+D:\Zen\Documents\Scripts\PSTree\src\obj\Release\net472\PSTree.AssemblyInfo.cs
+D:\Zen\Documents\Scripts\PSTree\src\obj\Release\net472\PSTree.csproj.CoreCompileInputs.cache
+D:\Zen\Documents\Scripts\PSTree\src\obj\Release\net472\PSTree.csproj.CopyComplete
+D:\Zen\Documents\Scripts\PSTree\src\obj\Release\net472\PSTree.dll
+D:\Zen\Documents\Scripts\PSTree\src\obj\Release\net472\PSTree.pdb

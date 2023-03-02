@@ -4,8 +4,8 @@
     <View>
       <Name>treeview</Name>
       <ViewSelectedBy>
-        <TypeName>PSTreeDirectory</TypeName>
-        <TypeName>PSTreeFile</TypeName>
+        <TypeName>PSTree.PSTreeDirectory</TypeName>
+        <TypeName>PSTree.PSTreeFile</TypeName>
       </ViewSelectedBy>
       <TableControl>
         <TableHeaders>
