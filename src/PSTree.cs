@@ -93,19 +93,14 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
     public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() =>
         Instance.EnumerateFileSystemInfos();
 
-    internal IEnumerable<string> GetParents(Dictionary<string, PSTreeDirectory> map)
+    public IEnumerable<string> GetParents()
     {
         int index = -1;
         string path = Instance.FullName;
 
         while((index = path.IndexOf(Path.DirectorySeparatorChar, index + 1)) != -1)
         {
-            string parent = path.Substring(0, index);
-
-            if(map.ContainsKey(parent))
-            {
-                yield return parent;
-            }
+            yield return path.Substring(0, index);
         }
     }
 }
@@ -221,9 +216,12 @@ public sealed class PSTree : PSCmdlet
 
                 if(RecursiveSize.IsPresent)
                 {
-                    foreach(string parent in next.GetParents(indexer))
+                    foreach(string parent in next.GetParents())
                     {
-                        indexer[parent].Length += size;
+                        if(indexer.ContainsKey(parent))
+                        {
+                            indexer[parent].Length += size;
+                        }
                     }
                 }
 
