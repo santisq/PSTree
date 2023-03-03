@@ -122,6 +122,8 @@ public sealed class PSTree : PSCmdlet
 {
     private bool _isRecursive;
 
+    private Dictionary<string, PSTreeDirectory> _indexer = null!;
+
     [Parameter(ValueFromPipeline = true, Position = 0)]
     [Alias("PSPath")]
     public string? LiteralPath { get; set; }
@@ -148,7 +150,7 @@ public sealed class PSTree : PSCmdlet
 
     protected override void ProcessRecord()
     {
-        string resolvedPath = GetUnresolvedProviderPathFromPSPath(LiteralPath);
+        string resolvedPath = LiteralPath ?? GetUnresolvedProviderPathFromPSPath(string.Empty);
 
         try
         {
@@ -168,9 +170,19 @@ public sealed class PSTree : PSCmdlet
                     resolvedPath));
         }
 
-        Dictionary<string, PSTreeDirectory> indexer = new();
+        if(resolvedPath != Path.GetPathRoot(resolvedPath))
+        {
+            resolvedPath = resolvedPath.TrimEnd(Path.DirectorySeparatorChar);
+        }
+
+        if(RecursiveSize.IsPresent)
+        {
+            _indexer = new();
+        }
+
         Stack<PSTreeDirectory> stack = new();
         List<PSTreeFile> files = new();
+
         stack.Push(new PSTreeDirectory(new DirectoryInfo(resolvedPath)));
 
         while(stack.Count > 0)
@@ -212,15 +224,16 @@ public sealed class PSTree : PSCmdlet
                 }
 
                 next.Length = size;
-                indexer[next.FullName] = next;
 
                 if(RecursiveSize.IsPresent)
                 {
+                    _indexer[next.FullName] = next;
+
                     foreach(string parent in next.GetParents())
                     {
-                        if(indexer.ContainsKey(parent))
+                        if(_indexer.ContainsKey(parent))
                         {
-                            indexer[parent].Length += size;
+                            _indexer[parent].Length += size;
                         }
                     }
                 }
