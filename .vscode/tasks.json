@@ -5,16 +5,11 @@
     "tasks": [
         {
             "label": "build",
-            "command": "dotnet",
+            "command": "pwsh",
             "type": "shell",
             "args": [
-                "publish",
-                "--framework",
-                "net472",
-                "-c",
-                "debug",
-                "-o",
-                "..\\PSTree\\"
+                "-File",
+                "${workspaceFolder}/build.ps1"
             ],
             "group": {
                 "kind": "build",
