@@ -152,13 +152,36 @@ public sealed class PSTree : PSCmdlet
     {
         string resolvedPath = LiteralPath ?? GetUnresolvedProviderPathFromPSPath(string.Empty);
 
+        if(resolvedPath != Path.GetPathRoot(resolvedPath))
+        {
+            resolvedPath = resolvedPath.TrimEnd(Path.DirectorySeparatorChar);
+        }
+
+        Stack<PSTreeDirectory> stack = new();
+        List<PSTreeFile> files = new();
+
         try
         {
-            if(!File.GetAttributes(resolvedPath).HasFlag(FileAttributes.Directory))
+            var item = InvokeProvider.Item.Get(new string[1] { resolvedPath }, true, true)[0];
+
+            if(item.BaseObject is not FileInfo && item.BaseObject is not DirectoryInfo)
             {
-                new PSTreeFile(new FileInfo(resolvedPath), 0);
+                ThrowTerminatingError(
+                    new ErrorRecord(
+                        new NotSupportedException("Not supported file system path."),
+                        "PStree.NotSupported",
+                        ErrorCategory.NotImplemented,
+                        resolvedPath
+                    ));
+            }
+
+            if(item.BaseObject is FileInfo file)
+            {
+                WriteObject(new PSTreeFile(file, 0));
                 return;
             }
+
+            stack.Push(new PSTreeDirectory((DirectoryInfo) item.BaseObject));
         }
         catch(Exception except)
         {
@@ -170,20 +193,10 @@ public sealed class PSTree : PSCmdlet
                     resolvedPath));
         }
 
-        if(resolvedPath != Path.GetPathRoot(resolvedPath))
-        {
-            resolvedPath = resolvedPath.TrimEnd(Path.DirectorySeparatorChar);
-        }
-
         if(RecursiveSize.IsPresent)
         {
             _indexer = new();
         }
-
-        Stack<PSTreeDirectory> stack = new();
-        List<PSTreeFile> files = new();
-
-        stack.Push(new PSTreeDirectory(new DirectoryInfo(resolvedPath)));
 
         while(stack.Count > 0)
         {
