@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
 using Microsoft.PowerShell.Commands;
+using System.Text.RegularExpressions;
 
 namespace PSTree;
 
@@ -13,17 +14,46 @@ internal static class PSTreeStatic
         return new string(' ', (4 * indentation) - 4) + "└── " + inputString;
     }
 
-    // internal static void DrawTree(object[] inputObject)
-    // {
-    //     char corner = '└';
-    //     char dash = '─';
-    //     char pipe = '│';
-    //     char lightVert = '├';
-    //     string cornerConnect = string.Concat(corner, dash, dash, ' ');
-    // }
+    internal static void DrawTree(List<PSTreeFileSystemInfo> inputObject)
+    {
+        Regex re = new(@"└|\S");
+
+        for(int i = 0; i < inputObject.Count; i++)
+        {
+            int index = inputObject[i].Hierarchy.IndexOf("└");
+
+            if(index >= 0)
+            {
+                int z = i - 1;
+                while(!re.IsMatch(inputObject[z].Hierarchy[index].ToString()))
+                {
+                    char[] replace = inputObject[z].Hierarchy.ToCharArray();
+                    replace[index] = '│';
+                    inputObject[z].Hierarchy = new string(replace);
+                    z--;
+                }
+
+                if(inputObject[z].Hierarchy[index] == '└')
+                {
+                    char[] replace = inputObject[z].Hierarchy.ToCharArray();
+                    replace[index] = '├';
+                    inputObject[z].Hierarchy = new string(replace);
+                }
+            }
+        }
+    }
 }
 
-public abstract class PSTreeFileSystemInfo<T>
+public abstract class PSTreeFileSystemInfo
+{
+    internal int Depth { get; set; }
+
+    public string? Hierarchy { get; set; } // internal set; } = null!;
+
+    public long Length { get; internal set; }
+}
+
+public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
     where T : FileSystemInfo
 {
     private PSObject? _pso;
@@ -32,15 +62,9 @@ public abstract class PSTreeFileSystemInfo<T>
 
     protected T Instance { get; }
 
-    internal int Depth { get; set; }
+    public string Name => Instance.Name;
 
     public string Mode => FileSystemProvider.Mode(InstancePso);
-
-    public string Hierarchy { get; internal set; }
-
-    public long Length { get; internal set; }
-
-    public string Name => Instance.Name;
 
     public string FullName => Instance.FullName;
 
@@ -159,6 +183,7 @@ public sealed class PSTree : PSCmdlet
 
         Stack<PSTreeDirectory> stack = new();
         List<PSTreeFile> files = new();
+        List<PSTreeFileSystemInfo> result = new();
 
         try
         {
@@ -253,11 +278,13 @@ public sealed class PSTree : PSCmdlet
 
                 if(Recurse.IsPresent || next.Depth <= Depth)
                 {
+                    // result.Add(next);
                     WriteObject(next);
 
                     if(files.Count > 0 && (Recurse.IsPresent || level <= Depth))
                     {
-                        WriteObject(files.ToArray(), true);
+                        // result.AddRange(files.ToArray());
+                        WriteObject(files, true);
                         files.Clear();
                     }
                 }
@@ -269,6 +296,7 @@ public sealed class PSTree : PSCmdlet
             catch(Exception except)
             {
                 if(Recurse.IsPresent || next.Depth <= Depth) {
+                    // result.Add(next);
                     WriteObject(next);
                 }
 
@@ -280,5 +308,8 @@ public sealed class PSTree : PSCmdlet
                         next));
             }
         }
+
+        // PSTreeStatic.DrawTree(result);
+        WriteObject(result.ToArray(), true);
     }
 }
