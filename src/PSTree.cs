@@ -20,7 +20,7 @@ internal static class PSTreeStatic
 
         for(int i = 0; i < inputObject.Count; i++)
         {
-            int index = inputObject[i].Hierarchy.IndexOf("└");
+            int index = inputObject[i].Hierarchy.IndexOf('└');
 
             if(index >= 0)
             {
@@ -48,7 +48,7 @@ public abstract class PSTreeFileSystemInfo
 {
     internal int Depth { get; set; }
 
-    public string? Hierarchy { get; set; } // internal set; } = null!;
+    public string Hierarchy { get; internal set; } = null!;
 
     public long Length { get; internal set; }
 }
@@ -213,7 +213,7 @@ public sealed class PSTree : PSCmdlet
             ThrowTerminatingError(
                 new ErrorRecord(
                     except,
-                    "PSTree.GetAttributes",
+                    "PSTree.GetItem",
                     ErrorCategory.NotSpecified,
                     resolvedPath));
         }
@@ -227,7 +227,7 @@ public sealed class PSTree : PSCmdlet
         {
             PSTreeDirectory next = stack.Pop();
             int level = next.Depth + 1;
-            long size  = 0;
+            long size = 0;
 
             try
             {
@@ -251,7 +251,11 @@ public sealed class PSTree : PSCmdlet
                             continue;
                         }
 
-                        files.Add(new PSTreeFile(file, level));
+                        if(Recurse.IsPresent || level <= Depth)
+                        {
+                            files.Add(new PSTreeFile(file, level));
+                        }
+
                         continue;
                     }
 
@@ -265,7 +269,7 @@ public sealed class PSTree : PSCmdlet
 
                 if(RecursiveSize.IsPresent)
                 {
-                    _indexer[next.FullName] = next;
+                    _indexer[next.FullName.TrimEnd(Path.DirectorySeparatorChar)] = next;
 
                     foreach(string parent in next.GetParents())
                     {
@@ -278,13 +282,11 @@ public sealed class PSTree : PSCmdlet
 
                 if(Recurse.IsPresent || next.Depth <= Depth)
                 {
-                    // result.Add(next);
-                    WriteObject(next);
+                    result.Add(next);
 
-                    if(files.Count > 0 && (Recurse.IsPresent || level <= Depth))
+                    if(files.Count > 0)
                     {
-                        // result.AddRange(files.ToArray());
-                        WriteObject(files, true);
+                        result.AddRange(files.ToArray());
                         files.Clear();
                     }
                 }
@@ -296,8 +298,7 @@ public sealed class PSTree : PSCmdlet
             catch(Exception except)
             {
                 if(Recurse.IsPresent || next.Depth <= Depth) {
-                    // result.Add(next);
-                    WriteObject(next);
+                    result.Add(next);
                 }
 
                 WriteError(
@@ -309,7 +310,7 @@ public sealed class PSTree : PSCmdlet
             }
         }
 
-        // PSTreeStatic.DrawTree(result);
+        PSTreeStatic.DrawTree(result);
         WriteObject(result.ToArray(), true);
     }
 }
