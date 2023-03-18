@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Management.Automation;
 using Microsoft.PowerShell.Commands;
 using System.Text.RegularExpressions;
@@ -11,15 +11,11 @@ internal static class PSTreeStatic
 {
     internal static string[] _suffix;
 
-    static PSTreeStatic()
-    {
+    static PSTreeStatic() =>
         _suffix = new string[] { "Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb" };
-    }
 
-    internal static string Indent(string inputString, int indentation)
-    {
-        return new string(' ', (4 * indentation) - 4) + "└── " + inputString;
-    }
+    internal static string Indent(string inputString, int indentation) =>
+        new string(' ', (4 * indentation) - 4) + "└── " + inputString;
 
     internal static void DrawTree(List<PSTreeFileSystemInfo> inputObject)
     {
@@ -116,10 +112,7 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
     }
 
     private protected PSTreeFileSystemInfo(T fileSystemInfo)
-        : base(fileSystemInfo.Name)
-    {
-        Instance  = fileSystemInfo;
-    }
+        : base(fileSystemInfo.Name) => Instance = fileSystemInfo;
 
     public bool HasFlag(FileAttributes flag) => Instance.Attributes.HasFlag(flag);
 }
@@ -161,9 +154,8 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
 
     public string DirectoryName => Instance.DirectoryName;
 
-    internal PSTreeFile(FileInfo fileInfo, int depth) : base(fileInfo, depth) {
+    internal PSTreeFile(FileInfo fileInfo, int depth) : base(fileInfo, depth) =>
         Length = fileInfo.Length;
-    }
 }
 
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Depth")]
