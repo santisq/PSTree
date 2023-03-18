@@ -56,7 +56,6 @@ internal static class PSTreeStatic
 
         return string.Format("{0} {1}", Math.Round(len, 2), suffix[index]);
     }
-
 }
 
 public abstract class PSTreeFileSystemInfo
