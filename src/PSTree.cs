@@ -9,6 +9,13 @@ namespace PSTree;
 
 internal static class PSTreeStatic
 {
+    internal static string[] _suffix;
+
+    static PSTreeStatic()
+    {
+        _suffix = new string[] { "Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb" };
+    }
+
     internal static string Indent(string inputString, int indentation)
     {
         return new string(' ', (4 * indentation) - 4) + "└── " + inputString;
@@ -45,8 +52,7 @@ internal static class PSTreeStatic
 
     internal static string FormatLength(long length)
     {
-        string[] suffix = new string[] { "Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb" };
-        int index  = 0;
+        int index = 0;
         double len = length;
 
         while(len >= 1024) {
@@ -54,7 +60,7 @@ internal static class PSTreeStatic
             index++;
         }
 
-        return string.Format("{0} {1}", Math.Round(len, 2), suffix[index]);
+        return string.Format("{0} {1}", Math.Round(len, 2), _suffix[index]);
     }
 }
 
