@@ -42,13 +42,30 @@ internal static class PSTreeStatic
             }
         }
     }
+
+    internal static string FormatLength(long length)
+    {
+        string[] suffix = new string[] { "Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb" };
+        int index  = 0;
+        double len = length;
+
+        while(len >= 1024) {
+            len /= 1024;
+            index++;
+        }
+
+        return string.Format("{0} {1}", Math.Round(len, 2), suffix[index]);
+    }
+
 }
 
 public abstract class PSTreeFileSystemInfo
 {
     internal int Depth { get; set; }
 
-    public string Hierarchy { get; internal set; } = null!;
+    public string Hierarchy { get; internal set; }
+
+    protected PSTreeFileSystemInfo(string hierarchy) => Hierarchy = hierarchy;
 
     public long Length { get; internal set; }
 }
@@ -65,6 +82,8 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
     public string Name => Instance.Name;
 
     public string Mode => FileSystemProvider.Mode(InstancePso);
+
+    public string Size => PSTreeStatic.FormatLength(Length);
 
     public string FullName => Instance.FullName;
 
@@ -85,16 +104,16 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
     public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
 
     private protected PSTreeFileSystemInfo(T fileSystemInfo, int depth)
+        : base(PSTreeStatic.Indent(fileSystemInfo.Name, depth))
     {
         Instance  = fileSystemInfo;
         Depth     = depth;
-        Hierarchy = PSTreeStatic.Indent(fileSystemInfo.Name, depth);
     }
 
     private protected PSTreeFileSystemInfo(T fileSystemInfo)
+        : base(fileSystemInfo.Name)
     {
         Instance  = fileSystemInfo;
-        Hierarchy = fileSystemInfo.Name;
     }
 
     public bool HasFlag(FileAttributes flag) => Instance.Attributes.HasFlag(flag);
@@ -104,9 +123,11 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 {
     public DirectoryInfo Parent => Instance.Parent;
 
-    internal PSTreeDirectory(DirectoryInfo directoryInfo, int depth) : base(directoryInfo, depth) { }
+    internal PSTreeDirectory(DirectoryInfo directoryInfo, int depth)
+        : base(directoryInfo, depth) { }
 
-    internal PSTreeDirectory(DirectoryInfo directoryInfo) : base(directoryInfo) { }
+    internal PSTreeDirectory(DirectoryInfo directoryInfo)
+        : base(directoryInfo) { }
 
     public IEnumerable<FileInfo> EnumerateFiles() =>
         Instance.EnumerateFiles();
@@ -147,7 +168,8 @@ public sealed class PSTree : PSCmdlet
 {
     private bool _isRecursive;
 
-    private Dictionary<string, PSTreeDirectory> _indexer = null!;
+    private Dictionary<string, PSTreeDirectory> _indexer = new();
+    private readonly List<PSTreeFile> _files = new();
 
     [Parameter(ValueFromPipeline = true, Position = 0)]
     [Alias("PSPath")]
@@ -183,7 +205,6 @@ public sealed class PSTree : PSCmdlet
         }
 
         Stack<PSTreeDirectory> stack = new();
-        List<PSTreeFile> files = new();
         List<PSTreeFileSystemInfo> result = new();
 
         try
@@ -254,7 +275,7 @@ public sealed class PSTree : PSCmdlet
 
                         if(Recurse.IsPresent || level <= Depth)
                         {
-                            files.Add(new PSTreeFile(file, level));
+                            _files.Add(new PSTreeFile(file, level));
                         }
 
                         continue;
@@ -285,10 +306,10 @@ public sealed class PSTree : PSCmdlet
                 {
                     result.Add(next);
 
-                    if(files.Count > 0)
+                    if(_files.Count > 0)
                     {
-                        result.AddRange(files.ToArray());
-                        files.Clear();
+                        result.AddRange(_files.ToArray());
+                        _files.Clear();
                     }
                 }
             }
@@ -313,5 +334,15 @@ public sealed class PSTree : PSCmdlet
 
         PSTreeStatic.DrawTree(result);
         WriteObject(result.ToArray(), true);
+
+        if(_indexer.Count > 0)
+        {
+            _indexer.Clear();
+        }
+
+        if(_files.Count > 0)
+        {
+            _files.Clear();
+        }
     }
 }
