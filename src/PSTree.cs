@@ -141,7 +141,8 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
 }
 
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Depth")]
-[Alias("pstree")]
+[OutputType(typeof(PSTreeDirectory))]
+[OutputType(typeof(PSTreeFile))]
 public sealed class PSTree : PSCmdlet
 {
     private bool _isRecursive;
