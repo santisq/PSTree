@@ -166,6 +166,7 @@ public sealed class PSTree : PSCmdlet
     private bool _isRecursive;
 
     private Dictionary<string, PSTreeDirectory> _indexer = new();
+
     private readonly List<PSTreeFile> _files = new();
 
     [Parameter(ValueFromPipeline = true, Position = 0)]
@@ -187,10 +188,8 @@ public sealed class PSTree : PSCmdlet
     [Parameter]
     public SwitchParameter RecursiveSize { get; set; }
 
-    protected override void BeginProcessing()
-    {
+    protected override void BeginProcessing() =>
         _isRecursive = RecursiveSize.IsPresent || Recurse.IsPresent;
-    }
 
     protected override void ProcessRecord()
     {
