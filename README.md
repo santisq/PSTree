@@ -1,8 +1,6 @@
 <h1 align="center">PSTree</h1>
 
-PowerShell function that intends to emulate the [`tree` command](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) with added functionality to calculate the __folders size__ as well as __recursive folders size__.
-
----
+`Get-PSTree` is a PowerShell cmdlet that intends to emulate the [`tree` command](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) with added functionality to calculate the __folders size__ as well as __recursive folders size__.
 
 ## Installation
 

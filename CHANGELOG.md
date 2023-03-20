@@ -6,7 +6,7 @@
 
 - __10/23/2022__
   - __PSTree Module__ is now published to the [PowerShell Gallery](https://www.powershellgallery.com/)!
-  - Introducing `-RecursiveSize` switch parameter to `Get-PSTree`. By default, `Get-PSTree` only returns the size of folders __based on the sum of the files length in each Directory__.
+  - Introducing `-RecursiveSize` switch parameter to `Get-PSTree`. By default, `Get-PSTree` only displays the size of folders __based on the sum of the files length in each Directory__.
   This parameter allows to calculate the recursive size of folders in the hierarchy, similar to how explorer does it. __It's important to note that this is a more expensive operation__, in order to calculate the recursive size, all folders in the hierarchy need to be traversed.
 
 ```none
