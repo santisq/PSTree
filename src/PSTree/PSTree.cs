@@ -165,6 +165,8 @@ public sealed class PSTree : PSCmdlet
 {
     private bool _isRecursive;
 
+    private bool _withExclude;
+
     private Dictionary<string, PSTreeDirectory> _indexer = new();
 
     private readonly List<PSTreeFile> _files = new();
@@ -188,8 +190,14 @@ public sealed class PSTree : PSCmdlet
     [Parameter]
     public SwitchParameter RecursiveSize { get; set; }
 
-    protected override void BeginProcessing() =>
+    [Parameter]
+    public ScriptBlock? Exclude { get; set; }
+
+    protected override void BeginProcessing()
+    {
         _isRecursive = RecursiveSize.IsPresent || Recurse.IsPresent;
+        _withExclude = MyInvocation.BoundParameters.ContainsKey("Exclude");
+    }
 
     protected override void ProcessRecord()
     {
@@ -258,6 +266,11 @@ public sealed class PSTree : PSCmdlet
                     if(!Force.IsPresent && item.Attributes.HasFlag(FileAttributes.Hidden))
                     {
                         continue;
+                    }
+
+                    if(_withExclude)
+                    {
+                        // to implement
                     }
 
                     if(item is FileInfo file)
