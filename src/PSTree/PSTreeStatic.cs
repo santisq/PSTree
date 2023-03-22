@@ -16,6 +16,8 @@ internal static class PSTreeStatic
 
     internal static void DrawTree(List<PSTreeFileSystemInfo> inputObject)
     {
+        // Well, I don't know what was I thinking when I wrote this, but it works :)
+
         Regex re = new(@"└|\S");
 
         for(int i = 0; i < inputObject.Count; i++)
