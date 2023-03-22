@@ -73,6 +73,10 @@ public sealed class PSTree : PSCmdlet
 
     protected override void ProcessRecord()
     {
+        _indexer.Clear();
+        _files.Clear();
+        _result.Clear();
+
         string resolvedPath = LiteralPath ?? GetUnresolvedProviderPathFromPSPath(string.Empty);
 
         if(resolvedPath != Path.GetPathRoot(resolvedPath))
@@ -197,9 +201,5 @@ public sealed class PSTree : PSCmdlet
 
         PSTreeStatic.DrawTree(_result);
         WriteObject(_result.ToArray(), true);
-
-        _indexer.Clear();
-        _files.Clear();
-        _result.Clear();
     }
 }
