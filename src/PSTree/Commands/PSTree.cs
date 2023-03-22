@@ -63,9 +63,9 @@ public sealed class PSTree : PSCmdlet
         if(Exclude is not null)
         {
             const WildcardOptions wpoptions =
-                WildcardOptions.Compiled |
-                WildcardOptions.CultureInvariant |
-                WildcardOptions.IgnoreCase;
+                WildcardOptions.Compiled
+                | WildcardOptions.CultureInvariant
+                | WildcardOptions.IgnoreCase;
 
             _excludePatterns = Exclude.Select(e => new WildcardPattern(e, wpoptions)).ToArray();
         }
