@@ -9,7 +9,7 @@
             "type": "shell",
             "args": [
                 "-File",
-                "${workspaceFolder}/build.ps1"
+                "${workspaceFolder}/compile.ps1"
             ],
             "group": {
                 "kind": "build",

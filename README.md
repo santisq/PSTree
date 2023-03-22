@@ -14,46 +14,74 @@ Install-Module PSTree -Scope CurrentUser
 
 Compatible with __Windows PowerShell v5.1__ and __PowerShell 7+__.
 
-## Examples
+## Usage
 
-### Get hierarchy of the current Directory with default parameters (`-Depth 3`)
+### Get the hierarchy of the current Directory with default parameters values
 
-```
+```powershell
 PS ..\PSTree> Get-PSTree
 
 Mode  Hierarchy                             Size
 ----  ---------                             ----
-d---- PSTree                             9.52 Kb
+d---- PSTree                            21.65 Kb
+-a--- ├── .gitignore                   101 Bytes
+-a--- ├── build.ps1                      2.32 Kb
+-a--- ├── CHANGELOG.md                   5.13 Kb
 -a--- ├── LICENSE                        1.07 Kb
--a--- ├── README.md                      8.45 Kb
-d---- └── PSTree                         4.83 Kb
--a---     ├── PSTree.psd1                4.57 Kb
--a---     ├── PSTree.psm1              270 Bytes
-d----     ├── public                     5.96 Kb
--a---     │   └── Get-PSTree.ps1         5.96 Kb
-d----     ├── private                    0 Bytes
-d----     │   └── classes                3.29 Kb
--a---     │       └── classes.ps1        3.29 Kb
-d----     └── Format                     1.83 Kb
--a---         └── PSTree.Format.ps1xml   1.83 Kb
+-a--- ├── PSTree.build.ps1               8.91 Kb
+-a--- ├── publish.ps1                  150 Bytes
+-a--- ├── README.md                      3.97 Kb
+d---- ├── tools                         74 Bytes
+-a--- │   └── requiredModules.psd1      74 Bytes
+d---- ├── src                            0 Bytes
+d---- │   └── PSTree                    10.58 Kb
+-a--- │       ├── PSTree.cs             10.16 Kb
+-a--- │       └── PSTree.csproj        439 Bytes
+d---- ├── PSTree                         5.83 Kb
+-a--- │   ├── PSTree.Format.ps1xml       1.23 Kb
+-a--- │   └── PSTree.psd1                 4.6 Kb
+d---- ├── docs                           0 Bytes
+d---- │   └── en-US                      3.68 Kb
+-a--- │       └── Get-PSTree.md          3.68 Kb
+d---- ├── .vscode                        1.89 Kb
+-a--- │   ├── launch.json                1.35 Kb
+-a--- │   └── tasks.json               550 Bytes
+d---- └── .github                        0 Bytes
+d----     └── workflows                  1.01 Kb
+-a---         ├── ondemand publish.yml 465 Bytes
+-a---         └── release publish.yml  565 Bytes
 ```
 
-### Get hierarchy of the current Directory recursively displaying only Folders
+### Get the hierarchy of `C:\Windows\System32` recursively displaying only folders
 
+```powershell
+PS ..\PSTree> Get-PSTree C:\Windows\System32\ -Directory -Recurse -EA 0 | Select-Object -First 20
+
+Mode  Hierarchy                                  Size
+----  ---------                                  ----
+d---- System32                                2.12 Gb
+d---- ├── zh-TW                              204.5 Kb
+d---- ├── zh-CN                             234.99 Kb
+d---- ├── winrm                               0 Bytes
+d---- │   └── 0409                          100.12 Kb
+d---- ├── WinMetadata                         6.18 Mb
+d---- ├── winevt                              0 Bytes
+d---- │   ├── TraceFormat                     0 Bytes
+d---- │   └── Logs                          296.28 Mb
+d---- ├── WindowsPowerShell                   0 Bytes
+d---- │   └── v1.0                            1.73 Mb
+d---- │       ├── SessionConfig               0 Bytes
+d---- │       ├── Schemas                     0 Bytes
+d---- │       │   └── PSMaml                532.76 Kb
+d---- │       ├── Modules                     0 Bytes
+d---- │       │   ├── WindowsUpdateProvider  16.51 Kb
+d---- │       │   ├── WindowsUpdate          16.09 Kb
+d---- │       │   ├── WindowsSearch          17.83 Kb
+d---- │       │   │   └── en                   5.5 Kb
+d---- │       │   ├── WindowsErrorReporting    7.4 Kb
 ```
-PS ..\PSTree> Get-PSTree -Directory -Recurse
 
-Mode  Hierarchy              Size
-----  ---------              ----
-d---- PSTree              9.52 Kb
-d---- └── PSTree          4.83 Kb
-d----     ├── public      5.72 Kb
-d----     ├── private     0 Bytes
-d----     │   └── classes 3.29 Kb
-d----     └── Format      1.83 Kb
-```
-
-### Get hierarchy of the current Directory 2 levels deep displaying hidden Folders
+### Get the hierarchy of `C:\Windows\System32` 2 levels deep displaying hidden files and folders
 
 ```
 PS ..\PSTree> Get-PSTree -Depth 2 -Force

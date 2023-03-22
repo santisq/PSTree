@@ -11,7 +11,7 @@
             "program": "pwsh",
             "args": [
                 "-NoExit",
-                "-NoProfile",
+                // "-NoProfile",
                 "-Command",
                 "Import-Module ./PSTree/PSTree.psd1"
             ],

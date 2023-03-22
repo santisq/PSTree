@@ -1,10 +1,6 @@
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-
-src/bin/
-src/debug/
-src/obj/
+src/*/bin/
+src/*/debug/
+src/*/obj/
 *.dll
 *.pdb
+*.deps.json

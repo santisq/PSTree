@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Management.Automation;
 using Microsoft.PowerShell.Commands;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace PSTree;
 
@@ -165,7 +166,7 @@ public sealed class PSTree : PSCmdlet
 {
     private bool _isRecursive;
 
-    private bool _withExclude;
+    private WildcardPattern[]? _excludePatterns;
 
     private Dictionary<string, PSTreeDirectory> _indexer = new();
 
@@ -191,12 +192,21 @@ public sealed class PSTree : PSCmdlet
     public SwitchParameter RecursiveSize { get; set; }
 
     [Parameter]
-    public ScriptBlock? Exclude { get; set; }
+    public string[]? Exclude { get; set; }
 
     protected override void BeginProcessing()
     {
         _isRecursive = RecursiveSize.IsPresent || Recurse.IsPresent;
-        _withExclude = MyInvocation.BoundParameters.ContainsKey("Exclude");
+
+        if(Exclude is not null)
+        {
+            const WildcardOptions wpoptions =
+                WildcardOptions.Compiled |
+                WildcardOptions.CultureInvariant |
+                WildcardOptions.IgnoreCase;
+
+            _excludePatterns = Exclude.Select(e => new WildcardPattern(e, wpoptions)).ToArray();
+        }
     }
 
     protected override void ProcessRecord()
@@ -268,12 +278,12 @@ public sealed class PSTree : PSCmdlet
                         continue;
                     }
 
-                    if(_withExclude)
+                    if (Exclude is not null && _excludePatterns.Any(e => e.IsMatch(item.FullName)))
                     {
-                        // to implement
+                        continue;
                     }
 
-                    if(item is FileInfo file)
+                    if (item is FileInfo file)
                     {
                         size += file.Length;
 
