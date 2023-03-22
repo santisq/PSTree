@@ -198,14 +198,8 @@ public sealed class PSTree : PSCmdlet
         PSTreeStatic.DrawTree(_result);
         WriteObject(_result.ToArray(), true);
 
-        if(_indexer.Count > 0)
-        {
-            _indexer.Clear();
-        }
-
-        if(_files.Count > 0)
-        {
-            _files.Clear();
-        }
+        _indexer.Clear();
+        _files.Clear();
+        _result.Clear();
     }
 }
