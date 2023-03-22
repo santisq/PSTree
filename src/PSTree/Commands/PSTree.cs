@@ -24,10 +24,12 @@ public sealed class PSTree : PSCmdlet
     private readonly List<PSTreeFile> _files = new();
 
     [Parameter(ValueFromPipeline = true, Position = 0)]
+    [ValidateNotNullOrEmpty]
     [Alias("PSPath")]
     public string? LiteralPath { get; set; }
 
     [Parameter(ParameterSetName = "Depth")]
+    [ValidateRange(0, int.MaxValue)]
     public int Depth = 3;
 
     [Parameter(ParameterSetName = "Recurse")]
@@ -44,6 +46,7 @@ public sealed class PSTree : PSCmdlet
 
     [Parameter]
     [SupportsWildcards]
+    [ValidateNotNullOrEmpty]
     public string[]? Exclude { get; set; }
 
     protected override void BeginProcessing()
@@ -67,16 +70,18 @@ public sealed class PSTree : PSCmdlet
         _files.Clear();
         _result.Clear();
 
-        string resolvedPath = LiteralPath ?? GetUnresolvedProviderPathFromPSPath(string.Empty);
-
-        if(resolvedPath != Path.GetPathRoot(resolvedPath))
-        {
-            resolvedPath = resolvedPath.TrimEnd(Path.DirectorySeparatorChar);
-        }
+        string resolvedPath = LiteralPath is not null ?
+            GetUnresolvedProviderPathFromPSPath(LiteralPath) :
+            SessionState.Path.CurrentLocation.Path;
 
         try
         {
-            var item = InvokeProvider.Item.Get(new string[1] { resolvedPath }, true, true)[0];
+            var item = InvokeProvider.Item.Get(new string[1] { resolvedPath }, true, true).FirstOrDefault();
+
+            if(item is null)
+            {
+                return;
+            }
 
             if(item.BaseObject is not FileInfo && item.BaseObject is not DirectoryInfo)
             {
