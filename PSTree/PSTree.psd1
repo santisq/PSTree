@@ -8,7 +8,7 @@
 
 @{
     # Script module or binary module file associated with this manifest.
-    RootModule = 'PSTree.dll'
+    RootModule = '..\src\PSTree\bin\release\netstandard2.0\publish\PSTree.dll'
 
     # Version number of this module.
     ModuleVersion = '2.1.9'
