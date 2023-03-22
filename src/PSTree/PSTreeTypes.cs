@@ -93,3 +93,13 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
         }
     }
 }
+
+public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
+{
+    public DirectoryInfo Directory => Instance.Directory;
+
+    public string DirectoryName => Instance.DirectoryName;
+
+    internal PSTreeFile(FileInfo fileInfo, int depth) : base(fileInfo, depth) =>
+        Length = fileInfo.Length;
+}
