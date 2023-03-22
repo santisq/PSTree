@@ -1,4 +1,5 @@
-﻿[CmdletBinding()]
+﻿# I might've also stolen this from jborean93 ¯\_(ツ)_/¯
+[CmdletBinding()]
 param(
     [ValidateSet('Debug', 'Release')]
     [string]
@@ -16,9 +17,11 @@ $PowerShellPath = [IO.Path]::Combine($PSScriptRoot, 'module')
 $CSharpPath = [IO.Path]::Combine($PSScriptRoot, 'src', $ModuleName)
 $ReleasePath = [IO.Path]::Combine($BuildPath, $ModuleName, $Version)
 $IsUnix = $PSEdition -eq 'Core' -and -not $IsWindows
-$UseNativeArguments = $PSVersionTable.PSVersion.Major -gt 7 -or ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -gt 2)
+$UseNativeArguments =
+    $PSVersionTable.PSVersion.Major -gt 7 -or
+    ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -gt 2)
 
-[xml]$csharpProjectInfo = Get-Content ([IO.Path]::Combine($CSharpPath, '*.csproj'))
+[xml] $csharpProjectInfo = Get-Content ([IO.Path]::Combine($CSharpPath, '*.csproj'))
 $TargetFrameworks = @(@($csharpProjectInfo.Project.PropertyGroup)[0].TargetFrameworks.Split(
         ';', [StringSplitOptions]::RemoveEmptyEntries))
 $PSFramework = $TargetFrameworks[0]
@@ -81,31 +84,6 @@ task CopyToRelease {
         }
         Copy-Item ([IO.Path]::Combine($buildFolder, "*")) -Destination $binFolder -Recurse
     }
-}
-
-task Sign {
-    $certPath = $env:PSMODULE_SIGNING_CERT
-    $certPassword = $env:PSMODULE_SIGNING_CERT_PASSWORD
-    if (-not $certPath -or -not $certPassword) {
-        return
-    }
-
-    [byte[]]$certBytes = [System.Convert]::FromBase64String($env:PSMODULE_SIGNING_CERT)
-    $cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new($certBytes, $certPassword)
-    $signParams = @{
-        Certificate = $cert
-        TimestampServer = 'http://timestamp.digicert.com'
-        HashAlgorithm = 'SHA256'
-    }
-
-    Get-ChildItem -LiteralPath $ReleasePath -Recurse -ErrorAction SilentlyContinue |
-        Where-Object Extension -In ".ps1", ".psm1", ".psd1", ".ps1xml", ".dll" |
-        ForEach-Object -Process {
-            $result = Set-AuthenticodeSignature -LiteralPath $_.FullName @signParams
-            if ($result.Status -ne "Valid") {
-                throw "Failed to sign $($_.FullName) - Status: $($result.Status) Message: $($result.StatusMessage)"
-            }
-        }
 }
 
 task Package {
@@ -203,6 +181,12 @@ task DoUnitTest {
 }
 
 task DoTest {
+    $pesterScript = [IO.Path]::Combine($PSScriptRoot, 'tools', 'PesterTest.ps1')
+    if(-not (Test-Path $pesterScript)) {
+        Write-Host "No Pester tests found, skipping"
+        return
+    }
+
     $resultsPath = [IO.Path]::Combine($BuildPath, 'TestResults')
     if (-not (Test-Path $resultsPath)) {
         New-Item $resultsPath -ItemType Directory -ErrorAction Stop | Out-Null
@@ -213,7 +197,6 @@ task DoTest {
         Remove-Item $resultsFile -ErrorAction Stop -Force
     }
 
-    $pesterScript = [IO.Path]::Combine($PSScriptRoot, 'tools', 'PesterTest.ps1')
     $pwsh = [Environment]::GetCommandLineArgs()[0] -replace '\.dll$', ''
     $arguments = @(
         '-NoProfile'
@@ -252,13 +235,13 @@ task DoTest {
         $pwsh = 'coverlet'
     }
 
-    &$pwsh $arguments
+    & $pwsh $arguments
     if ($LASTEXITCODE) {
         throw "Pester failed tests"
     }
 }
 
-task Build -Jobs Clean, BuildManaged, CopyToRelease, BuildDocs, Sign, Package
+task Build -Jobs Clean, BuildManaged, CopyToRelease, BuildDocs, Package
 
 # FIXME: Work out why we need the obj and bin folder for coverage to work
 task Test -Jobs BuildManaged, Analyze, DoUnitTest, DoTest

@@ -13,7 +13,7 @@
                 "-NoExit",
                 // "-NoProfile",
                 "-Command",
-                "Import-Module ./module/PSTree.psd1"
+                "Import-Module ./output/PSTree"
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

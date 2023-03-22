@@ -16,18 +16,20 @@ schema: 2.0.0
 ### Depth (Default)
 
 ```powershell
-Get-PSTree [[-LiteralPath] <String>] [[-Depth] <Int32>] [-Force] [-Directory] [-RecursiveSize] [<CommonParameters>]
+Get-PSTree [[-LiteralPath] <String>] [-Force] [-Directory] [-RecursiveSize] [-Exclude <String[]>]
+ [-Depth <Int32>] [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ### Recurse
 
 ```powershell
-Get-PSTree [[-LiteralPath] <String>] [-Recurse] [-Force] [-Directory] [-RecursiveSize] [<CommonParameters>]
+Get-PSTree [[-LiteralPath] <String>] [-Recurse] [-Force] [-Directory] [-RecursiveSize] [-Exclude <String[]>]
+ [-ProgressAction <ActionPreference>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
 
-`Get-PSTree` is a PowerShell cmdlet that intends to emulate the `tree` command with added functionality to calculate the __folders size__ as well as __recursive folders size__.
+`Get-PSTree` is a PowerShell cmdlet that intends to emulate the `tree` command with added functionality to calculate the folders size as well as recursive folders size .
 
 ## EXAMPLES
 
@@ -49,7 +51,7 @@ PS C:\> Get-PSTree $HOME -Directory -Recurse
 PS C:\> Get-PSTree -Depth 2 -Force
 ```
 
-### Example 4: Get the hierarchy of the `C:\` drive 1 level deep displaying only folders with their recursive size
+### Example 4: Get the hierarchy of the `C:\` drive 2 levels deep displaying only folders with their recursive size
 
 ```powershell
 PS C:\> Get-PSTree C:\ -Depth 2 -RecursiveSize -Directory
@@ -84,9 +86,27 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
+```
+
+### -Exclude
+
+Specifies an array of one or more string patterns to be matched as the cmdlet gets child items. Any matching item is excluded from the output. Wildcard characters are accepted.
+
+Note: Excluded items do not add to the recursive folders size.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: True
 ```
 
 ### -Force
@@ -100,14 +120,16 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -LiteralPath
 
-Absolute or relative folder path. Note that the value is used exactly as it's typed. No characters are interpreted as wildcards.
+Absolute or relative folder path.
+Note that the value is used exactly as it's typed.
+No characters are interpreted as wildcards.
 
 ```yaml
 Type: String
@@ -132,14 +154,16 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
 ### -RecursiveSize
 
-This switch enables the cmdlet to calculated the recursive size of folders in a hierarchy. By default, the cmdlet only displays the size of folders based on the sum of the files length in each Directory. It's important to note that this is a more expensive operation, in order to calculate the recursive size, all folders in the hierarchy need to be traversed.
+This switch enables the cmdlet to calculated the recursive size of folders in a hierarchy.
+By default, the cmdlet only displays the size of folders based on the sum of the files length in each Directory.
+It's important to note that this is a more expensive operation, in order to calculate the recursive size, all folders in the hierarchy need to be traversed.
 
 ```yaml
 Type: SwitchParameter
@@ -148,7 +172,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -163,6 +187,8 @@ This cmdlet supports the common parameters. See [about_CommonParameters](http://
 
 ## OUTPUTS
 
-### PSTree.PSTreeDirectory
+### PSTreeDirectory, PSTreeFile
 
-### PSTree.PSTreeFile
+## NOTES
+
+## RELATED LINKS

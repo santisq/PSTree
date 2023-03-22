@@ -9,6 +9,7 @@ namespace PSTree;
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Depth")]
 [OutputType(typeof(PSTreeDirectory))]
 [OutputType(typeof(PSTreeFile))]
+[Alias("pstree")]
 public sealed class PSTree : PSCmdlet
 {
     private bool _isRecursive;

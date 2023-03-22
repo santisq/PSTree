@@ -27,12 +27,6 @@ end {
             continue
         }
 
-        if($module = Get-Module $req.Key -ListAvailable) {
-            if($module.Version -ge $req.Value) {
-                continue
-            }
-        }
-
         Write-Host "Installing build pre-req $($req.Key) as it is not installed"
         $null = New-Item -Path $targetPath -ItemType Directory -Force
 
@@ -66,5 +60,5 @@ end {
         File          = (Get-Item ([IO.Path]::Combine($PSScriptRoot, '*.build.ps1'))).FullName
         Configuration = $Configuration
     }
-    # Invoke-Build @invokeBuildSplat
+    Invoke-Build @invokeBuildSplat
 }
