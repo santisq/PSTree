@@ -2,7 +2,7 @@
 
 - __03/22/2023__
   - `Get-PSTree` is now a binary cmdlet. Functionality remains the same.
-  - Added `-Exclude` parameter to the cmdlet. The parameter accepts wildcards and patterns are matched with the object's `.FullName` property. For more details checkout [cmdlet docs](/docs/Get-PSTree.md).
+  - Added `-Exclude` parameter to the cmdlet. The parameter accepts wildcards and patterns are matched with the object's `.FullName` property. For more details checkout [cmdlet docs](/docs/en-US/Get-PSTree.md).
 
 - __02/25/2023__
   - Fixed a bug that made `Get-PSTree` use `-Recurse` by default.

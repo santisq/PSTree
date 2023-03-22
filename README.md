@@ -196,7 +196,7 @@ d---- │   ├── xml            99.87 Kb
 
 ## Documentation
 
-See the [`Get-PSTree` doc](/docs/Get-PSTree.md) for parameter details and syntax.
+See the [`Get-PSTree` doc](/docs/en-US/Get-PSTree.md) for parameter details and syntax.
 
 ## Changelog
 
