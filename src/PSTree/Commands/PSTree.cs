@@ -1,153 +1,10 @@
-﻿using System;
-using System.IO;
+using System;
 using System.Collections.Generic;
-using System.Management.Automation;
-using Microsoft.PowerShell.Commands;
-using System.Text.RegularExpressions;
+using System.IO;
 using System.Linq;
+using System.Management.Automation;
 
 namespace PSTree;
-
-internal static class PSTreeStatic
-{
-    internal static string[] _suffix;
-
-    static PSTreeStatic() =>
-        _suffix = new string[] { "Bytes", "Kb", "Mb", "Gb", "Tb", "Pb", "Eb", "Zb", "Yb" };
-
-    internal static string Indent(string inputString, int indentation) =>
-        new string(' ', (4 * indentation) - 4) + "└── " + inputString;
-
-    internal static void DrawTree(List<PSTreeFileSystemInfo> inputObject)
-    {
-        Regex re = new(@"└|\S");
-
-        for(int i = 0; i < inputObject.Count; i++)
-        {
-            int index = inputObject[i].Hierarchy.IndexOf('└');
-
-            if(index >= 0)
-            {
-                int z = i - 1;
-                while(!re.IsMatch(inputObject[z].Hierarchy[index].ToString()))
-                {
-                    char[] replace = inputObject[z].Hierarchy.ToCharArray();
-                    replace[index] = '│';
-                    inputObject[z].Hierarchy = new string(replace);
-                    z--;
-                }
-
-                if(inputObject[z].Hierarchy[index] == '└')
-                {
-                    char[] replace = inputObject[z].Hierarchy.ToCharArray();
-                    replace[index] = '├';
-                    inputObject[z].Hierarchy = new string(replace);
-                }
-            }
-        }
-    }
-
-    internal static string FormatLength(long length)
-    {
-        int index = 0;
-        double len = length;
-
-        while(len >= 1024) {
-            len /= 1024;
-            index++;
-        }
-
-        return string.Format("{0} {1}", Math.Round(len, 2), _suffix[index]);
-    }
-}
-
-public abstract class PSTreeFileSystemInfo
-{
-    internal int Depth { get; set; }
-
-    public string Hierarchy { get; internal set; }
-
-    protected PSTreeFileSystemInfo(string hierarchy) => Hierarchy = hierarchy;
-
-    public long Length { get; internal set; }
-}
-
-public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
-    where T : FileSystemInfo
-{
-    private PSObject? _pso;
-
-    private PSObject InstancePso => _pso ??= PSObject.AsPSObject(Instance);
-
-    protected T Instance { get; }
-
-    public string Name => Instance.Name;
-
-    public string Mode => FileSystemProvider.Mode(InstancePso);
-
-    public string Size => PSTreeStatic.FormatLength(Length);
-
-    public string FullName => Instance.FullName;
-
-    public string Extension => Instance.Extension;
-
-    public FileAttributes Attributes => Instance.Attributes;
-
-    public DateTime CreationTime => Instance.CreationTime;
-
-    public DateTime CreationTimeUtc => Instance.CreationTimeUtc;
-
-    public DateTime LastWriteTime => Instance.LastWriteTime;
-
-    public DateTime LastWriteTimeUtc => Instance.LastAccessTimeUtc;
-
-    public DateTime LastAccessTime => Instance.LastAccessTime;
-
-    public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
-
-    private protected PSTreeFileSystemInfo(T fileSystemInfo, int depth)
-        : base(PSTreeStatic.Indent(fileSystemInfo.Name, depth))
-    {
-        Instance  = fileSystemInfo;
-        Depth     = depth;
-    }
-
-    private protected PSTreeFileSystemInfo(T fileSystemInfo)
-        : base(fileSystemInfo.Name) => Instance = fileSystemInfo;
-
-    public bool HasFlag(FileAttributes flag) => Instance.Attributes.HasFlag(flag);
-}
-
-public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
-{
-    public DirectoryInfo Parent => Instance.Parent;
-
-    internal PSTreeDirectory(DirectoryInfo directoryInfo, int depth)
-        : base(directoryInfo, depth) { }
-
-    internal PSTreeDirectory(DirectoryInfo directoryInfo)
-        : base(directoryInfo) { }
-
-    public IEnumerable<FileInfo> EnumerateFiles() =>
-        Instance.EnumerateFiles();
-
-    public IEnumerable<DirectoryInfo> EnumerateDirectories() =>
-        Instance.EnumerateDirectories();
-
-    public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() =>
-        Instance.EnumerateFileSystemInfos();
-
-    public IEnumerable<string> GetParents()
-    {
-        int index = -1;
-        string path = Instance.FullName;
-
-        while((index = path.IndexOf(Path.DirectorySeparatorChar, index + 1)) != -1)
-        {
-            yield return path.Substring(0, index);
-        }
-    }
-}
 
 public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
 {
@@ -192,6 +49,7 @@ public sealed class PSTree : PSCmdlet
     public SwitchParameter RecursiveSize { get; set; }
 
     [Parameter]
+    [SupportsWildcards()]
     public string[]? Exclude { get; set; }
 
     protected override void BeginProcessing()
@@ -227,13 +85,11 @@ public sealed class PSTree : PSCmdlet
 
             if(item.BaseObject is not FileInfo && item.BaseObject is not DirectoryInfo)
             {
-                ThrowTerminatingError(
-                    new ErrorRecord(
-                        new NotSupportedException("Not supported file system path."),
-                        "PStree.NotSupported",
-                        ErrorCategory.NotImplemented,
-                        resolvedPath
-                    ));
+                ThrowTerminatingError(new ErrorRecord(
+                    new NotSupportedException("Not supported file system path."),
+                    "PStree.NotSupported",
+                    ErrorCategory.NotImplemented,
+                    resolvedPath));
             }
 
             if(item.BaseObject is FileInfo file)
@@ -244,14 +100,10 @@ public sealed class PSTree : PSCmdlet
 
             stack.Push(new PSTreeDirectory((DirectoryInfo) item.BaseObject));
         }
-        catch(Exception except)
+        catch(Exception e)
         {
-            ThrowTerminatingError(
-                new ErrorRecord(
-                    except,
-                    "PSTree.GetItem",
-                    ErrorCategory.NotSpecified,
-                    resolvedPath));
+            ThrowTerminatingError(new ErrorRecord(
+                e, "PSTree.GetItem", ErrorCategory.NotSpecified, resolvedPath));
         }
 
         if(RecursiveSize.IsPresent)
@@ -336,18 +188,14 @@ public sealed class PSTree : PSCmdlet
             {
                 throw;
             }
-            catch(Exception except)
+            catch(Exception e)
             {
                 if(Recurse.IsPresent || next.Depth <= Depth) {
                     result.Add(next);
                 }
 
-                WriteError(
-                    new ErrorRecord(
-                        except,
-                        "PSTree.Enumerate",
-                        ErrorCategory.NotSpecified,
-                        next));
+                WriteError(new ErrorRecord(
+                    e, "PSTree.Enumerate", ErrorCategory.NotSpecified, next));
             }
         }
 
