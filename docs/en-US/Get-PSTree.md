@@ -57,6 +57,12 @@ PS C:\> Get-PSTree -Depth 2 -Force
 PS C:\> Get-PSTree C:\ -Depth 2 -RecursiveSize -Directory
 ```
 
+### Example 5: Get hierarchy of the `$HOME` recursively excluding all `.jpg` and `.png` files
+
+```powershell
+PS C:\> Get-PSTree $HOME -Recurse -Exclude *.jpg, *.png
+```
+
 ## PARAMETERS
 
 ### -Depth
@@ -95,7 +101,8 @@ Accept wildcard characters: False
 
 Specifies an array of one or more string patterns to be matched as the cmdlet gets child items. Any matching item is excluded from the output. Wildcard characters are accepted.
 
-Note: Excluded items do not add to the recursive folders size.
+Excluded items do not add to the recursive folders size.
+Patterns are tested with the object's `FullName` property.
 
 ```yaml
 Type: String[]

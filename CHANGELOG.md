@@ -1,5 +1,9 @@
 # CHANGELOG
 
+- __03/22/2023__
+  - `Get-PSTree` is now a binary cmdlet. Functionality remains the same.
+  - Added `-Exclude` parameter to the cmdlet. The parameter accepts wildcards and patterns are matched with the object's `.FullName` property. For more details checkout [cmdlet docs](/docs/Get-PSTree.md).
+
 - __02/25/2023__
   - Fixed a bug that made `Get-PSTree` use `-Recurse` by default.
   - Added [ETS properties](./PSTree/PSTree.Types.ps1xml) to `PSTreeDirectory` and `PSTreeFile` instances that would make exporting the output easier.
@@ -9,7 +13,7 @@
   - Introducing `-RecursiveSize` switch parameter to `Get-PSTree`. By default, `Get-PSTree` only displays the size of folders __based on the sum of the files length in each Directory__.
   This parameter allows to calculate the recursive size of folders in the hierarchy, similar to how explorer does it. __It's important to note that this is a more expensive operation__, in order to calculate the recursive size, all folders in the hierarchy need to be traversed.
 
-```none
+```powershell
 PS ..\PSTree> pstree -Directory -Depth 2
 
 Mode  Hierarchy          Size
@@ -39,7 +43,7 @@ d----     └── Format    1.83 Kb
   - `-Deep` parameter has been replaced with `-Recurse` parameter, same functionality.
   - `PSTreeDirectory` and `PSTreeFile` instances now only include 2 visible properties, `Hierarchy` and `Length`, the rest is done with format view.
 
-```none
+```powershell
 PS ..\PSTree> pstree -Recurse
 
 Mode  Hierarchy                             Size
