@@ -53,7 +53,7 @@ public sealed class PSTree : PSCmdlet
     public SwitchParameter RecursiveSize { get; set; }
 
     [Parameter]
-    [SupportsWildcards()]
+    [SupportsWildcards]
     public string[]? Exclude { get; set; }
 
     protected override void BeginProcessing()
