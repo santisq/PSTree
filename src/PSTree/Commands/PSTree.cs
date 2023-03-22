@@ -25,7 +25,11 @@ public sealed class PSTree : PSCmdlet
 
     private WildcardPattern[]? _excludePatterns;
 
-    private Dictionary<string, PSTreeDirectory> _indexer = new();
+    private readonly Dictionary<string, PSTreeDirectory> _indexer = new();
+
+    private readonly Stack<PSTreeDirectory> _stack = new();
+
+    private readonly List<PSTreeFileSystemInfo> _result = new();
 
     private readonly List<PSTreeFile> _files = new();
 
@@ -76,9 +80,6 @@ public sealed class PSTree : PSCmdlet
             resolvedPath = resolvedPath.TrimEnd(Path.DirectorySeparatorChar);
         }
 
-        Stack<PSTreeDirectory> stack = new();
-        List<PSTreeFileSystemInfo> result = new();
-
         try
         {
             var item = InvokeProvider.Item.Get(new string[1] { resolvedPath }, true, true)[0];
@@ -98,7 +99,7 @@ public sealed class PSTree : PSCmdlet
                 return;
             }
 
-            stack.Push(new PSTreeDirectory((DirectoryInfo) item.BaseObject));
+            _stack.Push(new PSTreeDirectory((DirectoryInfo) item.BaseObject));
         }
         catch(Exception e)
         {
@@ -106,14 +107,9 @@ public sealed class PSTree : PSCmdlet
                 e, "PSTree.GetItem", ErrorCategory.NotSpecified, resolvedPath));
         }
 
-        if(RecursiveSize.IsPresent)
+        while(_stack.Count > 0)
         {
-            _indexer = new();
-        }
-
-        while(stack.Count > 0)
-        {
-            PSTreeDirectory next = stack.Pop();
+            PSTreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
             long size = 0;
 
@@ -154,7 +150,7 @@ public sealed class PSTree : PSCmdlet
 
                     if(keepProcessing)
                     {
-                        stack.Push(new PSTreeDirectory((DirectoryInfo) item, level));
+                        _stack.Push(new PSTreeDirectory((DirectoryInfo) item, level));
                     }
                 }
 
@@ -175,11 +171,11 @@ public sealed class PSTree : PSCmdlet
 
                 if(Recurse.IsPresent || next.Depth <= Depth)
                 {
-                    result.Add(next);
+                    _result.Add(next);
 
                     if(_files.Count > 0)
                     {
-                        result.AddRange(_files.ToArray());
+                        _result.AddRange(_files.ToArray());
                         _files.Clear();
                     }
                 }
@@ -191,7 +187,7 @@ public sealed class PSTree : PSCmdlet
             catch(Exception e)
             {
                 if(Recurse.IsPresent || next.Depth <= Depth) {
-                    result.Add(next);
+                    _result.Add(next);
                 }
 
                 WriteError(new ErrorRecord(
@@ -199,8 +195,8 @@ public sealed class PSTree : PSCmdlet
             }
         }
 
-        PSTreeStatic.DrawTree(result);
-        WriteObject(result.ToArray(), true);
+        PSTreeStatic.DrawTree(_result);
+        WriteObject(_result.ToArray(), true);
 
         if(_indexer.Count > 0)
         {
