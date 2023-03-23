@@ -39,7 +39,7 @@ Get-PSTree [[-LiteralPath] <String>] [-Recurse] [-Force] [-Directory] [-Recursiv
 PS C:\> Get-PSTree
 ```
 
-The default parameter set uses `-Depth` with a value of 3. No hidden and system files folder are displayed and recursive folder folder is not calculated.
+The default parameter set uses `-Depth` with a value of 3. No hidden and system files folder are displayed and recursive folder size is not calculated.
 
 ### Example 2: Get the hierarchy of the `$HOME` directory recursively displaying only folders
 
