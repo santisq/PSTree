@@ -5,11 +5,40 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "PowerShell: Launch Current File",
+            "name": "PowerShell launch",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "pwsh",
+            "args": [
+                "-NoExit",
+                // "-NoProfile",
+                "-Command",
+                "Import-Module ./output/PSTree"
+            ],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "externalTerminal",
+        },
+        {
+            "name": "PowerShell Launch Current File",
             "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
-            "args": []
-        }
-    ]
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": ".NET FullCLR Attach",
+            "type": "clr",
+            "request": "attach",
+            "processId": "${command:pickProcess}",
+            "justMyCode": true,
+        },
+        {
+            "name": ".NET CoreCLR Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}",
+            "justMyCode": true,
+        },
+    ],
 }
