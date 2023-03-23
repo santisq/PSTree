@@ -172,7 +172,7 @@ This switch enables the cmdlet to calculated the recursive size of folders in a 
 By default, the cmdlet only displays the size of folders based on the sum of the files length in each directory.
 It's important to note that this is a more expensive operation, in order to calculate the recursive size, all folders in the hierarchy need to be traversed.
 
-By default, hidden and system files and folders is not added to the recursive size, for this you must use the `-Force` parameter. Excluded files and folders with the `-Exclude` parameter do not add to the recursive folders size.
+By default, hidden and system files and folders size is not added to the recursive size, for this you must use the `-Force` parameter. Excluded files and folders with the `-Exclude` parameter do not add to the recursive folders size.
 
 ```yaml
 Type: SwitchParameter
