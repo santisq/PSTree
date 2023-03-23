@@ -95,7 +95,7 @@ public sealed class PSTree : PSCmdlet
 
             if(item.BaseObject is FileInfo file)
             {
-                WriteObject(new PSTreeFile(file, 0));
+                WriteObject(new PSTreeFile(file));
                 return;
             }
 
