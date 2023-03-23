@@ -33,7 +33,7 @@ Get-PSTree [[-LiteralPath] <String>] [-Recurse] [-Force] [-Directory] [-Recursiv
 
 ## EXAMPLES
 
-### Example 1: Get the hierarchy of the current directory with default parameter values
+### Example 1: Get the current directory hierarchy with default parameter values
 
 ```powershell
 PS C:\> Get-PSTree
@@ -47,19 +47,19 @@ The default parameter set uses `-Depth` with a value of 3. No hidden and system 
 PS C:\> Get-PSTree $HOME -Directory -Recurse
 ```
 
-### Example 3: Get hierarchy of the `$HOME` directory 2 levels deep displaying hidden files and folders
+### Example 3: Recurse `$HOME` subdirectories 2 levels in depth displaying hidden files and folders
 
 ```powershell
 PS C:\> Get-PSTree -Depth 2 -Force
 ```
 
-### Example 4: Get the hierarchy of the `C:\` drive 2 levels deep displaying only folders with their recursive size
+### Example 4: Recurse the `C:\` drive 2 levels in depth displaying only folders with their recursive size
 
 ```powershell
 PS C:\> Get-PSTree C:\ -Depth 2 -RecursiveSize -Directory
 ```
 
-### Example 5: Get the hierarchy of the `$HOME` directory recursively excluding all `.jpg` and `.png` files
+### Example 5: Get the `$HOME` directory hierarchy recursively excluding all `.jpg` and `.png` files
 
 ```powershell
 PS C:\> Get-PSTree $HOME -Recurse -Exclude *.jpg, *.png
@@ -172,9 +172,9 @@ Accept wildcard characters: False
 
 This switch enables the cmdlet to calculate the recursive size of folders in a hierarchy.
 By default, the cmdlet only displays the size of folders based on the sum of the file's Length in each directory.
-It's important to note that this is a more expensive operation, in order to calculate the recursive size, all folders in the hierarchy need to be traversed.
+It's important to note that this is a more expensive operation, in order to calculate the recursive size, all items in the hierarchy needs to be traversed.
 
-By default, the size of hidden and system items is not added to the recursive size of the folders, for this you must use the `-Force` parameter. Excluded files and folders with the `-Exclude` parameter do not add to the recursive folders size.
+By default, the size of hidden and system items is not added to the recursive size, for this you must use the `-Force` parameter. Excluded items with the `-Exclude` parameter do not add to the recursive size.
 
 ```yaml
 Type: SwitchParameter

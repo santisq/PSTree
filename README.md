@@ -16,7 +16,7 @@ Compatible with __Windows PowerShell v5.1__ and __PowerShell 7+__.
 
 ## Usage
 
-### Get the hierarchy of the current Directory with default parameters values
+### Get the current directory hierarchy with default parameters values
 
 ```powershell
 PS ..\PSTree> Get-PSTree
@@ -134,7 +134,7 @@ d---- │       │   │   └── en                   5.5 Kb
 d---- │       │   ├── WindowsErrorReporting    7.4 Kb
 ```
 
-### Display folders only 2 levels deep
+### Recurse subdirectories only 2 levels in Depth
 
 ```powershell
 PS ..\PSTree> $tree = Get-PSTree C:\Windows\System32\ -Directory -Depth 2 -EA 0
