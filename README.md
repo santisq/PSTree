@@ -1,5 +1,21 @@
 <h1 align="center">PSTree</h1>
 
+<p align="center">
+    <sub>
+        Tree like cmdlet for PowerShell!
+    </sub>
+    <br /><br />
+    <a title="Commits" href="https://github.com/santisq/PSTree/actions/workflows/ci.yml">
+        <img alt="Build Status" src="https://github.com/santisq/PSTree/actions/workflows/ci.yml/badge.svg" />
+    </a>
+    <a title="PSTree on PowerShell Gallery" href="https://www.powershellgallery.com/packages/PSTree">
+        <img alt="PowerShell Gallery Version" src="https://img.shields.io/powershellgallery/v/PSTree?label=gallery">
+    </a>
+    <a title="LICENSE" href="https://github.com/santisq/PSTree/blob/main/LICENSE">
+        <img alt="GitHub" src="https://img.shields.io/github/license/santisq/PSTree">
+    </a>
+</p>
+
 `Get-PSTree` is a PowerShell cmdlet that intends to emulate the [`tree` command](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) with added functionality to calculate the __folders size__ as well as __recursive folders size__.
 
 ## Installation

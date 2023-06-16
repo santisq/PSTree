@@ -59,7 +59,6 @@
     # ScriptsToProcess = @()
 
     # Type files (.ps1xml) to be loaded when importing this module
-    # TypesToProcess = @('PSTree.Types.ps1xml')
     TypesToProcess = @()
 
     # Format files (.ps1xml) to be loaded when importing this module
@@ -92,9 +91,13 @@
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData = @{
         PSData = @{
-
             # Tags applied to this module. These help with module discovery in online galleries.
-            Tags = @('hierarchy', 'tree')
+            Tags = @(
+                'hierarchy'
+                'tree'
+                'powershell'
+                'csharp'
+            )
 
             # A URL to the license for this module.
             LicenseUri = 'https://www.github.com/santisq/PSTree/blob/main/LICENSE'
