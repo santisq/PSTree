@@ -12,7 +12,8 @@ public abstract class PSTreeFileSystemInfo
 
     public string Hierarchy { get; internal set; }
 
-    protected PSTreeFileSystemInfo(string hierarchy) => Hierarchy = hierarchy;
+    protected PSTreeFileSystemInfo(string hierarchy) =>
+        Hierarchy = hierarchy;
 
     public long Length { get; internal set; }
 }
@@ -29,8 +30,6 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
     public string Name => Instance.Name;
 
     public string Mode => FileSystemProvider.Mode(InstancePso);
-
-    public string Size => PSTreeStatic.FormatLength(Length);
 
     public string FullName => Instance.FullName;
 
@@ -51,10 +50,10 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
     public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
 
     private protected PSTreeFileSystemInfo(T fileSystemInfo, int depth)
-        : base(PSTreeStatic.Indent(fileSystemInfo.Name, depth))
+        : base(fileSystemInfo.Name.Indent(depth))
     {
-        Instance  = fileSystemInfo;
-        Depth     = depth;
+        Instance = fileSystemInfo;
+        Depth = depth;
     }
 
     private protected PSTreeFileSystemInfo(T fileSystemInfo)
@@ -87,7 +86,7 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
         int index = -1;
         string path = Instance.FullName;
 
-        while((index = path.IndexOf(Path.DirectorySeparatorChar, index + 1)) != -1)
+        while ((index = path.IndexOf(Path.DirectorySeparatorChar, index + 1)) != -1)
         {
             yield return path.Substring(0, index);
         }

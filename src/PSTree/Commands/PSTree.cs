@@ -7,8 +7,7 @@ using System.Management.Automation;
 namespace PSTree;
 
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Depth")]
-[OutputType(typeof(PSTreeDirectory))]
-[OutputType(typeof(PSTreeFile))]
+[OutputType(typeof(PSTreeDirectory), typeof(PSTreeFile))]
 [Alias("pstree")]
 public sealed class PSTree : PSCmdlet
 {
@@ -54,14 +53,15 @@ public sealed class PSTree : PSCmdlet
     {
         _isRecursive = RecursiveSize.IsPresent || Recurse.IsPresent;
 
-        if(Exclude is not null)
+        if (Exclude is not null)
         {
             const WildcardOptions wpoptions =
                 WildcardOptions.Compiled
                 | WildcardOptions.CultureInvariant
                 | WildcardOptions.IgnoreCase;
 
-            _excludePatterns = Exclude.Select(e => new WildcardPattern(e, wpoptions)).ToArray();
+            _excludePatterns = Exclude.Select(e => new WildcardPattern(e, wpoptions))
+                .ToArray();
         }
     }
 
@@ -79,12 +79,12 @@ public sealed class PSTree : PSCmdlet
         {
             var item = InvokeProvider.Item.Get(new string[1] { resolvedPath }, true, true).FirstOrDefault();
 
-            if(item is null)
+            if (item is null)
             {
                 return;
             }
 
-            if(item.BaseObject is not FileInfo && item.BaseObject is not DirectoryInfo)
+            if (item.BaseObject is not FileInfo && item.BaseObject is not DirectoryInfo)
             {
                 ThrowTerminatingError(new ErrorRecord(
                     new NotSupportedException("Not supported file system path."),
@@ -93,21 +93,21 @@ public sealed class PSTree : PSCmdlet
                     resolvedPath));
             }
 
-            if(item.BaseObject is FileInfo file)
+            if (item.BaseObject is FileInfo file)
             {
                 WriteObject(new PSTreeFile(file));
                 return;
             }
 
-            _stack.Push(new PSTreeDirectory((DirectoryInfo) item.BaseObject));
+            _stack.Push(new PSTreeDirectory((DirectoryInfo)item.BaseObject));
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             ThrowTerminatingError(new ErrorRecord(
                 e, "PSTree.GetItem", ErrorCategory.NotSpecified, resolvedPath));
         }
 
-        while(_stack.Count > 0)
+        while (_stack.Count > 0)
         {
             PSTreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
@@ -119,9 +119,9 @@ public sealed class PSTree : PSCmdlet
 
                 bool keepProcessing = _isRecursive || level <= Depth;
 
-                foreach(FileSystemInfo item in enumerator)
+                foreach (FileSystemInfo item in enumerator)
                 {
-                    if(!Force.IsPresent && item.Attributes.HasFlag(FileAttributes.Hidden))
+                    if (!Force.IsPresent && item.Attributes.HasFlag(FileAttributes.Hidden))
                     {
                         continue;
                     }
@@ -135,12 +135,12 @@ public sealed class PSTree : PSCmdlet
                     {
                         size += file.Length;
 
-                        if(Directory.IsPresent)
+                        if (Directory.IsPresent)
                         {
                             continue;
                         }
 
-                        if(Recurse.IsPresent || level <= Depth)
+                        if (Recurse.IsPresent || level <= Depth)
                         {
                             _files.Add(new PSTreeFile(file, level));
                         }
@@ -148,45 +148,46 @@ public sealed class PSTree : PSCmdlet
                         continue;
                     }
 
-                    if(keepProcessing)
+                    if (keepProcessing)
                     {
-                        _stack.Push(new PSTreeDirectory((DirectoryInfo) item, level));
+                        _stack.Push(new PSTreeDirectory((DirectoryInfo)item, level));
                     }
                 }
 
                 next.Length = size;
 
-                if(RecursiveSize.IsPresent)
+                if (RecursiveSize.IsPresent)
                 {
                     _indexer[next.FullName.TrimEnd(Path.DirectorySeparatorChar)] = next;
 
-                    foreach(string parent in next.GetParents())
+                    foreach (string parent in next.GetParents())
                     {
-                        if(_indexer.ContainsKey(parent))
+                        if (_indexer.ContainsKey(parent))
                         {
                             _indexer[parent].Length += size;
                         }
                     }
                 }
 
-                if(Recurse.IsPresent || next.Depth <= Depth)
+                if (Recurse.IsPresent || next.Depth <= Depth)
                 {
                     _result.Add(next);
 
-                    if(_files.Count > 0)
+                    if (_files.Count > 0)
                     {
                         _result.AddRange(_files.ToArray());
                         _files.Clear();
                     }
                 }
             }
-            catch(PipelineStoppedException)
+            catch (PipelineStoppedException)
             {
                 throw;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                if(Recurse.IsPresent || next.Depth <= Depth) {
+                if (Recurse.IsPresent || next.Depth <= Depth)
+                {
                     _result.Add(next);
                 }
 
@@ -195,7 +196,6 @@ public sealed class PSTree : PSCmdlet
             }
         }
 
-        PSTreeStatic.DrawTree(_result);
-        WriteObject(_result.ToArray(), true);
+        WriteObject(_result.ConvertToTree(), enumerateCollection: true);
     }
 }
