@@ -7,11 +7,13 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 {
     public DirectoryInfo Parent => Instance.Parent;
 
-    internal PSTreeDirectory(DirectoryInfo directoryInfo, int depth)
-        : base(directoryInfo, depth) { }
+    internal PSTreeDirectory(DirectoryInfo directoryInfo, int depth) :
+        base(directoryInfo, depth)
+    { }
 
-    internal PSTreeDirectory(DirectoryInfo directoryInfo)
-        : base(directoryInfo) { }
+    internal PSTreeDirectory(DirectoryInfo directoryInfo) :
+        base(directoryInfo)
+    { }
 
     public IEnumerable<FileInfo> EnumerateFiles() =>
         Instance.EnumerateFiles();

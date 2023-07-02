@@ -13,6 +13,8 @@ internal static class PSTreeStatic
 {
     private static readonly List<(string, ProviderInfo)> s_normalizedPaths = new();
 
+    private static readonly Regex _re = new(@"└|\S", RegexOptions.Compiled);
+
     internal static string Indent(this string inputString, int indentation) =>
         new string(' ', (4 * indentation) - 4) + "└── " + inputString;
 
@@ -20,8 +22,6 @@ internal static class PSTreeStatic
         this List<PSTreeFileSystemInfo> inputObject)
     {
         // Well, I don't know what was I thinking when I wrote this, but it works :)
-
-        Regex re = new(@"└|\S", RegexOptions.Compiled);
 
         for (int i = 0; i < inputObject.Count; i++)
         {
@@ -33,7 +33,8 @@ internal static class PSTreeStatic
             }
 
             int z = i - 1;
-            while (!re.IsMatch(inputObject[z].Hierarchy[index].ToString()))
+
+            while (!_re.IsMatch(inputObject[z].Hierarchy[index].ToString()))
             {
                 char[] replace = inputObject[z].Hierarchy.ToCharArray();
                 replace[index] = '│';
@@ -88,15 +89,10 @@ internal static class PSTreeStatic
         return s_normalizedPaths.ToArray();
     }
 
-    internal static (string?, ProviderInfo?) NormalizePath(
-        this string path, bool isLiteral, PSCmdlet cmdlet) =>
-        NormalizePath(new string[1] { path }, isLiteral, cmdlet)
-        .FirstOrDefault();
-
     internal static bool AssertFileSystem(this ProviderInfo provider) =>
         provider.ImplementingType == typeof(FileSystemProvider);
 
-    internal static bool AssertArchive(this string path) =>
+    internal static bool IsArchive(this string path) =>
         !File.GetAttributes(path).HasFlag(FileAttributes.Directory);
 
     internal static bool AssertDirectory(this string path) =>

@@ -105,7 +105,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
                 continue;
             }
 
-            if (path.AssertArchive())
+            if (path.IsArchive())
             {
                 WriteObject(new PSTreeFile(new FileInfo(path)));
                 continue;
