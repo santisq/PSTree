@@ -21,7 +21,7 @@ public sealed class PSTree : PSCmdlet
 
     private WildcardPattern[]? _excludePatterns;
 
-    private readonly Dictionary<string, PSTreeDirectory> _indexer = new();
+    private readonly PSTreeIndexer _indexer = new();
 
     private readonly Stack<PSTreeDirectory> _stack = new();
 
@@ -173,15 +173,7 @@ public sealed class PSTree : PSCmdlet
 
                 if (RecursiveSize.IsPresent)
                 {
-                    _indexer[next.FullName.TrimEnd(System.IO.Path.DirectorySeparatorChar)] = next;
-
-                    foreach (string parent in next.GetParents())
-                    {
-                        if (_indexer.ContainsKey(parent))
-                        {
-                            _indexer[parent].Length += size;
-                        }
-                    }
+                    _indexer.Index(next, size);
                 }
 
                 if (Recurse.IsPresent || next.Depth <= Depth)
