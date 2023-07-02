@@ -89,12 +89,12 @@ internal static class PSTreeStatic
         return s_normalizedPaths.ToArray();
     }
 
-    internal static bool AssertFileSystem(this ProviderInfo provider) =>
+    internal static bool IsFileSystem(this ProviderInfo provider) =>
         provider.ImplementingType == typeof(FileSystemProvider);
 
     internal static bool IsArchive(this string path) =>
         !File.GetAttributes(path).HasFlag(FileAttributes.Directory);
 
-    internal static bool AssertDirectory(this string path) =>
+    internal static bool IsDirectory(this string path) =>
         File.GetAttributes(path).HasFlag(FileAttributes.Directory);
 }

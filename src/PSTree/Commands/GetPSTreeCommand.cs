@@ -99,7 +99,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
         foreach ((string path, ProviderInfo provider) in _paths.NormalizePath(_isLiteral, this))
         {
-            if (!provider.AssertFileSystem())
+            if (!provider.IsFileSystem())
             {
                 WriteError(ExceptionHelpers.NotFileSystemPathError(path, provider));
                 continue;
