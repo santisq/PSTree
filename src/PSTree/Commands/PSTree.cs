@@ -13,6 +13,12 @@ public sealed class PSTree : PSCmdlet
 {
     private bool _isRecursive;
 
+    private bool _isLiteral;
+
+    private bool _withExclude;
+
+    private string[]? _paths;
+
     private WildcardPattern[]? _excludePatterns;
 
     private readonly Dictionary<string, PSTreeDirectory> _indexer = new();
@@ -23,10 +29,29 @@ public sealed class PSTree : PSCmdlet
 
     private readonly List<PSTreeFile> _files = new();
 
-    [Parameter(ValueFromPipeline = true, Position = 0)]
-    [ValidateNotNullOrEmpty]
+    [Parameter(ParameterSetName = "Path", Position = 0, ValueFromPipeline = true)]
+    [SupportsWildcards]
+    public string[]? Path
+    {
+        get => _paths;
+        set
+        {
+            _paths = value;
+            _isLiteral = false;
+        }
+    }
+
+    [Parameter(ParameterSetName = "LiteralPath", ValueFromPipelineByPropertyName = true)]
     [Alias("PSPath")]
-    public string? LiteralPath { get; set; }
+    public string[]? LiteralPath
+    {
+        get => _paths;
+        set
+        {
+            _paths = value;
+            _isLiteral = true;
+        }
+    }
 
     [Parameter(ParameterSetName = "Depth")]
     [ValidateRange(0, int.MaxValue)]
@@ -60,52 +85,42 @@ public sealed class PSTree : PSCmdlet
                 | WildcardOptions.CultureInvariant
                 | WildcardOptions.IgnoreCase;
 
-            _excludePatterns = Exclude.Select(e => new WildcardPattern(e, wpoptions))
+            _excludePatterns = Exclude
+                .Select(e => new WildcardPattern(e, wpoptions))
                 .ToArray();
+
+            _withExclude = true;
         }
     }
 
     protected override void ProcessRecord()
     {
+        _paths ??= new string[1] { SessionState.Path.CurrentLocation.Path };
+
+        foreach ((string path, ProviderInfo provider) in _paths.NormalizePath(_isLiteral, this))
+        {
+            if (!provider.AssertFileSystem())
+            {
+                WriteError(ExceptionHelpers.NotFileSystemPathError(path, provider));
+                continue;
+            }
+
+            if (path.AssertArchive())
+            {
+                WriteObject(new PSTreeFile(new FileInfo(path)));
+                continue;
+            }
+
+            Traverse(new DirectoryInfo(path));
+        }
+    }
+
+    private void Traverse(DirectoryInfo directory)
+    {
         _indexer.Clear();
         _files.Clear();
         _result.Clear();
-
-        string resolvedPath = LiteralPath is not null ?
-            GetUnresolvedProviderPathFromPSPath(LiteralPath) :
-            SessionState.Path.CurrentLocation.Path;
-
-        try
-        {
-            var item = InvokeProvider.Item.Get(new string[1] { resolvedPath }, true, true).FirstOrDefault();
-
-            if (item is null)
-            {
-                return;
-            }
-
-            if (item.BaseObject is not FileInfo && item.BaseObject is not DirectoryInfo)
-            {
-                ThrowTerminatingError(new ErrorRecord(
-                    new NotSupportedException("Not supported file system path."),
-                    "PStree.NotSupported",
-                    ErrorCategory.NotImplemented,
-                    resolvedPath));
-            }
-
-            if (item.BaseObject is FileInfo file)
-            {
-                WriteObject(new PSTreeFile(file));
-                return;
-            }
-
-            _stack.Push(new PSTreeDirectory((DirectoryInfo)item.BaseObject));
-        }
-        catch (Exception e)
-        {
-            ThrowTerminatingError(new ErrorRecord(
-                e, "PSTree.GetItem", ErrorCategory.NotSpecified, resolvedPath));
-        }
+        _stack.Push(new PSTreeDirectory(directory));
 
         while (_stack.Count > 0)
         {
@@ -126,7 +141,7 @@ public sealed class PSTree : PSCmdlet
                         continue;
                     }
 
-                    if (Exclude is not null && _excludePatterns.Any(e => e.IsMatch(item.FullName)))
+                    if (_withExclude && _excludePatterns.Any(e => e.IsMatch(item.FullName)))
                     {
                         continue;
                     }
@@ -158,7 +173,7 @@ public sealed class PSTree : PSCmdlet
 
                 if (RecursiveSize.IsPresent)
                 {
-                    _indexer[next.FullName.TrimEnd(Path.DirectorySeparatorChar)] = next;
+                    _indexer[next.FullName.TrimEnd(System.IO.Path.DirectorySeparatorChar)] = next;
 
                     foreach (string parent in next.GetParents())
                     {
