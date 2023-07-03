@@ -121,8 +121,7 @@ Wildcard characters are accepted.
 
 Excluded items do not add to the recursive folders size.
 
->[!NOTE]
->Patterns are tested with the object's `.FullName` property.
+> __NOTE__: Patterns are tested with the object's `.FullName` property.
 
 ```yaml
 Type: String[]
@@ -165,14 +164,14 @@ Aliases: PSPath
 
 Required: False
 Position: 0
-Default value: $PWD
+Default value: None
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
 ```
 
 ### -Path
 
-{{ Fill Path Description }}
+Specifies a path to one or more locations. Wildcards are accepted. The default location is the current directory (`.`).
 
 ```yaml
 Type: String[]
@@ -181,7 +180,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: .
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: True
 ```
@@ -208,8 +207,8 @@ This switch enables the cmdlet to calculate the recursive size of folders in a h
 By default, the cmdlet only displays the size of folders based on the sum of the file's Length in each directory.
 It's important to note that this is a more expensive operation, in order to calculate the recursive size, all items in the hierarchy needs to be traversed.
 
-By default, the size of hidden and system items is not added to the recursive size, for this you must use the \`-Force\` parameter.
-Excluded items with the \`-Exclude\` parameter do not add to the recursive size.
+By default, the size of hidden and system items is not added to the recursive size, for this you must use the `-Force` parameter.
+Excluded items with the `-Exclude` parameter do not add to the recursive size.
 
 ```yaml
 Type: SwitchParameter
@@ -225,11 +224,13 @@ Accept wildcard characters: False
 
 ### CommonParameters
 
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+This cmdlet supports the common parameters. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
-### System.String
+### String
+
+You can pipe a string that contains a path to this cmdlet. Output from `Get-ChildItem` can also be piped to this cmdlet.
 
 ## OUTPUTS
 
