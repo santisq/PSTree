@@ -120,8 +120,9 @@ Any matching item is excluded from the output.
 Wildcard characters are accepted.
 
 Excluded items do not add to the recursive folders size.
-> [!NOTE]
-> Patterns are tested with the object's `.FullName` property.
+
+>[!NOTE]
+>Patterns are tested with the object's `.FullName` property.
 
 ```yaml
 Type: String[]
