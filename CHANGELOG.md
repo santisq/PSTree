@@ -3,7 +3,9 @@
 - __07/03/2023__
   - Added `-Path` parameter, now both `-Path` and `-LiteralPath` parameters take `string[]` as input and support pipeline input.
   - Added Pester tests, Code Coverage and coverage upload to [codecov.io](https://app.codecov.io/gh/santisq/PSTree).
-  - Removed `.Size` Property from `PSTreeFile` and `PSTreeDirectory` instances. The `Size` column has been renamed to `Length` and moved to the left-hand side of the `Hierarchy` column (I know it looks much better on the right-hand side :expressionless: but having it in the left allows for fixed size width in the first 2 columns, which in turn brings less formatting issues :man_shrugging:...)  and the default display for this column is available through `[PSTree.Internal._Format]::GetFormattedLength(...)`, for example:
+  - Removed `.Size` Property from `PSTreeFile` and `PSTreeDirectory` instances. The `Size` column has been renamed to `Length` and moved to the left-hand side of the `Hierarchy` column (I know it looks much better on the right-hand side :expressionless: but having it in the left allows for fixed width in the first 2 columns, which in turn brings less formatting issues :man_shrugging:...).
+
+    The default display for this column is available through `[PSTree.Internal._Format]::GetFormattedLength(...)`, for example:
 
     ```powershell
     Get-PSTree | Select-Object Hierarchy, @{ N='Size'; E={ [PSTree.Internal._Format]::GetFormattedLength($_.Length) }}

@@ -48,16 +48,16 @@ PS ..\PSTree> Get-PSTree | Select-Object -First 20
 
    Source: C:\path\to\PSTree
 
-Mode              Size Hierarchy
-----              ---- ---------
-d----         32.71 KB PSTree
+Mode            Length Hierarchy
+----            ------ ---------
+d----         31.20 KB PSTree
 -a---          4.64 KB ├── .gitignore
 -a---        137.00  B ├── .markdownlint.json
 -a---          2.16 KB ├── build.ps1
--a---          5.58 KB ├── CHANGELOG.md
+-a---          7.90 KB ├── CHANGELOG.md
 -a---          1.07 KB ├── LICENSE
 -a---          8.10 KB ├── PSTree.build.ps1
--a---          9.80 KB ├── README.md
+-a---          5.96 KB ├── README.md
 -a---          1.23 KB ├── ScriptAnalyzerSettings.psd1
 d----          1.74 KB ├── tools
 -a---          1.60 KB │   ├── PesterTest.ps1
@@ -79,16 +79,16 @@ PS ..\PSTree> Get-PSTree -Exclude *tools, *tests  | Select-Object -First 20
 
    Source: C:\path\to\PSTree
 
-Mode              Size Hierarchy
-----              ---- ---------
-d----         31.72 KB PSTree
+Mode            Length Hierarchy
+----            ------ ---------
+d----         31.20 KB PSTree
 -a---          4.64 KB ├── .gitignore
 -a---        137.00  B ├── .markdownlint.json
 -a---          2.16 KB ├── build.ps1
--a---          5.58 KB ├── CHANGELOG.md
+-a---          7.90 KB ├── CHANGELOG.md
 -a---          1.07 KB ├── LICENSE
 -a---          8.10 KB ├── PSTree.build.ps1
--a---          8.81 KB ├── README.md
+-a---          5.96 KB ├── README.md
 -a---          1.23 KB ├── ScriptAnalyzerSettings.psd1
 d----          0.00  B ├── src
 d----         10.30 KB │   └── PSTree
@@ -110,19 +110,19 @@ PS ..\PSTree> Get-PSTree .\src\ -Recurse -Directory
 
    Source: C:\path\to\PSTree\src
 
-Mode              Size Hierarchy
-----              ---- ---------
+Mode            Length Hierarchy
+----            ------ ---------
 d----          0.00  B src
 d----         10.30 KB └── PSTree
 d----         16.53 KB     ├── obj
 d----          0.00  B     │   └── Debug
-d----         87.98 KB     │       └── netstandard2.0
+d----         88.02 KB     │       └── netstandard2.0
 d----          1.13 KB     ├── Internal
-d----          5.47 KB     ├── Commands
+d----          5.68 KB     ├── Commands
 d----          0.00  B     └── bin
 d----          0.00  B         └── Debug
-d----         33.27 KB             └── netstandard2.0
-d----         33.07 KB                 └── publish
+d----         33.31 KB             └── netstandard2.0
+d----         33.11 KB                 └── publish
 ```
 
 ### Display subdirectories only 2 levels deep
@@ -132,8 +132,8 @@ PS ..\PSTree> Get-PSTree .\src\ -Depth 2 -Directory
 
    Source: C:\path\to\PSTree\src
 
-Mode              Size Hierarchy
-----              ---- ---------
+Mode            Length Hierarchy
+----            ------ ---------
 d----          0.00  B src
 d----         10.30 KB └── PSTree
 d----         16.53 KB     ├── obj
@@ -149,8 +149,8 @@ PS ..\PSTree> Get-PSTree .\src\ -Depth 2 -Directory -RecursiveSize
 
    Source: C:\path\to\PSTree\src
 
-Mode              Size Hierarchy
-----              ---- ---------
+Mode            Length Hierarchy
+----            ------ ---------
 d----        188.08 KB src
 d----        188.08 KB └── PSTree
 d----        104.55 KB     ├── obj
