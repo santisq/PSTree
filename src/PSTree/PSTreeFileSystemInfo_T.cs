@@ -44,7 +44,8 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
     }
 
     private protected PSTreeFileSystemInfo(T fileSystemInfo, string source) :
-        base(fileSystemInfo.Name, source) => Instance = fileSystemInfo;
+        base(fileSystemInfo.Name, source) =>
+        Instance = fileSystemInfo;
 
     public bool HasFlag(FileAttributes flag) =>
         Instance.Attributes.HasFlag(flag);

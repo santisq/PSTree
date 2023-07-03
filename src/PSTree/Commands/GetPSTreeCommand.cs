@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
+using System.Text.RegularExpressions;
 
 namespace PSTree;
 
@@ -11,13 +12,14 @@ namespace PSTree;
 [Alias("pstree")]
 public sealed class GetPSTreeCommand : PSCmdlet
 {
-    private bool _isRecursive;
-
     private bool _isLiteral;
 
     private bool _withExclude;
 
     private string[]? _paths;
+
+    private readonly Regex _re = new(@"[\\/]$",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
     private WildcardPattern[]? _excludePatterns;
 
@@ -33,6 +35,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
         ValueFromPipeline = true
     )]
     [SupportsWildcards]
+    [ValidateNotNullOrEmpty]
     public string[]? Path
     {
         get => _paths;
@@ -48,6 +51,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
         ValueFromPipelineByPropertyName = true
     )]
     [Alias("PSPath")]
+    [ValidateNotNullOrEmpty]
     public string[]? LiteralPath
     {
         get => _paths;
@@ -81,7 +85,10 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
     protected override void BeginProcessing()
     {
-        _isRecursive = RecursiveSize.IsPresent || Recurse.IsPresent;
+        if (Recurse.IsPresent && !MyInvocation.BoundParameters.ContainsKey("Depth"))
+        {
+            Depth = int.MaxValue;
+        }
 
         if (Exclude is not null)
         {
@@ -104,17 +111,23 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
         foreach (string path in _paths.NormalizePath(_isLiteral, this))
         {
+            string source = _re.Replace(path, "");
+
             if (path.IsArchive())
             {
-                WriteObject(new PSTreeFile(new FileInfo(path), path));
+                WriteObject(new PSTreeFile(new FileInfo(path), source));
                 continue;
             }
 
-            Traverse(new DirectoryInfo(path), path);
+            WriteObject(
+                Traverse(new DirectoryInfo(path), source),
+                enumerateCollection: true);
         }
     }
 
-    private void Traverse(DirectoryInfo directory, string source)
+    private PSTreeFileSystemInfo[] Traverse(
+        DirectoryInfo directory,
+        string source)
     {
         _indexer.Clear();
         _helper.Clear();
@@ -130,7 +143,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
             try
             {
                 enumerator = next.EnumerateFileSystemInfos();
-                bool keepProcessing = _isRecursive || level <= Depth;
+                bool keepProcessing = level <= Depth;
 
                 foreach (FileSystemInfo item in enumerator)
                 {
@@ -153,7 +166,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
                             continue;
                         }
 
-                        if (Recurse.IsPresent || level <= Depth)
+                        if (keepProcessing)
                         {
                             _helper.AddFile(file, level, source);
                         }
@@ -161,7 +174,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
                         continue;
                     }
 
-                    if (keepProcessing)
+                    if (keepProcessing || RecursiveSize.IsPresent)
                     {
                         _stack.Push(new PSTreeDirectory(
                             (DirectoryInfo)item, level, source));
@@ -175,7 +188,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
                     _indexer.Index(next, size);
                 }
 
-                if (Recurse.IsPresent || next.Depth <= Depth)
+                if (next.Depth <= Depth)
                 {
                     _helper.Add(next);
                     _helper.TryAddFiles();
@@ -187,7 +200,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
             }
             catch (Exception e)
             {
-                if (Recurse.IsPresent || next.Depth <= Depth)
+                if (next.Depth <= Depth)
                 {
                     _helper.Add(next);
                 }
@@ -196,7 +209,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
             }
         }
 
-        WriteObject(_helper.GetResult(), enumerateCollection: true);
+        return _helper.GetResult();
     }
 
     private bool ShouldExclude(FileSystemInfo item) =>

@@ -27,11 +27,6 @@ jobs:
     - name: Check out repository
       uses: actions/checkout@v3
 
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 8.0.x
-
     - name: Build module - Debug
       shell: pwsh
       run: ./build.ps1 -Configuration $env:BUILD_CONFIGURATION -Task Build
@@ -48,11 +43,91 @@ jobs:
         name: PSModule
         path: output/*.nupkg
 
+  test:
+    name: test
+    needs:
+      - build
+    runs-on: ${{ matrix.info.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        info:
+        - name: PS_5.1
+          psversion: '5.1'
+          os: windows-latest
+        - name: PS_7_Windows
+          psversion: '7'
+          os: windows-latest
+        - name: PS_7_Linux
+          psversion: '7'
+          os: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Restore Built PowerShell Module
+      uses: actions/download-artifact@v3
+      with:
+        name: PSModule
+        path: output
+
+    - name: Install Built PowerShell Module
+      shell: pwsh
+      run: |
+        $manifestItem = Get-Item ([IO.Path]::Combine('Module', '*.psd1'))
+        $moduleName = $manifestItem.BaseName
+        $manifest = Test-ModuleManifest -Path $manifestItem.FullName -ErrorAction SilentlyContinue -WarningAction Ignore
+
+        $destPath = [IO.Path]::Combine('output', $moduleName, $manifest.Version)
+        if (-not (Test-Path -LiteralPath $destPath)) {
+            New-Item -Path $destPath -ItemType Directory | Out-Null
+        }
+
+        Get-ChildItem output/*.nupkg | Rename-Item -NewName { $_.Name -replace '.nupkg', '.zip' }
+
+        Expand-Archive -Path output/*.zip -DestinationPath $destPath -Force -ErrorAction Stop
+
+    - name: Run Tests - Windows PowerShell
+      if: ${{ matrix.info.psversion == '5.1' }}
+      shell: pwsh
+      run: |
+        powershell.exe -NoProfile -File ./build.ps1 -Configuration $env:BUILD_CONFIGURATION -Task Test
+        exit $LASTEXITCODE
+
+    - name: Run Tests - PowerShell
+      if: ${{ matrix.info.psversion != '5.1' }}
+      shell: pwsh
+      run: |
+        pwsh -NoProfile -File ./build.ps1 -Configuration $env:BUILD_CONFIGURATION -Task Test
+        exit $LASTEXITCODE
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: Unit Test Results (${{ matrix.info.name }})
+        path: ./output/TestResults/Pester.xml
+
+    - name: Upload Coverage Results
+      if: always() && !startsWith(github.ref, 'refs/tags/v')
+      uses: actions/upload-artifact@v3
+      with:
+        name: Coverage Results (${{ matrix.info.name }})
+        path: ./output/TestResults/Coverage.xml
+
+    - name: Upload Coverage to codecov
+      if: always() && !startsWith(github.ref, 'refs/tags/v')
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./output/TestResults/Coverage.xml
+        flags: ${{ matrix.info.name }}
+
   publish:
     name: publish
     if: startsWith(github.ref, 'refs/tags/v')
     needs:
     - build
+    - test
     runs-on: windows-latest
     steps:
     - name: Restore Built PowerShell Module

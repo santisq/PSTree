@@ -18,7 +18,7 @@
             <Alignment>Left</Alignment>
           </TableColumnHeader>
           <TableColumnHeader>
-            <Label>Size</Label>
+            <Label>Length</Label>
             <Width>14</Width>
             <Alignment>Right</Alignment>
           </TableColumnHeader>
