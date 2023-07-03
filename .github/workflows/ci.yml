@@ -74,7 +74,7 @@ jobs:
     - name: Install Built PowerShell Module
       shell: pwsh
       run: |
-        $manifestItem = Get-Item ([IO.Path]::Combine('Module', '*.psd1'))
+        $manifestItem = Get-Item ([IO.Path]::Combine('module', '*.psd1'))
         $moduleName = $manifestItem.BaseName
         $manifest = Test-ModuleManifest -Path $manifestItem.FullName -ErrorAction SilentlyContinue -WarningAction Ignore
 

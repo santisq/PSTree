@@ -32,7 +32,7 @@ end {
 
         $webParams = @{
             Uri             = "https://www.powershellgallery.com/api/v2/package/$($req.Key)/$($req.Value)"
-            OutFile         = [IO.Path]::Combine($modulePath, "$($req.Key).zip") # WinPS requires the .zip extension to extract
+            OutFile         = [IO.Path]::Combine($modulePath, "$($req.Key).zip")
             UseBasicParsing = $true
         }
 
@@ -53,6 +53,12 @@ end {
         }
 
         Import-Module -Name $targetPath -Force -ErrorAction Stop
+    }
+
+    $dotnetTools = @(dotnet tool list --global) -join "`n"
+    if (-not $dotnetTools.Contains('coverlet.console')) {
+        Write-Host 'Installing dotnet tool coverlet.console'
+        dotnet tool install --global coverlet.console
     }
 
     $invokeBuildSplat = @{
