@@ -6,7 +6,7 @@ using System.Management.Automation;
 
 namespace PSTree;
 
-[Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Depth")]
+[Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Path")]
 [OutputType(typeof(PSTreeDirectory), typeof(PSTreeFile))]
 [Alias("pstree")]
 public sealed class GetPSTreeCommand : PSCmdlet
@@ -25,11 +25,13 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
     private readonly Stack<PSTreeDirectory> _stack = new();
 
-    private readonly List<PSTreeFileSystemInfo> _result = new();
+    private readonly PSTreeHelper _helper = new();
 
-    private readonly List<PSTreeFile> _files = new();
-
-    [Parameter(ParameterSetName = "Path", Position = 0, ValueFromPipeline = true)]
+    [Parameter(
+        ParameterSetName = "Path",
+        Position = 0,
+        ValueFromPipeline = true
+    )]
     [SupportsWildcards]
     public string[]? Path
     {
@@ -41,7 +43,10 @@ public sealed class GetPSTreeCommand : PSCmdlet
         }
     }
 
-    [Parameter(ParameterSetName = "LiteralPath", ValueFromPipelineByPropertyName = true)]
+    [Parameter(
+        ParameterSetName = "LiteralPath",
+        ValueFromPipelineByPropertyName = true
+    )]
     [Alias("PSPath")]
     public string[]? LiteralPath
     {
@@ -53,11 +58,11 @@ public sealed class GetPSTreeCommand : PSCmdlet
         }
     }
 
-    [Parameter(ParameterSetName = "Depth")]
+    [Parameter]
     [ValidateRange(0, int.MaxValue)]
     public int Depth = 3;
 
-    [Parameter(ParameterSetName = "Recurse")]
+    [Parameter]
     public SwitchParameter Recurse { get; set; }
 
     [Parameter]
@@ -97,51 +102,44 @@ public sealed class GetPSTreeCommand : PSCmdlet
     {
         _paths ??= new string[1] { SessionState.Path.CurrentLocation.Path };
 
-        foreach ((string path, ProviderInfo provider) in _paths.NormalizePath(_isLiteral, this))
+        foreach (string path in _paths.NormalizePath(_isLiteral, this))
         {
-            if (!provider.IsFileSystem())
-            {
-                WriteError(ExceptionHelpers.NotFileSystemPathError(path, provider));
-                continue;
-            }
-
             if (path.IsArchive())
             {
-                WriteObject(new PSTreeFile(new FileInfo(path)));
+                WriteObject(new PSTreeFile(new FileInfo(path), path));
                 continue;
             }
 
-            Traverse(new DirectoryInfo(path));
+            Traverse(new DirectoryInfo(path), path);
         }
     }
 
-    private void Traverse(DirectoryInfo directory)
+    private void Traverse(DirectoryInfo directory, string source)
     {
         _indexer.Clear();
-        _files.Clear();
-        _result.Clear();
-        _stack.Push(new PSTreeDirectory(directory));
+        _helper.Clear();
+        _stack.Push(new PSTreeDirectory(directory, source));
 
         while (_stack.Count > 0)
         {
+            IEnumerable<FileSystemInfo> enumerator;
             PSTreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
             long size = 0;
 
             try
             {
-                IEnumerable<FileSystemInfo> enumerator = next.EnumerateFileSystemInfos();
-
+                enumerator = next.EnumerateFileSystemInfos();
                 bool keepProcessing = _isRecursive || level <= Depth;
 
                 foreach (FileSystemInfo item in enumerator)
                 {
-                    if (!Force.IsPresent && item.Attributes.HasFlag(FileAttributes.Hidden))
+                    if (!Force.IsPresent && item.IsHidden())
                     {
                         continue;
                     }
 
-                    if (_withExclude && _excludePatterns.Any(e => e.IsMatch(item.FullName)))
+                    if (_withExclude && ShouldExclude(item))
                     {
                         continue;
                     }
@@ -157,7 +155,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
                         if (Recurse.IsPresent || level <= Depth)
                         {
-                            _files.Add(new PSTreeFile(file, level));
+                            _helper.AddFile(file, level, source);
                         }
 
                         continue;
@@ -165,7 +163,8 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
                     if (keepProcessing)
                     {
-                        _stack.Push(new PSTreeDirectory((DirectoryInfo)item, level));
+                        _stack.Push(new PSTreeDirectory(
+                            (DirectoryInfo)item, level, source));
                     }
                 }
 
@@ -178,13 +177,8 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
                 if (Recurse.IsPresent || next.Depth <= Depth)
                 {
-                    _result.Add(next);
-
-                    if (_files.Count > 0)
-                    {
-                        _result.AddRange(_files.ToArray());
-                        _files.Clear();
-                    }
+                    _helper.Add(next);
+                    _helper.TryAddFiles();
                 }
             }
             catch (PipelineStoppedException)
@@ -195,14 +189,16 @@ public sealed class GetPSTreeCommand : PSCmdlet
             {
                 if (Recurse.IsPresent || next.Depth <= Depth)
                 {
-                    _result.Add(next);
+                    _helper.Add(next);
                 }
 
-                WriteError(new ErrorRecord(
-                    e, "PSTree.Enumerate", ErrorCategory.NotSpecified, next));
+                WriteError(ExceptionHelpers.EnumerationError(next, e));
             }
         }
 
-        WriteObject(_result.ConvertToTree(), enumerateCollection: true);
+        WriteObject(_helper.GetResult(), enumerateCollection: true);
     }
+
+    private bool ShouldExclude(FileSystemInfo item) =>
+        _excludePatterns.Any(e => e.IsMatch(item.FullName));
 }

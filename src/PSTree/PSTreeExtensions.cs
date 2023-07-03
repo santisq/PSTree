@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Management.Automation;
 using System.Text.RegularExpressions;
 using Microsoft.PowerShell.Commands;
@@ -11,19 +10,19 @@ namespace PSTree;
 
 internal static class PSTreeStatic
 {
-    private static readonly List<(string, ProviderInfo)> s_normalizedPaths = new();
+    private static readonly List<string> s_normalizedPaths = new();
 
-    private static readonly Regex _re = new(@"└|\S", RegexOptions.Compiled);
+    private static readonly Regex s_re = new(@"└|\S", RegexOptions.Compiled);
 
     internal static string Indent(this string inputString, int indentation) =>
         new string(' ', (4 * indentation) - 4) + "└── " + inputString;
 
     internal static PSTreeFileSystemInfo[] ConvertToTree(
-        this List<PSTreeFileSystemInfo> inputObject)
+        this PSTreeFileSystemInfo[] inputObject)
     {
         // Well, I don't know what was I thinking when I wrote this, but it works :)
 
-        for (int i = 0; i < inputObject.Count; i++)
+        for (int i = 0; i < inputObject.Length; i++)
         {
             int index = inputObject[i].Hierarchy.IndexOf('└');
 
@@ -34,7 +33,7 @@ internal static class PSTreeStatic
 
             int z = i - 1;
 
-            while (!_re.IsMatch(inputObject[z].Hierarchy[index].ToString()))
+            while (!s_re.IsMatch(inputObject[z].Hierarchy[index].ToString()))
             {
                 char[] replace = inputObject[z].Hierarchy.ToCharArray();
                 replace[index] = '│';
@@ -50,11 +49,13 @@ internal static class PSTreeStatic
             }
         }
 
-        return inputObject.ToArray();
+        return inputObject;
     }
 
-    internal static (string, ProviderInfo)[] NormalizePath(
-        this string[] paths, bool isLiteral, PSCmdlet cmdlet)
+    internal static string[] NormalizePath(
+        this string[] paths,
+        bool isLiteral,
+        PSCmdlet cmdlet)
     {
         Collection<string> resolvedPaths;
         ProviderInfo provider;
@@ -67,7 +68,19 @@ internal static class PSTreeStatic
                 string resolvedPath = cmdlet.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
                     path, out provider, out _);
 
-                s_normalizedPaths.Add((resolvedPath, provider));
+                if (!provider.IsFileSystem())
+                {
+                    cmdlet.WriteError(ExceptionHelpers.InvalidProviderError(path, provider));
+                    continue;
+                }
+
+                if (!resolvedPath.Exists())
+                {
+                    cmdlet.WriteError(ExceptionHelpers.InvalidPathError(resolvedPath));
+                    continue;
+                }
+
+                s_normalizedPaths.Add(resolvedPath);
                 continue;
             }
 
@@ -77,7 +90,14 @@ internal static class PSTreeStatic
 
                 foreach (string resolvedPath in resolvedPaths)
                 {
-                    s_normalizedPaths.Add((resolvedPath, provider));
+                    if (!provider.IsFileSystem())
+                    {
+                        cmdlet.WriteError(ExceptionHelpers.InvalidProviderError(
+                            resolvedPath, provider));
+                        continue;
+                    }
+
+                    s_normalizedPaths.Add(resolvedPath);
                 }
             }
             catch (Exception e)
@@ -89,6 +109,9 @@ internal static class PSTreeStatic
         return s_normalizedPaths.ToArray();
     }
 
+    internal static bool Exists(this string path) =>
+        File.Exists(path) || Directory.Exists(path);
+
     internal static bool IsFileSystem(this ProviderInfo provider) =>
         provider.ImplementingType == typeof(FileSystemProvider);
 
@@ -97,4 +120,7 @@ internal static class PSTreeStatic
 
     internal static bool IsDirectory(this string path) =>
         File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+
+    internal static bool IsHidden(this FileSystemInfo item) =>
+        item.Attributes.HasFlag(FileAttributes.Hidden);
 }

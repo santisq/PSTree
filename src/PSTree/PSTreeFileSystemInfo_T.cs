@@ -36,15 +36,16 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
 
     public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
 
-    private protected PSTreeFileSystemInfo(T fileSystemInfo, int depth) :
-        base(fileSystemInfo.Name.Indent(depth))
+    private protected PSTreeFileSystemInfo(T fileSystemInfo, int depth, string source) :
+        base(fileSystemInfo.Name.Indent(depth), source)
     {
         Instance = fileSystemInfo;
         Depth = depth;
     }
 
-    private protected PSTreeFileSystemInfo(T fileSystemInfo) :
-        base(fileSystemInfo.Name) => Instance = fileSystemInfo;
+    private protected PSTreeFileSystemInfo(T fileSystemInfo, string source) :
+        base(fileSystemInfo.Name, source) => Instance = fileSystemInfo;
 
-    public bool HasFlag(FileAttributes flag) => Instance.Attributes.HasFlag(flag);
+    public bool HasFlag(FileAttributes flag) =>
+        Instance.Attributes.HasFlag(flag);
 }

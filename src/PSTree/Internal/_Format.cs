@@ -28,6 +28,10 @@ public static class _Format
         string.Format(CultureInfo.CurrentCulture, "{0,10:d} {0,8:t}", date);
 
     [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
+    public static string GetSource(PSTreeFileSystemInfo item) =>
+        item.Source;
+
+    [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
     public static string GetFormattedLength(long length)
     {
         int index = 0;

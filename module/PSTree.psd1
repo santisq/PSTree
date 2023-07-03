@@ -11,7 +11,7 @@
     RootModule = 'bin/netstandard2.0/PSTree.dll'
 
     # Version number of this module.
-    ModuleVersion = '2.1.11'
+    ModuleVersion = '2.1.12'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
