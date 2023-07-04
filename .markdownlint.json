@@ -1,0 +1,7 @@
+{
+  "default": true,
+  "no-hard-tabs": true,
+  "no-duplicate-heading": false,
+  "line-length": false,
+  "no-inline-html": false
+}

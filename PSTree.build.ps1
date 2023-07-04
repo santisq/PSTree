@@ -8,18 +8,26 @@ param(
 
 $modulePath = [IO.Path]::Combine($PSScriptRoot, 'module')
 $manifestItem = Get-Item ([IO.Path]::Combine($modulePath, '*.psd1'))
-
 $ModuleName = $manifestItem.BaseName
-$Manifest = Test-ModuleManifest -Path $manifestItem.FullName -ErrorAction Ignore -WarningAction Ignore
+
+$testModuleManifestSplat = @{
+    Path          = $manifestItem.FullName
+    ErrorAction   = 'Ignore'
+    WarningAction = 'Ignore'
+}
+$Manifest = Test-ModuleManifest @testModuleManifestSplat
 $Version = $Manifest.Version
 $BuildPath = [IO.Path]::Combine($PSScriptRoot, 'output')
 $PowerShellPath = [IO.Path]::Combine($PSScriptRoot, 'module')
 $CSharpPath = [IO.Path]::Combine($PSScriptRoot, 'src', $ModuleName)
 $ReleasePath = [IO.Path]::Combine($BuildPath, $ModuleName, $Version)
 $IsUnix = $PSEdition -eq 'Core' -and -not $IsWindows
-$UseNativeArguments =
-    $PSVersionTable.PSVersion.Major -gt 7 -or
-    ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -gt 2)
+$UseNativeArguments = $PSVersionTable.PSVersion -gt '7.0'
+($csharpProjectInfo = [xml]::new()).Load((Get-Item ([IO.Path]::Combine($CSharpPath, '*.csproj'))).FullName)
+$TargetFrameworks = @(@($csharpProjectInfo.Project.PropertyGroup)[0].
+    TargetFrameworks.Split(';', [StringSplitOptions]::RemoveEmptyEntries))
+
+$PSFramework = $TargetFrameworks[0]
 
 [xml] $csharpProjectInfo = Get-Content ([IO.Path]::Combine($CSharpPath, '*.csproj'))
 $TargetFrameworks = @(@($csharpProjectInfo.Project.PropertyGroup)[0].TargetFrameworks.Split(
@@ -36,7 +44,7 @@ task Clean {
 
 task BuildDocs {
     $helpParams = @{
-        Path = [IO.Path]::Combine($PSScriptRoot, 'docs', 'en-US')
+        Path       = [IO.Path]::Combine($PSScriptRoot, 'docs', 'en-US')
         OutputPath = [IO.Path]::Combine($ReleasePath, 'en-US')
     }
     New-ExternalHelp @helpParams | Out-Null
@@ -69,10 +77,10 @@ task BuildManaged {
 
 task CopyToRelease {
     $copyParams = @{
-        Path = [IO.Path]::Combine($PowerShellPath, '*')
+        Path        = [IO.Path]::Combine($PowerShellPath, '*')
         Destination = $ReleasePath
-        Recurse = $true
-        Force = $true
+        Recurse     = $true
+        Force       = $true
     }
     Copy-Item @copyParams
 
@@ -82,7 +90,7 @@ task CopyToRelease {
         if (-not (Test-Path -LiteralPath $binFolder)) {
             New-Item -Path $binFolder -ItemType Directory | Out-Null
         }
-        Copy-Item ([IO.Path]::Combine($buildFolder, "*")) -Destination $binFolder -Recurse
+        Copy-Item ([IO.Path]::Combine($buildFolder, '*')) -Destination $binFolder -Recurse
     }
 }
 
@@ -93,9 +101,9 @@ task Package {
     }
 
     $repoParams = @{
-        Name = 'LocalRepo'
-        SourceLocation = $BuildPath
-        PublishLocation = $BuildPath
+        Name               = 'LocalRepo'
+        SourceLocation     = $BuildPath
+        PublishLocation    = $BuildPath
         InstallationPolicy = 'Trusted'
     }
     if (Get-PSRepository -Name $repoParams.Name -ErrorAction SilentlyContinue) {
@@ -113,22 +121,22 @@ task Package {
 
 task Analyze {
     $pssaSplat = @{
-        Path = $ReleasePath
-        Settings = [IO.Path]::Combine($PSScriptRoot, 'ScriptAnalyzerSettings.psd1')
-        Recurse = $true
+        Path        = $ReleasePath
+        Settings    = [IO.Path]::Combine($PSScriptRoot, 'ScriptAnalyzerSettings.psd1')
+        Recurse     = $true
         ErrorAction = 'SilentlyContinue'
     }
     $results = Invoke-ScriptAnalyzer @pssaSplat
     if ($null -ne $results) {
         $results | Out-String
-        throw "Failed PsScriptAnalyzer tests, build failed"
+        throw 'Failed PsScriptAnalyzer tests, build failed'
     }
 }
 
 task DoUnitTest {
     $testsPath = [IO.Path]::Combine($PSScriptRoot, 'tests', 'units')
     if (-not (Test-Path -LiteralPath $testsPath)) {
-        Write-Host "No unit tests found, skipping"
+        Write-Host 'No unit tests found, skipping'
         return
     }
 
@@ -137,9 +145,7 @@ task DoUnitTest {
         New-Item $resultsPath -ItemType Directory -ErrorAction Stop | Out-Null
     }
 
-    # dotnet test places the results in a subfolder of the results-directory. This subfolder is based on a random guid
-    # so a temp folder is used to ensure we only get the current runs results
-    $tempResultsPath = [IO.Path]::Combine($resultsPath, "TempUnit")
+    $tempResultsPath = [IO.Path]::Combine($resultsPath, 'TempUnit')
     if (Test-Path -LiteralPath $tempResultsPath) {
         Remove-Item -LiteralPath $tempResultsPath -Force -Recurse
     }
@@ -164,11 +170,11 @@ task DoUnitTest {
             }
         )
 
-        Write-Host "Running unit tests"
+        Write-Host 'Running unit tests'
         dotnet @arguments
 
         if ($LASTEXITCODE) {
-            throw "Unit tests failed"
+            throw 'Unit tests failed'
         }
 
         if ($Configuration -eq 'Debug') {
@@ -182,8 +188,8 @@ task DoUnitTest {
 
 task DoTest {
     $pesterScript = [IO.Path]::Combine($PSScriptRoot, 'tools', 'PesterTest.ps1')
-    if(-not (Test-Path $pesterScript)) {
-        Write-Host "No Pester tests found, skipping"
+    if (-not (Test-Path $pesterScript)) {
+        Write-Host 'No Pester tests found, skipping'
         return
     }
 
@@ -210,7 +216,6 @@ task DoTest {
     )
 
     if ($Configuration -eq 'Debug') {
-        # We use coverlet to collect code coverage of our binary
         $unitCoveragePath = [IO.Path]::Combine($resultsPath, 'UnitCoverage.json')
         $targetArgs = '"' + ($arguments -join '" "') + '"'
 
@@ -236,14 +241,12 @@ task DoTest {
     }
 
     & $pwsh $arguments
+
     if ($LASTEXITCODE) {
-        throw "Pester failed tests"
+        throw 'Pester failed tests'
     }
 }
 
 task Build -Jobs Clean, BuildManaged, CopyToRelease, BuildDocs, Package
-
-# FIXME: Work out why we need the obj and bin folder for coverage to work
 task Test -Jobs BuildManaged, Analyze, DoUnitTest, DoTest
-
 task . Build

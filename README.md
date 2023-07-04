@@ -1,20 +1,25 @@
 <h1 align="center">PSTree</h1>
 
 <div align="center">
-    <sub>
-        Tree like cmdlet for PowerShell!
-    </sub>
+    <sub>Tree like cmdlet for PowerShell!</sub>
     <br /><br />
 
 [![build](https://github.com/santisq/PSTree/actions/workflows/ci.yml/badge.svg)](https://github.com/santisq/PSTree/actions/workflows/ci.yml)
-[![PSTree on PowerShell Gallery](https://img.shields.io/powershellgallery/v/PSTree?label=gallery)](https://www.powershellgallery.com/packages/PSTree)
+[![codecov](https://codecov.io/gh/santisq/PSTree/branch/main/graph/badge.svg?token=b51IOhpLfQ)](https://codecov.io/gh/santisq/PSTree)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/PSTree?label=gallery)](https://www.powershellgallery.com/packages/PSTree)
 [![LICENSE](https://img.shields.io/github/license/santisq/PSTree)](https://github.com/santisq/PSTree/blob/main/LICENSE)
 
 </div>
 
-`Get-PSTree` is a PowerShell cmdlet that intends to emulate the [`tree` command](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) with added functionality to calculate the __folders size__ as well as __recursive folders size__.
+PSTree is a PowerShell Module that includes the `Get-PSTree` cmdlet that intends to emulate the [`tree` command](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/tree) with added functionalities to calculate the __folders size__ as well as __recursive folders size__.
+
+## Documentation
+
+Check out [__the docs__](./docs/en-US/Get-PSTree.md) for information about how to use this Module.
 
 ## Installation
+
+### Gallery
 
 The module is available through the [PowerShell Gallery](https://www.powershellgallery.com/packages/PSTree):
 
@@ -22,193 +27,137 @@ The module is available through the [PowerShell Gallery](https://www.powershellg
 Install-Module PSTree -Scope CurrentUser
 ```
 
+### Source
+
+```powershell
+git clone 'https://github.com/santisq/PSTree.git'
+Set-Location ./PSTree
+./build.ps1
+```
+
 ## Requirements
 
-Compatible with __Windows PowerShell v5.1__ and __PowerShell 7+__.
+Compatible with __Windows PowerShell v5.1__ and [__PowerShell 7+__](https://github.com/PowerShell/PowerShell).
 
 ## Usage
 
-### Get the current directory hierarchy with default parameters values
+### Get the current directory tree with default parameters values
 
 ```powershell
-PS ..\PSTree> Get-PSTree
+PS ..\PSTree> Get-PSTree | Select-Object -First 20
 
-Mode  Hierarchy                         Size
-----  ---------                         ----
-d---- PSTree                        27.27 Kb
--a--- ├── .gitignore                 4.64 Kb
--a--- ├── build.ps1                  2.16 Kb
--a--- ├── CHANGELOG.md               5.44 Kb
--a--- ├── LICENSE                    1.07 Kb
--a--- ├── PSTree.build.ps1            8.1 Kb
--a--- ├── README.md                  5.87 Kb
-d---- ├── tools                    107 Bytes
--a--- │   ├── requiredModules.psd1 107 Bytes
-d---- │   └── Modules                0 Bytes
-d---- │       ├── PSScriptAnalyzer   1.44 Mb
-d---- │       ├── platyPS          401.83 Kb
-d---- │       └── InvokeBuild      143.43 Kb
-d---- ├── src                        0 Bytes
-d---- │   └── PSTree                  5.3 Kb
--a--- │       ├── PSTree.csproj    439 Bytes
--a--- │       ├── PSTreeStatic.cs     1.8 Kb
--a--- │       ├── PSTreeTypes.cs     3.07 Kb
-d---- │       ├── obj               16.53 Kb
-d---- │       ├── Commands           5.98 Kb
-d---- │       └── bin                0 Bytes
-d---- ├── output                    20.34 Kb
--a--- │   ├── PSTree.2.1.9.nupkg    20.34 Kb
-d---- │   └── PSTree                 0 Bytes
-d---- │       └── 2.1.9              5.85 Kb
-d---- ├── module                     5.85 Kb
--a--- │   ├── PSTree.Format.ps1xml   1.23 Kb
--a--- │   └── PSTree.psd1            4.62 Kb
-d---- ├── docs                       0 Bytes
-d---- │   └── en-US                   4.3 Kb
--a--- │       └── Get-PSTree.md       4.3 Kb
-d---- ├── .vscode                    4.07 Kb
--a--- │   ├── extensions.json      275 Bytes
--a--- │   ├── launch.json            1.35 Kb
--a--- │   ├── settings.json          1.02 Kb
--a--- │   └── tasks.json             1.43 Kb
-d---- └── .github                    0 Bytes
-d----     └── workflows              1.77 Kb
--a---         └── ci.yml             1.77 Kb
+   Source: C:\path\to\PSTree
+
+Mode            Length Hierarchy
+----            ------ ---------
+d----         31.20 KB PSTree
+-a---          4.64 KB ├── .gitignore
+-a---        137.00  B ├── .markdownlint.json
+-a---          2.16 KB ├── build.ps1
+-a---          7.90 KB ├── CHANGELOG.md
+-a---          1.07 KB ├── LICENSE
+-a---          8.10 KB ├── PSTree.build.ps1
+-a---          5.96 KB ├── README.md
+-a---          1.23 KB ├── ScriptAnalyzerSettings.psd1
+d----          1.74 KB ├── tools
+-a---          1.60 KB │   ├── PesterTest.ps1
+-a---        141.00  B │   ├── requiredModules.psd1
+d----          0.00  B │   └── Modules
+d----          1.44 MB │       ├── PSScriptAnalyzer
+d----        401.83 KB │       ├── platyPS
+d----        771.55 KB │       ├── Pester
+d----        143.43 KB │       └── InvokeBuild
+d----          6.76 KB ├── tests
+-a---          6.76 KB │   └── PSTree.Tests.ps1
+d----          0.00  B ├── src
 ```
 
-### Exclude `.vscode` and `.github` folders
+### Exclude `tools` and `tests` folders
 
 ```powershell
-PS ..\PSTree> Get-PSTree -Exclude *.vscode, *.github
+PS ..\PSTree> Get-PSTree -Exclude *tools, *tests  | Select-Object -First 20
 
-Mode  Hierarchy                         Size
-----  ---------                         ----
-d---- PSTree                        27.82 Kb
--a--- ├── .gitignore                 4.64 Kb
--a--- ├── build.ps1                  2.16 Kb
--a--- ├── CHANGELOG.md               5.44 Kb
--a--- ├── LICENSE                    1.07 Kb
--a--- ├── PSTree.build.ps1            8.1 Kb
--a--- ├── README.md                  6.42 Kb
-d---- ├── tools                    107 Bytes
--a--- │   ├── requiredModules.psd1 107 Bytes
-d---- │   └── Modules                0 Bytes
-d---- │       ├── PSScriptAnalyzer   1.44 Mb
-d---- │       ├── platyPS          401.83 Kb
-d---- │       └── InvokeBuild      143.43 Kb
-d---- ├── src                        0 Bytes
-d---- │   └── PSTree                  5.3 Kb
--a--- │       ├── PSTree.csproj    439 Bytes
--a--- │       ├── PSTreeStatic.cs     1.8 Kb
--a--- │       ├── PSTreeTypes.cs     3.07 Kb
-d---- │       ├── obj               16.53 Kb
-d---- │       ├── Commands           5.98 Kb
-d---- │       └── bin                0 Bytes
-d---- ├── output                    20.34 Kb
--a--- │   ├── PSTree.2.1.9.nupkg    20.34 Kb
-d---- │   └── PSTree                 0 Bytes
-d---- │       └── 2.1.9              5.85 Kb
-d---- ├── module                     5.85 Kb
--a--- │   ├── PSTree.Format.ps1xml   1.23 Kb
--a--- │   └── PSTree.psd1            4.62 Kb
-d---- └── docs                       0 Bytes
-d----     └── en-US                   4.3 Kb
--a---         └── Get-PSTree.md       4.3 Kb
+   Source: C:\path\to\PSTree
+
+Mode            Length Hierarchy
+----            ------ ---------
+d----         31.20 KB PSTree
+-a---          4.64 KB ├── .gitignore
+-a---        137.00  B ├── .markdownlint.json
+-a---          2.16 KB ├── build.ps1
+-a---          7.90 KB ├── CHANGELOG.md
+-a---          1.07 KB ├── LICENSE
+-a---          8.10 KB ├── PSTree.build.ps1
+-a---          5.96 KB ├── README.md
+-a---          1.23 KB ├── ScriptAnalyzerSettings.psd1
+d----          0.00  B ├── src
+d----         10.30 KB │   └── PSTree
+-a---        931.00  B │       ├── ExceptionHelpers.cs
+-a---        439.00  B │       ├── PSTree.csproj
+-a---          1.06 KB │       ├── PSTreeDirectory.cs
+-a---          4.01 KB │       ├── PSTreeExtensions.cs
+-a---        517.00  B │       ├── PSTreeFile.cs
+-a---        399.00  B │       ├── PSTreeFileSystemInfo.cs
+-a---          1.51 KB │       ├── PSTreeFileSystemInfo_T.cs
+-a---        897.00  B │       ├── PSTreeHelper.cs
+-a---        619.00  B │       ├── PSTreeIndexer.cs
 ```
 
-### Get the hierarchy of `C:\Windows\System32` recursively displaying only folders
+### Get the `src` tree recursively displaying only folders
 
 ```powershell
-PS ..\PSTree> $tree = Get-PSTree C:\Windows\System32\ -Directory -Recurse -EA 0
-PS ..\PSTree> $tree | Select-Object -First 20
+PS ..\PSTree> Get-PSTree .\src\ -Recurse -Directory
 
-Mode  Hierarchy                                  Size
-----  ---------                                  ----
-d---- System32                                2.12 Gb
-d---- ├── zh-TW                              204.5 Kb
-d---- ├── zh-CN                             234.99 Kb
-d---- ├── winrm                               0 Bytes
-d---- │   └── 0409                          100.12 Kb
-d---- ├── WinMetadata                         6.18 Mb
-d---- ├── winevt                              0 Bytes
-d---- │   ├── TraceFormat                     0 Bytes
-d---- │   └── Logs                          296.28 Mb
-d---- ├── WindowsPowerShell                   0 Bytes
-d---- │   └── v1.0                            1.73 Mb
-d---- │       ├── SessionConfig               0 Bytes
-d---- │       ├── Schemas                     0 Bytes
-d---- │       │   └── PSMaml                532.76 Kb
-d---- │       ├── Modules                     0 Bytes
-d---- │       │   ├── WindowsUpdateProvider  16.51 Kb
-d---- │       │   ├── WindowsUpdate          16.09 Kb
-d---- │       │   ├── WindowsSearch          17.83 Kb
-d---- │       │   │   └── en                   5.5 Kb
-d---- │       │   ├── WindowsErrorReporting    7.4 Kb
+   Source: C:\path\to\PSTree\src
+
+Mode            Length Hierarchy
+----            ------ ---------
+d----          0.00  B src
+d----         10.30 KB └── PSTree
+d----         16.53 KB     ├── obj
+d----          0.00  B     │   └── Debug
+d----         88.02 KB     │       └── netstandard2.0
+d----          1.13 KB     ├── Internal
+d----          5.68 KB     ├── Commands
+d----          0.00  B     └── bin
+d----          0.00  B         └── Debug
+d----         33.31 KB             └── netstandard2.0
+d----         33.11 KB                 └── publish
 ```
 
-### Recurse subdirectories only 2 levels in Depth
+### Display subdirectories only 2 levels deep
 
 ```powershell
-PS ..\PSTree> $tree = Get-PSTree C:\Windows\System32\ -Directory -Depth 2 -EA 0
-PS ..\PSTree> $tree | Select-Object -First 20
+PS ..\PSTree> Get-PSTree .\src\ -Depth 2 -Directory
 
-Mode  Hierarchy                  Size
-----  ---------                  ----
-d---- System32                2.12 Gb
-d---- ├── zh-TW              204.5 Kb
-d---- ├── zh-CN             234.99 Kb
-d---- ├── winrm               0 Bytes
-d---- │   └── 0409          100.12 Kb
-d---- ├── WinMetadata         6.18 Mb
-d---- ├── winevt              0 Bytes
-d---- │   ├── TraceFormat     0 Bytes
-d---- │   └── Logs          296.28 Mb
-d---- ├── WindowsPowerShell   0 Bytes
-d---- │   └── v1.0            1.73 Mb
-d---- ├── WinBioPlugIns       1.86 Mb
-d---- │   ├── FaceDriver    717.47 Kb
-d---- │   └── en-US           0 Bytes
-d---- ├── WinBioDatabase      1.12 Kb
-d---- ├── WDI                 0 Bytes
-d---- ├── WCN                 0 Bytes
-d---- │   └── en-US           0 Bytes
-d---- ├── wbem                66.4 Mb
-d---- │   ├── xml            99.87 Kb
+   Source: C:\path\to\PSTree\src
+
+Mode            Length Hierarchy
+----            ------ ---------
+d----          0.00  B src
+d----         10.30 KB └── PSTree
+d----         16.53 KB     ├── obj
+d----          1.13 KB     ├── Internal
+d----          5.68 KB     ├── Commands
+d----          0.00  B     └── bin
 ```
 
 ### Get the recursive size of the folders
 
 ```powershell
-PS ..\PSTree> $tree = Get-PSTree C:\Windows\System32\ -Directory -Depth 2 -RecursiveSize -EA 0
-PS ..\PSTree> $tree | Select-Object -First 20
+PS ..\PSTree> Get-PSTree .\src\ -Depth 2 -Directory -RecursiveSize
 
-Mode  Hierarchy                  Size
-----  ---------                  ----
-d---- System32                7.73 Gb
-d---- ├── zh-TW              204.5 Kb
-d---- ├── zh-CN             234.99 Kb
-d---- ├── winrm             100.12 Kb
-d---- │   └── 0409          100.12 Kb
-d---- ├── WinMetadata         6.18 Mb
-d---- ├── winevt            296.28 Mb
-d---- │   ├── TraceFormat     0 Bytes
-d---- │   └── Logs          296.28 Mb
-d---- ├── WindowsPowerShell  10.55 Mb
-d---- │   └── v1.0           10.55 Mb
-d---- ├── WinBioPlugIns      56.33 Mb
-d---- │   ├── FaceDriver     54.48 Mb
-d---- │   └── en-US           0 Bytes
-d---- ├── WinBioDatabase      1.12 Kb
-d---- ├── WDI                 0 Bytes
-d---- ├── WCN                 0 Bytes
-d---- │   └── en-US           0 Bytes
-d---- ├── wbem               110.6 Mb
-d---- │   ├── xml            99.87 Kb
+   Source: C:\path\to\PSTree\src
+
+Mode            Length Hierarchy
+----            ------ ---------
+d----        188.08 KB src
+d----        188.08 KB └── PSTree
+d----        104.55 KB     ├── obj
+d----          1.13 KB     ├── Internal
+d----          5.68 KB     ├── Commands
+d----         66.42 KB     └── bin
 ```
-
-## Documentation
-
-See the [`Get-PSTree` doc](/docs/en-US/Get-PSTree.md) for parameter details and syntax.
 
 ## Changelog
 

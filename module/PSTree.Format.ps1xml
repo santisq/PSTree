@@ -4,36 +4,43 @@
     <View>
       <Name>treeview</Name>
       <ViewSelectedBy>
-        <TypeName>PSTree.PSTreeDirectory</TypeName>
-        <TypeName>PSTree.PSTreeFile</TypeName>
+        <TypeName>PSTree.PSTreeFileSystemInfo</TypeName>
       </ViewSelectedBy>
+      <GroupBy>
+        <ScriptBlock>[PSTree.Internal._Format]::GetSource($_)</ScriptBlock>
+        <Label>Source</Label>
+      </GroupBy>
       <TableControl>
         <TableHeaders>
           <TableColumnHeader>
             <Label>Mode</Label>
+            <Width>7</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Length</Label>
+            <Width>14</Width>
+            <Alignment>Right</Alignment>
           </TableColumnHeader>
           <TableColumnHeader>
             <Label>Hierarchy</Label>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>Size</Label>
-            <Alignment>Right</Alignment>
+            <Alignment>Left</Alignment>
           </TableColumnHeader>
         </TableHeaders>
         <TableRowEntries>
-        <TableRowEntry>
+          <TableRowEntry>
             <TableColumnItems>
-            <TableColumnItem>
-              <PropertyName>Mode</PropertyName>
-            </TableColumnItem>
-            <TableColumnItem>
-              <PropertyName>Hierarchy</PropertyName>
-            </TableColumnItem>
-            <TableColumnItem>
-              <PropertyName>Size</PropertyName>
-            </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Mode</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>[PSTree.Internal._Format]::GetFormattedLength($_.Length)</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Hierarchy</PropertyName>
+              </TableColumnItem>
             </TableColumnItems>
-        </TableRowEntry>
+          </TableRowEntry>
         </TableRowEntries>
       </TableControl>
     </View>
