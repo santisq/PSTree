@@ -17,14 +17,14 @@
             $folderSplat = @{
                 ItemType = 'Directory'
                 Force    = $true
-                Path     = Join-Path $testHiddenFolder.FullName ('HiddenFolder{0:D2}' -f $_)
+                Path     = Join-Path $testHiddenFolder.FullName ('.HiddenFolder{0:D2}' -f $_)
             }
             $newFolder = New-Item @folderSplat
 
             $fileSplat = @{
                 ItemType = 'File'
                 Force    = $true
-                Path     = Join-Path $newFolder.FullName ('HiddenFile{0:D2}' -f $_)
+                Path     = Join-Path $newFolder.FullName ('.HiddenFile{0:D2}' -f $_)
             }
 
             $newFolder
