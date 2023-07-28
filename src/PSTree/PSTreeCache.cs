@@ -3,13 +3,13 @@ using System.IO;
 
 namespace PSTree;
 
-internal class PSTreeHelper
+internal class PSTreeCache
 {
     private readonly List<PSTreeFileSystemInfo> _items;
 
     private readonly List<PSTreeFile> _files;
 
-    internal PSTreeHelper()
+    internal PSTreeCache()
     {
         _items = new();
         _files = new();
@@ -30,7 +30,7 @@ internal class PSTreeHelper
         }
     }
 
-    internal PSTreeFileSystemInfo[] GetResult() =>
+    internal PSTreeFileSystemInfo[] GetTree() =>
         _items.ToArray().ConvertToTree();
 
     internal void Clear()

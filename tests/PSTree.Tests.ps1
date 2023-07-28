@@ -3,6 +3,7 @@
         $ErrorActionPreference = 'Stop'
         $moduleName = (Get-Item ([IO.Path]::Combine($PSScriptRoot, '..', 'module', '*.psd1'))).BaseName
         $manifestPath = [IO.Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
+        Import-Module $manifestPath
         $testPath = Split-Path $PSScriptRoot
 
         $newItemSplat = @{
@@ -34,7 +35,6 @@
         }
 
         $testPath | Out-Null
-        Import-Module $manifestPath -ErrorAction Stop
     }
 
     Context 'Get-PSTree' {
