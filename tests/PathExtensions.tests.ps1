@@ -9,10 +9,16 @@ Import-Module ([System.IO.Path]::Combine($PSScriptRoot, 'shared.psm1'))
 
 Describe 'PathExtensions' {
     BeforeAll {
-        $pathExtensions = (Get-PSTree -Depth 0).GetType().Assembly.GetType('PSTree.PathExtensions')
-        $normalizePath = $pathExtensions.GetMethod(
-            'NormalizePath', [System.Reflection.BindingFlags] 'NonPublic, Static',
-            [type[]] ([string], [bool], [System.Management.Automation.PSCmdlet], [bool], [bool]))
+        $normalizePath = (Get-PSTree -Depth 0).GetType().
+            Assembly.
+            GetType('PSTree.PathExtensions').
+            GetMethod(
+                'NormalizePath',
+                [System.Reflection.BindingFlags] 'NonPublic, Static',
+                $null,
+                [type[]] ([string], [bool], [System.Management.Automation.PSCmdlet], [bool], [bool]),
+                $null)
+
         $normalizePath | Out-Null
     }
 
