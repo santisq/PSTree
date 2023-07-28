@@ -163,7 +163,7 @@ Parameter Sets: LiteralPath
 Aliases: PSPath
 
 Required: False
-Position: 0
+Position: Named
 Default value: None
 Accept pipeline input: True (ByPropertyName)
 Accept wildcard characters: False
@@ -179,8 +179,8 @@ Parameter Sets: Path
 Aliases:
 
 Required: False
-Position: Named
-Default value: .
+Position: 0
+Default value: Current directory
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: True
 ```
@@ -230,8 +230,10 @@ This cmdlet supports the common parameters. For more information, see [about_Com
 
 ### String
 
-You can pipe a string that contains a path to this cmdlet. Output from `Get-ChildItem` can also be piped to this cmdlet.
+You can pipe a string that contains a path to this cmdlet. Output from `Get-Item` and `Get-ChildItem` can be piped to this cmdlet.
 
 ## OUTPUTS
 
-### PSTreeDirectory, PSTreeFile
+### PSTreeDirectory
+
+### PSTreeFile
