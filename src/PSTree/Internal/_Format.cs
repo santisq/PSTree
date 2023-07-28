@@ -8,7 +8,7 @@ namespace PSTree.Internal;
 #pragma warning disable IDE1006
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public static class _Format
+public static class _FormattingInternals
 {
     private readonly static string[] s_suffix =
     {
