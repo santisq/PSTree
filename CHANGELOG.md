@@ -6,6 +6,7 @@
     ```powershell
     Get-PStree -Depth 0 | Get-Item
     ```
+
   - Added `.Refresh()` method to `PSTreeFileSystemInfo<T>`, functionality is the same as [`FileSystemInfo.Refresh` Method](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.refresh?view=net-7.0#system-io-filesysteminfo-refresh).
   - Reorganizing source files and Pester tests.
   - Added more Pester tests.
