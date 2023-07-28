@@ -42,6 +42,14 @@
             { Get-PSTree -Path doesnotexist } | Should -Throw
         }
 
+        It '-Path should throw on invalid Provider Path' {
+            { Get-PSTree -Path function: } | Should -Throw
+        }
+
+        It '-LiteralPath should throw on invalid Provider Path' {
+            { Get-PSTree -LiteralPath function: } | Should -Throw
+        }
+
         It '-Path should support wildcards' {
             Get-PSTree * | Should -Not -BeNullOrEmpty
         }
@@ -51,8 +59,8 @@
         }
 
         It 'Can take pipeline input to -Path' {
-        (Get-ChildItem $testPath).FullName |
-                Get-PSTree | Should -Not -BeNullOrEmpty
+            (Get-ChildItem $testPath).FullName | Get-PSTree |
+                Should -Not -BeNullOrEmpty
         }
 
         It 'Can take pipeline input to -LiteralPath' {
@@ -130,6 +138,23 @@
     }
 
     Context 'PSTreeFileSystemInfo<T>' {
+        BeforeAll {
+            $standardProperties = @(
+                'Name'
+                'Mode'
+                'FullName'
+                'Extension'
+                'Attributes'
+                'Length'
+                'CreationTime'
+                'CreationTimeUtc'
+                'LastWriteTime'
+                'LastWriteTimeUtc'
+            )
+
+            $standardProperties | Out-Null
+        }
+
         It 'Can determine if an instance is a Directory or File with its .HasFlag() method' {
             $testPath | Get-PSTree | ForEach-Object {
                 if ($_.HasFlag([System.IO.FileAttributes]::Directory)) {
@@ -139,6 +164,41 @@
 
                 $_ | Should -BeOfType ([PSTree.PSTreeFile])
             }
+        }
+
+        It 'Shares same properties as FileSystemInfo' {
+            $instance = $testPath | Get-PSTree |
+                Where-Object { $_ -is [PSTree.PSTreeFile] } |
+                Select-Object -First 1
+
+            $instance | Should -HaveCount 1
+
+            $item = $instance | Get-Item
+
+            foreach ($property in $standardProperties) {
+                $instance.$property | Should -BeExactly ($item.$property)
+            }
+        }
+
+        It 'Can refresh the state of the object' {
+            { $testPath | Get-PSTree | ForEach-Object Refresh } |
+                Should -Not -Throw
+        }
+
+        It 'ToString() should resolve to the instance FullName property' {
+            $testPath | Get-PSTree | ForEach-Object {
+                $_.ToString() | Should -BeExactly $_.FullName
+            }
+        }
+
+        It 'LastAccessTime properties should refresh when calling Refresh()' {
+            $instance = $testPath | Get-PSTree | Select-Object -First 1
+            $accessTime = $instance.LastAccessTime
+            $accessTimeUtc = $instance.LastAccessTimeUtc
+            Start-Sleep 5
+            $instance.Refresh()
+            $accessTime | Should -BeLessThan $instance.LastAccessTime
+            $accessTimeUtc | Should -BeLessThan $instance.LastAccessTimeUtc
         }
     }
 
@@ -167,6 +227,22 @@
         }
     }
 
+    Context 'PSTreeFile' {
+        It 'Has a reference of the parent DirectoryInfo instance' {
+            $instance = $testPath | Get-PSTree | Where-Object { $_ -is [PSTree.PSTreeFile] } |
+                Select-Object -First 1
+
+            $instance.Directory | Should -BeOfType ([System.IO.DirectoryInfo])
+        }
+
+        It 'Has a reference of the parent directory path' {
+            $instance = $testPath | Get-PSTree | Where-Object { $_ -is [PSTree.PSTreeFile] } |
+                Select-Object -First 1
+
+            $instance.DirectoryName | Should -BeExactly (Get-Item $instance.FullName).DirectoryName
+        }
+    }
+
     Context 'Formatting internals' {
         It 'Converts Length to their friendly representation' {
             [PSTree.Internal._Format]::GetFormattedLength(1mb) |
@@ -175,8 +251,7 @@
 
         It 'Can get the source of the generated trees' {
             $testPath | Get-PSTree | ForEach-Object {
-                [PSTree.Internal._Format]::GetSource($_) |
-                    Should -BeExactly $testPath
+                [PSTree.Internal._Format]::GetSource($_) | Should -BeExactly $testPath
             }
         }
     }

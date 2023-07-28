@@ -30,7 +30,7 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
 
     public DateTime LastWriteTime => Instance.LastWriteTime;
 
-    public DateTime LastWriteTimeUtc => Instance.LastAccessTimeUtc;
+    public DateTime LastWriteTimeUtc => Instance.LastWriteTimeUtc;
 
     public DateTime LastAccessTime => Instance.LastAccessTime;
 
@@ -49,4 +49,8 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
 
     public bool HasFlag(FileAttributes flag) =>
         Instance.Attributes.HasFlag(flag);
+
+    public override string ToString() => FullName;
+
+    public void Refresh() => Instance.Refresh();
 }
