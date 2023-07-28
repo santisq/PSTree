@@ -121,7 +121,7 @@ Wildcard characters are accepted.
 
 Excluded items do not add to the recursive folders size.
 
-> __NOTE__: Patterns are tested with the object's `.FullName` property.
+> __NOTE__: Patterns are tested against the object's `.FullName` property.
 
 ```yaml
 Type: String[]
