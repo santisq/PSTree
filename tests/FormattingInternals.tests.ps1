@@ -8,13 +8,13 @@ Import-Module ([System.IO.Path]::Combine($PSScriptRoot, 'shared.psm1'))
 
 Describe 'Formatting internals' {
     It 'Converts Length to their friendly representation' {
-        [PSTree.Internal._Format]::GetFormattedLength(1mb) |
+        [PSTree.Internal._FormattingInternals]::GetFormattedLength(1mb) |
             Should -BeExactly '1.00 MB'
     }
 
     It 'Can get the source of the generated trees' {
         $testPath | Get-PSTree | ForEach-Object {
-            [PSTree.Internal._Format]::GetSource($_) | Should -BeExactly $testPath
+            [PSTree.Internal._FormattingInternals]::GetSource($_) | Should -BeExactly $testPath
         }
     }
 }

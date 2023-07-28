@@ -118,6 +118,11 @@ internal static class PathExtensions
     {
         path = path.TrimEnd(_dirSeparator);
 
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return Path.DirectorySeparatorChar.ToString();
+        }
+
         if (Path.GetPathRoot(path) == path)
         {
             return string.Concat(path.ToUpper(), Path.DirectorySeparatorChar);

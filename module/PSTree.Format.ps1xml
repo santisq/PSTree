@@ -7,7 +7,7 @@
         <TypeName>PSTree.PSTreeFileSystemInfo</TypeName>
       </ViewSelectedBy>
       <GroupBy>
-        <ScriptBlock>[PSTree.Internal._Format]::GetSource($_)</ScriptBlock>
+        <ScriptBlock>[PSTree.Internal._FormattingInternals]::GetSource($_)</ScriptBlock>
         <Label>Source</Label>
       </GroupBy>
       <TableControl>
@@ -34,7 +34,7 @@
                 <PropertyName>Mode</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
-                <ScriptBlock>[PSTree.Internal._Format]::GetFormattedLength($_.Length)</ScriptBlock>
+                <ScriptBlock>[PSTree.Internal._FormattingInternals]::GetFormattedLength($_.Length)</ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
                 <PropertyName>Hierarchy</PropertyName>

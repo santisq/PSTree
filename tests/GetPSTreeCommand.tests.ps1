@@ -72,7 +72,7 @@ Describe 'Get-PSTree' {
     }
 
     It 'Should trim excess directory path separators' {
-            (Get-PSTree /\/\/\/\ -Depth 0).FullName | Should -BeExactly (Get-Item /\).FullName
+        (Get-PSTree /\/\/\/\ -Depth 0).FullName | Should -BeExactly (Get-Item /\).FullName
     }
 
     It '-Path should support wildcards' {
