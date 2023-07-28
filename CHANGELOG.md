@@ -1,5 +1,16 @@
 # CHANGELOG
 
+- __07/28/2023__
+  - Added `.ToString()` method to `PSTreeFileSystemInfo<T>` instances, the method resolves to the instances `.FullName` property similar to [`FileSystemInfo.ToString` Method](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.tostring?view=net-7.0#system-io-filesysteminfo-tostring). Now it should be possible to pipe `Get-PSTree` output to `Get-Item` and `Get-ChildItem` when needed:
+
+    ```powershell
+    Get-PStree -Depth 0 | Get-Item
+    ```
+  - Added `.Refresh()` method to `PSTreeFileSystemInfo<T>`, functionality is the same as [`FileSystemInfo.Refresh` Method](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.refresh?view=net-7.0#system-io-filesysteminfo-refresh).
+  - Reorganizing source files and Pester tests.
+  - Added more Pester tests.
+  - Fixed a few documentation typos.
+
 - __07/03/2023__
   - Added `-Path` parameter, now both `-Path` and `-LiteralPath` parameters take `string[]` as input and support pipeline input.
   - Added Pester tests, Code Coverage and coverage upload to [codecov.io](https://app.codecov.io/gh/santisq/PSTree).
