@@ -192,7 +192,7 @@
         }
 
         It 'LastAccessTime properties should refresh when calling Refresh()' {
-            $instance = $testPath | Get-PSTree | Select-Object -First 1
+            $instance = Get-PSTree | Select-Object -First 1
             $accessTime = $instance.LastAccessTime
             $accessTimeUtc = $instance.LastAccessTimeUtc
             Start-Sleep 5
