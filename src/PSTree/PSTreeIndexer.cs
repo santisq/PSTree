@@ -3,7 +3,7 @@ using System.IO;
 
 namespace PSTree;
 
-internal class PSTreeIndexer
+internal sealed class PSTreeIndexer
 {
     private readonly Dictionary<string, PSTreeDirectory> _indexer = new();
 

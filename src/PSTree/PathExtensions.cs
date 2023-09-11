@@ -43,7 +43,6 @@ internal static class PathExtensions
 
                     cmdlet.WriteError(ExceptionHelpers
                         .InvalidProviderError(path, provider));
-
                     continue;
                 }
 
@@ -95,7 +94,8 @@ internal static class PathExtensions
         bool isLiteral,
         PSCmdlet cmdlet,
         bool throwOnInvalidPath = false,
-        bool throwOnInvalidProvider = false) => NormalizePath(
+        bool throwOnInvalidProvider = false) =>
+        NormalizePath(
             new[] { path },
             isLiteral,
             cmdlet,

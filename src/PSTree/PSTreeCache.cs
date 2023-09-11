@@ -3,7 +3,7 @@ using System.IO;
 
 namespace PSTree;
 
-internal class PSTreeCache
+internal sealed class PSTreeCache
 {
     private readonly List<PSTreeFileSystemInfo> _items;
 
