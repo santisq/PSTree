@@ -1,12 +1,9 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 
 namespace PSTree;
 
 internal static class PSTreeExtensions
 {
-    private static readonly Regex s_re = new(@"└|\S", RegexOptions.Compiled);
-
     private static readonly StringBuilder s_sb = new();
 
     internal static string Indent(this string inputString, int indentation)
@@ -22,35 +19,43 @@ internal static class PSTreeExtensions
     internal static PSTreeFileSystemInfo[] ConvertToTree(
         this PSTreeFileSystemInfo[] inputObject)
     {
-        // Well, I don't know what was I thinking when I wrote this, but it works :)
-
+        int index;
+        PSTreeFileSystemInfo current;
         for (int i = 0; i < inputObject.Length; i++)
         {
-            int index = inputObject[i].Hierarchy.IndexOf('└');
-
-            if (index < 0)
+            current = inputObject[i];
+            if ((index = current.Hierarchy.IndexOf('└')) == -1)
             {
                 continue;
             }
 
-            int z = i - 1;
-
-            while (!s_re.IsMatch(inputObject[z].Hierarchy[index].ToString()))
+            int z;
+            char[] replace;
+            for (z = i - 1; z >= 0; z--)
             {
-                char[] replace = inputObject[z].Hierarchy.ToCharArray();
+                current = inputObject[z];
+                if (!char.IsWhiteSpace(current.Hierarchy[index]))
+                {
+                    UpdateCorner(index, current);
+                    break;
+                }
+
+                replace = current.Hierarchy.ToCharArray();
                 replace[index] = '│';
-                inputObject[z].Hierarchy = new string(replace);
-                z--;
-            }
-
-            if (inputObject[z].Hierarchy[index] == '└')
-            {
-                char[] replace = inputObject[z].Hierarchy.ToCharArray();
-                replace[index] = '├';
-                inputObject[z].Hierarchy = new string(replace);
+                current.Hierarchy = new string(replace);
             }
         }
 
         return inputObject;
+    }
+
+    private static void UpdateCorner(int index, PSTreeFileSystemInfo current)
+    {
+        if (current.Hierarchy[index] == '└')
+        {
+            char[] replace = current.Hierarchy.ToCharArray();
+            replace[index] = '├';
+            current.Hierarchy = new string(replace);
+        }
     }
 }
