@@ -17,14 +17,14 @@ schema: 2.0.0
 
 ```powershell
 Get-PSTree [-Path <String[]>] [-Recurse] [-Force] [-Directory] [-RecursiveSize] [-Exclude <String[]>]
- [-Depth <Int32>] [<CommonParameters>]
+ [-Depth <UInt32>] [<CommonParameters>]
 ```
 
 ### LiteralPath
 
 ```powershell
 Get-PSTree [[-LiteralPath] <String[]>] [-Recurse] [-Force] [-Directory] [-RecursiveSize] [-Exclude <String[]>]
- [-Depth <Int32>] [<CommonParameters>]
+ [-Depth <UInt32>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -86,7 +86,7 @@ PS ..\PSTree> Get-ChildItem -Directory | Get-PSTree
 Determines the number of subdirectory levels that are included in the recursion.
 
 ```yaml
-Type: Int32
+Type: UInt32
 Parameter Sets: (All)
 Aliases:
 
