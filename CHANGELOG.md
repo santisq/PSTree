@@ -1,5 +1,12 @@
 # CHANGELOG
 
+- __09/11/2023__
+  - No changes to the cmdlet but a few improvements to the code base:
+    - [x] <https://github.com/santisq/PSTree/issues/16> `PSTreeCache` and `PSTreeIndexer` internal classes have been sealed following the recommendations from dotnet/runtime#49944.
+    - [x] <https://github.com/santisq/PSTree/issues/17> `Indent` extension method has been changed to use `StringBuilder`.
+    - [x] <https://github.com/santisq/PSTree/issues/19> Improved `ConvertToTree` method. Was too complicated and inefficient, there was also no need to use `Regex`.
+    - [x] <https://github.com/santisq/PSTree/issues/20> `-Depth` parameter type was changed from `int` to `uint` and the documentation was updated accordingly.
+
 - __07/28/2023__
   - Added `.ToString()` method to `PSTreeFileSystemInfo<T>` instances, the method resolves to the instances `.FullName` property similar to [`FileSystemInfo.ToString` Method](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.tostring?view=net-7.0#system-io-filesysteminfo-tostring). Now it should be possible to pipe `Get-PSTree` output to `Get-Item` and `Get-ChildItem` when needed:
 

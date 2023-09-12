@@ -11,7 +11,7 @@
     RootModule = 'bin/netstandard2.0/PSTree.dll'
 
     # Version number of this module.
-    ModuleVersion = '2.1.13'
+    ModuleVersion = '2.1.14'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -97,6 +97,8 @@
                 'tree'
                 'powershell'
                 'csharp'
+                'recursion'
+                'tree-structure'
             )
 
             # A URL to the license for this module.
