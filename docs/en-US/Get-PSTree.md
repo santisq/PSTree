@@ -16,15 +16,15 @@ schema: 2.0.0
 ### Path (Default)
 
 ```powershell
-Get-PSTree [-Path <String[]>] [-Recurse] [-Force] [-Directory] [-RecursiveSize] [-Exclude <String[]>]
- [-Depth <UInt32>] [<CommonParameters>]
+Get-PSTree [[-Path] <String[]>] [-Depth <UInt32>] [-Recurse] [-Force] [-Directory] [-RecursiveSize]
+ [-Exclude <String[]>] [-Include <String[]>] [<CommonParameters>]
 ```
 
 ### LiteralPath
 
 ```powershell
-Get-PSTree [[-LiteralPath] <String[]>] [-Recurse] [-Force] [-Directory] [-RecursiveSize] [-Exclude <String[]>]
- [-Depth <UInt32>] [<CommonParameters>]
+Get-PSTree [-LiteralPath <String[]>] [-Depth <UInt32>] [-Recurse] [-Force] [-Directory] [-RecursiveSize]
+ [-Exclude <String[]>] [-Include <String[]>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -41,7 +41,7 @@ PS ..\PSTree> Get-PSTree
 
 The default parameter set uses `-Depth` with a value of 3. No hidden and system files folder are displayed and recursive folder size is not calculated.
 
-### Example 2: Get the hierarchy of the `$HOME` directory recursively displaying only folders
+### Example 2: Get the `$HOME` tree recursively displaying only folders
 
 ```powershell
 PS ..\PSTree> Get-PSTree $HOME -Directory -Recurse
@@ -49,7 +49,7 @@ PS ..\PSTree> Get-PSTree $HOME -Directory -Recurse
 
 In this example `$HOME` is bound positionally to the `-Path` parameter.
 
-### Example 3: Recurse `$HOME` subdirectories 2 levels deep displaying hidden files and folders
+### Example 3: Get the `$HOME` tree 2 levels deep displaying hidden files and folders
 
 ```powershell
 PS ..\PSTree> Get-PSTree -Depth 2 -Force
@@ -57,13 +57,13 @@ PS ..\PSTree> Get-PSTree -Depth 2 -Force
 
 The `-Force` switch is needed to display hidden files and folders. In addition, hidden child items do not add up to the folders size without this switch.
 
-### Example 4: Recurse the `C:\` drive 2 levels in depth displaying only folders with their recursive size
+### Example 4: Get the `C:\` drive tree 2 levels in depth displaying only folders calculating the recursive size
 
 ```powershell
 PS ..\PSTree> Get-PSTree C:\ -Depth 2 -RecursiveSize -Directory
 ```
 
-### Example 5: Get the `$HOME` directory hierarchy recursively excluding all `.jpg` and `.png` files
+### Example 5: Get the `$HOME` tree recursively excluding all `.jpg` and `.png` files
 
 ```powershell
 PS ..\PSTree> Get-PSTree $HOME -Recurse -Exclude *.jpg, *.png
@@ -71,13 +71,21 @@ PS ..\PSTree> Get-PSTree $HOME -Recurse -Exclude *.jpg, *.png
 
 The `-Exclude` parameter supports [wildcard patterns](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_wildcards?view=powershell-7.3), exclusion patterns are tested against the items `.FullName` property. Excluded items do not do not add to the folders size.
 
-### Example 6: Get the hierarchy of all folders in a location
+### Example 6: Get the tree of all folders in a location
 
 ```powershell
 PS ..\PSTree> Get-ChildItem -Directory | Get-PSTree
 ```
 
 `DirectoryInfo` and `FileInfo` instances having the `PSPath` Property are bound to the `-LiteralPath` parameter.
+
+### Example 7: Get the tree of all folders in a location including only `*.ps1` files
+
+```powershell
+PS ..\PSTree> Get-ChildItem -Directory | Get-PSTree -Include *.ps1
+```
+
+Similar to `-Exclude`, the `-Include` parameter supports [wildcard patterns](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_wildcards?view=powershell-7.3), however, __this parameter works only with Files__.
 
 ## PARAMETERS
 
@@ -121,7 +129,10 @@ Wildcard characters are accepted.
 
 Excluded items do not add to the recursive folders size.
 
-> __NOTE__: Patterns are tested against the object's `.FullName` property.
+> __NOTE__:
+>
+> - Patterns are tested against the object's `.FullName` property.
+> - The `-Include` and `-Exclude` parameters can be used together and the inclusions are applied after the exclusions.
 
 ```yaml
 Type: String[]
@@ -149,6 +160,30 @@ Position: Named
 Default value: False
 Accept pipeline input: False
 Accept wildcard characters: False
+```
+
+### -Include
+
+Specifies an array of one or more string patterns to be matched as the cmdlet gets child items.
+Any matching item is included in the output.
+Wildcard characters are accepted.
+
+> __NOTE__:
+>
+> - Patterns are tested against the object's `.FullName` property.
+> - This parameter focuses only on files, the inclusion patterns are only evaluated against `FileInfo` instances.
+> - The `-Include` and `-Exclude` parameters can be used together and the inclusions are applied after the exclusions.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: True
 ```
 
 ### -LiteralPath
