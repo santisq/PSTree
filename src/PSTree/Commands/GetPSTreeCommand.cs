@@ -15,9 +15,13 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
     private bool _withExclude;
 
+    private bool _withInclude;
+
     private string[]? _paths;
 
     private WildcardPattern[]? _excludePatterns;
+
+    private WildcardPattern[]? _includePatterns;
 
     private readonly PSTreeIndexer _indexer = new();
 
@@ -78,6 +82,11 @@ public sealed class GetPSTreeCommand : PSCmdlet
     [ValidateNotNullOrEmpty]
     public string[]? Exclude { get; set; }
 
+    [Parameter]
+    [SupportsWildcards]
+    [ValidateNotNullOrEmpty]
+    public string[]? Include { get; set; }
+
     protected override void BeginProcessing()
     {
         if (Recurse.IsPresent && !MyInvocation.BoundParameters.ContainsKey("Depth"))
@@ -85,18 +94,29 @@ public sealed class GetPSTreeCommand : PSCmdlet
             Depth = int.MaxValue;
         }
 
+        const WildcardOptions wpoptions =
+            WildcardOptions.Compiled
+            | WildcardOptions.CultureInvariant
+            | WildcardOptions.IgnoreCase;
+
         if (Exclude is not null)
         {
-            const WildcardOptions wpoptions =
-                WildcardOptions.Compiled
-                | WildcardOptions.CultureInvariant
-                | WildcardOptions.IgnoreCase;
-
             _excludePatterns = Exclude
                 .Select(e => new WildcardPattern(e, wpoptions))
                 .ToArray();
 
             _withExclude = true;
+        }
+
+        // this Parameter only targets files, there is no reason to use it
+        // if -Directory is in use
+        if (Include is not null && !Directory.IsPresent)
+        {
+            _includePatterns = Include
+                .Select(e => new WildcardPattern(e, wpoptions))
+                .ToArray();
+
+            _withInclude = true;
         }
     }
 
@@ -128,6 +148,27 @@ public sealed class GetPSTreeCommand : PSCmdlet
         _cache.Clear();
         _stack.Push(new PSTreeDirectory(directory, source));
 
+        bool ShouldInclude(FileInfo file)
+        {
+            if (!_withInclude)
+            {
+                return true;
+            }
+
+            return _includePatterns.Any(e => e.IsMatch(file.FullName));
+        }
+
+        bool ShouldExclude(FileSystemInfo item)
+        {
+            if (!_withExclude)
+            {
+                return false;
+            }
+
+            return _excludePatterns.Any(e => e.IsMatch(item.FullName));
+        }
+
+
         while (_stack.Count > 0)
         {
             IEnumerable<FileSystemInfo> enumerator;
@@ -147,7 +188,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
                         continue;
                     }
 
-                    if (_withExclude && ShouldExclude(item))
+                    if (ShouldExclude(item))
                     {
                         continue;
                     }
@@ -161,7 +202,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
                             continue;
                         }
 
-                        if (keepProcessing)
+                        if (keepProcessing && ShouldInclude(file))
                         {
                             _cache.AddFile(file, level, source);
                         }
@@ -206,7 +247,4 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
         return _cache.GetTree();
     }
-
-    private bool ShouldExclude(FileSystemInfo item) =>
-        _excludePatterns.Any(e => e.IsMatch(item.FullName));
 }

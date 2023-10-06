@@ -124,6 +124,18 @@ Describe 'Get-PSTree' {
         } | Should -Not -BeTrue
     }
 
+    It 'Include childs with -Include parameter' {
+        $include = '*.ps1', '*.cs'
+        Get-PSTree $testPath -Include $include -Recurse | ForEach-Object {
+            [System.Linq.Enumerable]::Any(
+                [string[]] $include,
+                [System.Func[string, bool]] {
+                    $_.FullName -like $args[0] -or $_ -is [PSTree.PSTreeDirectory]
+                }
+            )
+        } | Should -BeTrue
+    }
+
     It 'Should prioritize -Depth if used together with -Recurse' {
         $ref = (Get-ChildItem $testPath -Directory | Get-ChildItem -Recurse).FullName
         Get-PSTree $testPath -Directory -Recurse -Depth 1 |
