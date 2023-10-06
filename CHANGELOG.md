@@ -1,5 +1,8 @@
 # CHANGELOG
 
+- __10/05/2023__
+  - Added Parameter `-Include`. Works very similar to `-Exclude`, the patterns are evaluated against the items `.FullName` property, however this parameter targets only files (`FileInfo` instances).
+
 - __09/11/2023__
   - No changes to the cmdlet but a few improvements to the code base:
     - [x] <https://github.com/santisq/PSTree/issues/16> `PSTreeCache` and `PSTreeIndexer` internal classes have been sealed following the recommendations from dotnet/runtime#49944.

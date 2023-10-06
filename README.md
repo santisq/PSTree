@@ -103,6 +103,45 @@ d----         10.30 KB │   └── PSTree
 -a---        619.00  B │       ├── PSTreeIndexer.cs
 ```
 
+### Include `.ps1` and `.cs` files and exclude some folders
+
+```powershell
+PS ..\PSTree> Get-PStree -Include *.ps1, *.cs -Exclude *output, *tools, *docs, *module
+
+   Source: C:\path\to\PSTree
+
+Mode            Length Hierarchy
+----            ------ ---------
+d----         33.15 KB PSTree
+-a---          2.35 KB ├── build.ps1
+-a---          8.10 KB ├── PSTree.build.ps1
+d----         13.29 KB ├── tests
+-a---        765.00  B │   ├── FormattingInternals.tests.ps1
+-a---          5.89 KB │   ├── GetPSTreeCommand.tests.ps1
+-a---          1.51 KB │   ├── PathExtensions.tests.ps1
+-a---          1.38 KB │   ├── PSTreeDirectory.ps1
+-a---        920.00  B │   ├── PSTreeFile.tests.ps1
+-a---          2.09 KB │   └── PSTreeFileSystemInfo_T.tests.ps1
+d----          0.00  B ├── src
+d----         12.15 KB │   └── PSTree
+-a---        931.00  B │       ├── ExceptionHelpers.cs
+-a---          4.09 KB │       ├── PathExtensions.cs
+-a---        900.00  B │       ├── PSTreeCache.cs
+-a---          1.06 KB │       ├── PSTreeDirectory.cs
+-a---          1.66 KB │       ├── PSTreeExtensions.cs
+-a---        517.00  B │       ├── PSTreeFile.cs
+-a---        399.00  B │       ├── PSTreeFileSystemInfo.cs
+-a---          1.61 KB │       ├── PSTreeFileSystemInfo_T.cs
+-a---        626.00  B │       ├── PSTreeIndexer.cs
+d----         16.53 KB │       ├── obj
+d----          1.15 KB │       ├── Internal
+d----          6.43 KB │       ├── Commands
+d----          0.00  B │       └── bin
+d----          4.07 KB ├── .vscode
+d----          0.00  B └── .github
+d----          4.17 KB     └── workflows
+```
+
 ### Get the `src` tree recursively displaying only folders
 
 ```powershell

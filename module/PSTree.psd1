@@ -11,7 +11,7 @@
     RootModule = 'bin/netstandard2.0/PSTree.dll'
 
     # Version number of this module.
-    ModuleVersion = '2.1.14'
+    ModuleVersion = '2.1.15'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -29,7 +29,7 @@
     Copyright = '(c) Santiago Squarzon. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description = 'tree like function for PowerShell'
+    Description = 'tree like cmdlet for PowerShell'
 
     # Minimum version of the PowerShell engine required by this module
     PowerShellVersion = '5.1'
