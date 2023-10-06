@@ -16,15 +16,31 @@ schema: 2.0.0
 ### Path (Default)
 
 ```powershell
-Get-PSTree [[-Path] <String[]>] [-Depth <UInt32>] [-Recurse] [-Force] [-Directory] [-RecursiveSize]
- [-Exclude <String[]>] [-Include <String[]>] [<CommonParameters>]
+Get-PSTree
+    [[-Path] <String[]>]
+    [-Depth <UInt32>]
+    [-Recurse]
+    [-Force]
+    [-Directory]
+    [-RecursiveSize]
+    [-Exclude <String[]>]
+    [-Include <String[]>]
+    [<CommonParameters>]
 ```
 
 ### LiteralPath
 
 ```powershell
-Get-PSTree [-LiteralPath <String[]>] [-Depth <UInt32>] [-Recurse] [-Force] [-Directory] [-RecursiveSize]
- [-Exclude <String[]>] [-Include <String[]>] [<CommonParameters>]
+Get-PSTree
+    [-LiteralPath <String[]>]
+    [-Depth <UInt32>]
+    [-Recurse]
+    [-Force]
+    [-Directory]
+    [-RecursiveSize]
+    [-Exclude <String[]>]
+    [-Include <String[]>]
+    [<CommonParameters>]
 ```
 
 ## DESCRIPTION
