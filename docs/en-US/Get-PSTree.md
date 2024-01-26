@@ -145,7 +145,7 @@ Wildcard characters are accepted.
 
 Excluded items do not add to the recursive folders size.
 
-> __NOTE__:
+> [!NOTE]
 >
 > - Patterns are tested against the object's `.FullName` property.
 > - The `-Include` and `-Exclude` parameters can be used together and the inclusions are applied after the exclusions.
@@ -184,7 +184,7 @@ Specifies an array of one or more string patterns to be matched as the cmdlet ge
 Any matching item is included in the output.
 Wildcard characters are accepted.
 
-> __NOTE__:
+> [!NOTE]
 >
 > - Patterns are tested against the object's `.FullName` property.
 > - This parameter focuses only on files, the inclusion patterns are only evaluated against `FileInfo` instances.
