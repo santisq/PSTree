@@ -65,4 +65,9 @@ Describe 'PSTreeFileSystemInfo<T>' {
         $instance.LastAccessTime | Should -BeOfType ([datetime])
         $instance.LastWriteTimeUtc | Should -BeOfType ([datetime])
     }
+
+    It 'GetFormattedLength() outputs friendly length' {
+        $pattern = '(?:{0}$)' -f ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' -join '|')
+        (Get-PSTree $testPath).GetFormattedLength() | Should -Match $pattern
+    }
 }

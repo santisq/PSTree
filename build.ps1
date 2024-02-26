@@ -58,7 +58,7 @@ end {
     $dotnetTools = @(dotnet tool list --global) -join "`n"
     if (-not $dotnetTools.Contains('coverlet.console')) {
         Write-Host 'Installing dotnet tool coverlet.console'
-        dotnet tool install --global coverlet.console
+        dotnet tool install --global coverlet.console --version 6.0.0
     }
 
     $invokeBuildSplat = @{

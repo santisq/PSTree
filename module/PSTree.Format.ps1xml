@@ -34,7 +34,7 @@
                 <PropertyName>Mode</PropertyName>
               </TableColumnItem>
               <TableColumnItem>
-                <ScriptBlock>[PSTree.Internal._FormattingInternals]::GetFormattedLength($_.Length)</ScriptBlock>
+                <ScriptBlock>$_.GetFormattedLength()</ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
                 <PropertyName>Hierarchy</PropertyName>

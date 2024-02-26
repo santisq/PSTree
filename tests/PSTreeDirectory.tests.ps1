@@ -9,14 +9,12 @@ Import-Module ([System.IO.Path]::Combine($PSScriptRoot, 'shared.psm1'))
 Describe 'PSTreeDirectory' {
     It 'Can enumerate Files with .EnumerateFiles()' {
         ($testPath | Get-PSTree -Depth 0).EnumerateFiles() |
-            ForEach-Object GetType |
-            Should -Be ([System.IO.FileInfo])
+            Should -BeOfType ([System.IO.FileInfo])
     }
 
     It 'Can enumerate Directories with .EnumerateDirectories()' {
         ($testPath | Get-PSTree -Depth 0).EnumerateDirectories() |
-            ForEach-Object GetType |
-            Should -Be ([System.IO.DirectoryInfo])
+            Should -BeOfType ([System.IO.DirectoryInfo])
     }
 
     It 'Can enumerate File System Infos with .EnumerateFileSystemInfos()' {
@@ -26,9 +24,10 @@ Describe 'PSTreeDirectory' {
     }
 
     It 'Can enumerate its parent directories with .GetParents()' {
-        $parent = ($testPath | Get-PSTree -Depth 0).Parent
+        $treedir = $testPath | Get-PSTree -Depth 0
+        $parent = $treedir.Parent
         $parent | Should -BeOfType ([System.IO.DirectoryInfo])
         $paths = $parent.FullName.Split([System.IO.Path]::DirectorySeparatorChar)
-        $parent.GetParents() | Should -HaveCount $paths.Count
+        $treedir.GetParents() | Should -HaveCount $paths.Count
     }
 }

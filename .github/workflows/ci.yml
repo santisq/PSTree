@@ -25,7 +25,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Check out repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Build module - Debug
       shell: pwsh
@@ -38,7 +38,7 @@ jobs:
       if: ${{ env.BUILD_CONFIGURATION == 'Release' }}
 
     - name: Capture PowerShell Module
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: PSModule
         path: output/*.nupkg
@@ -63,10 +63,10 @@ jobs:
           os: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Restore Built PowerShell Module
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: PSModule
         path: output
@@ -103,21 +103,21 @@ jobs:
 
     - name: Upload Test Results
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Unit Test Results (${{ matrix.info.name }})
         path: ./output/TestResults/Pester.xml
 
     - name: Upload Coverage Results
       if: always() && !startsWith(github.ref, 'refs/tags/v')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Coverage Results (${{ matrix.info.name }})
         path: ./output/TestResults/Coverage.xml
 
     - name: Upload Coverage to codecov
       if: always() && !startsWith(github.ref, 'refs/tags/v')
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./output/TestResults/Coverage.xml
         flags: ${{ matrix.info.name }}
@@ -131,7 +131,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Restore Built PowerShell Module
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: PSModule
         path: ./

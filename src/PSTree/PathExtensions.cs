@@ -11,7 +11,7 @@ namespace PSTree;
 internal static class PathExtensions
 {
     [ThreadStatic]
-    private static readonly List<string> s_normalizedPaths = new();
+    private static List<string>? s_normalizedPaths;
 
     private static readonly char[] _dirSeparator = @"\/".ToCharArray();
 
@@ -22,9 +22,11 @@ internal static class PathExtensions
         bool throwOnInvalidPath = false,
         bool throwOnInvalidProvider = false)
     {
+        s_normalizedPaths ??= new();
+        s_normalizedPaths.Clear();
+
         Collection<string> resolvedPaths;
         ProviderInfo provider;
-        s_normalizedPaths.Clear();
 
         foreach (string path in paths)
         {

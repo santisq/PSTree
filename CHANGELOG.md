@@ -1,5 +1,13 @@
 # CHANGELOG
 
+- __02/26/2024__
+  - Added method `.GetFormattedLength()`. Outputs the friendly `.Length` representation of `PSTreeFile` and `PSTreeDirectory` instances.
+
+  ```powershell
+  PS ..\PSTree> (Get-PSTree D:\ -RecursiveSize -Depth 0).GetFormattedLength()
+  629.59 GB
+  ```
+
 - __10/05/2023__
   - Added Parameter `-Include`. Works very similar to `-Exclude`, the patterns are evaluated against the items `.FullName` property, however this parameter targets only files (`FileInfo` instances).
 

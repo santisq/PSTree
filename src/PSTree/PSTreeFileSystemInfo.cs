@@ -15,4 +15,7 @@ public abstract class PSTreeFileSystemInfo
         Hierarchy = hierarchy;
         Source = source;
     }
+
+    public string GetFormattedLength() =>
+        Internal._FormattingInternals.GetFormattedLength(Length);
 }
