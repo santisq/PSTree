@@ -117,7 +117,7 @@ jobs:
 
     - name: Upload Coverage to codecov
       if: always() && !startsWith(github.ref, 'refs/tags/v')
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v3
       with:
         files: ./output/TestResults/Coverage.xml
         flags: ${{ matrix.info.name }}
