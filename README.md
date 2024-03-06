@@ -1,12 +1,12 @@
 <h1 align="center">PSTree</h1>
 
 <div align="center">
-    <sub>Tree like cmdlet for PowerShell!</sub>
-    <br /><br />
+<sub>Tree like cmdlet for PowerShell!</sub>
+<br/><br/>
 
 [![build](https://github.com/santisq/PSTree/actions/workflows/ci.yml/badge.svg)](https://github.com/santisq/PSTree/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/santisq/PSTree/branch/main/graph/badge.svg?token=b51IOhpLfQ)](https://codecov.io/gh/santisq/PSTree)
-[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/PSTree?label=gallery)](https://www.powershellgallery.com/packages/PSTree)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/PSTree)](https://www.powershellgallery.com/packages/PSTree)
 [![LICENSE](https://img.shields.io/github/license/santisq/PSTree)](https://github.com/santisq/PSTree/blob/main/LICENSE)
 
 </div>
