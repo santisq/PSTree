@@ -52,13 +52,13 @@ jobs:
       fail-fast: false
       matrix:
         info:
-        - name: PS_5.1
+        - name: PS-5.1
           psversion: '5.1'
           os: windows-latest
-        - name: PS_7_Windows
+        - name: PS-7_Windows
           psversion: '7'
           os: windows-latest
-        - name: PS_7_Linux
+        - name: PS-7_Linux
           psversion: '7'
           os: ubuntu-latest
 
@@ -89,17 +89,13 @@ jobs:
 
     - name: Run Tests - Windows PowerShell
       if: ${{ matrix.info.psversion == '5.1' }}
-      shell: pwsh
-      run: |
-        powershell.exe -NoProfile -File ./build.ps1 -Configuration $env:BUILD_CONFIGURATION -Task Test
-        exit $LASTEXITCODE
+      shell: powershell
+      run: ./build.ps1 -Configuration $env:BUILD_CONFIGURATION -Task Test
 
     - name: Run Tests - PowerShell
       if: ${{ matrix.info.psversion != '5.1' }}
       shell: pwsh
-      run: |
-        pwsh -NoProfile -File ./build.ps1 -Configuration $env:BUILD_CONFIGURATION -Task Test
-        exit $LASTEXITCODE
+      run: ./build.ps1 -Configuration $env:BUILD_CONFIGURATION -Task Test
 
     - name: Upload Test Results
       if: always()
@@ -117,10 +113,11 @@ jobs:
 
     - name: Upload Coverage to codecov
       if: always() && !startsWith(github.ref, 'refs/tags/v')
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./output/TestResults/Coverage.xml
         flags: ${{ matrix.info.name }}
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
     name: publish
