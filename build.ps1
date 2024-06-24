@@ -1,70 +1,51 @@
-﻿# I may've totally stolen this from jborean93 :D
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
     [Parameter()]
     [ValidateSet('Debug', 'Release')]
-    [string]
-    $Configuration = 'Debug',
+    [string] $Configuration = 'Debug',
 
     [Parameter()]
-    [string[]]
-    $Task = 'Build'
+    [ValidateSet('Build', 'Test')]
+    [string[]] $Task = 'Build'
 )
 
-end {
-    if ($PSEdition -eq 'Desktop') {
-        [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor 'Tls12'
+$prev = $ErrorActionPreference
+$ErrorActionPreference = 'Stop'
+
+if (-not ('ProjectBuilder.ProjectInfo' -as [type])) {
+    try {
+        $builderPath = [IO.Path]::Combine($PSScriptRoot, 'tools', 'ProjectBuilder')
+        Push-Location $builderPath
+
+        dotnet @(
+            'publish'
+            '--configuration', 'Release'
+            '-o', 'output'
+            '--framework', 'netstandard2.0'
+            '--verbosity', 'q'
+            '-nologo'
+        )
+
+        if ($LASTEXITCODE) {
+            throw "Failed to compiled 'ProjectBuilder'"
+        }
+
+        $dll = [IO.Path]::Combine($builderPath, 'output', 'ProjectBuilder.dll')
+        Add-Type -Path $dll
     }
-
-    $modulePath = [IO.Path]::Combine($PSScriptRoot, 'tools', 'Modules')
-    $requirements = Import-PowerShellDataFile ([IO.Path]::Combine($PSScriptRoot, 'tools', 'requiredModules.psd1'))
-
-    foreach ($req in $requirements.GetEnumerator()) {
-        $targetPath = [IO.Path]::Combine($modulePath, $req.Key)
-
-        if (Test-Path -LiteralPath $targetPath) {
-            Import-Module -Name $targetPath -Force -ErrorAction Stop
-            continue
-        }
-
-        Write-Host "Installing build pre-req $($req.Key) as it is not installed"
-        $null = New-Item -Path $targetPath -ItemType Directory -Force
-
-        $webParams = @{
-            Uri             = "https://www.powershellgallery.com/api/v2/package/$($req.Key)/$($req.Value)"
-            OutFile         = [IO.Path]::Combine($modulePath, "$($req.Key).zip")
-            UseBasicParsing = $true
-        }
-
-        if ('Authentication' -in (Get-Command -Name Invoke-WebRequest).Parameters.Keys) {
-            $webParams.Authentication = 'None'
-        }
-
-        $oldProgress = $ProgressPreference
-        $ProgressPreference = 'SilentlyContinue'
-
-        try {
-            Invoke-WebRequest @webParams
-            Expand-Archive -Path $webParams.OutFile -DestinationPath $targetPath -Force
-            Remove-Item -LiteralPath $webParams.OutFile -Force
-        }
-        finally {
-            $ProgressPreference = $oldProgress
-        }
-
-        Import-Module -Name $targetPath -Force -ErrorAction Stop
+    finally {
+        Pop-Location
     }
-
-    $dotnetTools = @(dotnet tool list --global) -join "`n"
-    if (-not $dotnetTools.Contains('coverlet.console')) {
-        Write-Host 'Installing dotnet tool coverlet.console'
-        dotnet tool install --global coverlet.console --version 6.0.0
-    }
-
-    $invokeBuildSplat = @{
-        Task          = $Task
-        File          = (Get-Item ([IO.Path]::Combine($PSScriptRoot, '*.build.ps1'))).FullName
-        Configuration = $Configuration
-    }
-    Invoke-Build @invokeBuildSplat
 }
+
+$projectInfo = [ProjectBuilder.ProjectInfo]::Create($PSScriptRoot, $Configuration)
+$projectInfo.GetRequirements() | Import-Module -DisableNameChecking -Force
+
+$ErrorActionPreference = $prev
+
+$invokeBuildSplat = @{
+    Task        = $Task
+    File        = Convert-Path ([IO.Path]::Combine($PSScriptRoot, 'tools', 'InvokeBuild.ps1'))
+    ProjectInfo = $projectInfo
+}
+Invoke-Build @invokeBuildSplat

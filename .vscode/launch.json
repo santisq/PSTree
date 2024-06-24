@@ -13,6 +13,7 @@
                 "-NoExit",
                 "-NoProfile",
                 "-Command",
+                ". ./tools/prompt.ps1;",
                 "Import-Module ./output/PSTree"
             ],
             "cwd": "${workspaceFolder}",
