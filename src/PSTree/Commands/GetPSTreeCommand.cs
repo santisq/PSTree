@@ -9,7 +9,7 @@ namespace PSTree;
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Path")]
 [OutputType(typeof(PSTreeDirectory), typeof(PSTreeFile))]
 [Alias("pstree")]
-public sealed class GetPSTreeCommand : PSCmdlet
+public sealed partial class GetPSTreeCommand : PSCmdlet
 {
     private bool _isLiteral;
 
@@ -168,17 +168,22 @@ public sealed class GetPSTreeCommand : PSCmdlet
             return _excludePatterns.Any(e => e.IsMatch(item.FullName));
         }
 
+        static IOrderedEnumerable<FileSystemInfo> GetSortEnumerator(PSTreeDirectory treedir) =>
+            treedir
+                .EnumerateFileSystemInfos()
+                .OrderBy(e => e is DirectoryInfo)
+                .ThenBy(e => e, new FileSystemEntryComparer());
 
         while (_stack.Count > 0)
         {
-            IEnumerable<FileSystemInfo> enumerator;
+            IOrderedEnumerable<FileSystemInfo> enumerator;
             PSTreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
             long size = 0;
 
             try
             {
-                enumerator = next.EnumerateFileSystemInfos();
+                enumerator = GetSortEnumerator(next);
                 bool keepProcessing = level <= Depth;
 
                 foreach (FileSystemInfo item in enumerator)
