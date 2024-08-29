@@ -2,60 +2,60 @@
 
 - __08/29/2024__
   - Added method `.GetUnderlyingObject()`. Outputs the underlying `FileSystemInfo` instance.
-  - Fixes [Issue #9: Sort by ascending values][1]:
+  - Fixes Issue #9:
     - PSTree v2.1.16
 
-    ```powershell
-    PS ..\PSTree> pstree -Directory -Depth 2
+      ```powershell
+      PS ..\PSTree> pstree -Directory -Depth 2
 
-      Source: D:\...\PSTree
+        Source: D:\...\PSTree
 
-    Mode            Length Hierarchy
-    ----            ------ ---------
-    d----         25.27 KB PSTree
-    d----          3.72 KB ├── tools
-    d----         16.96 KB │   ├── ProjectBuilder
-    d----          0.00  B │   └── Modules
-    d----         13.66 KB ├── tests
-    d----          0.00  B ├── src
-    d----         13.26 KB │   └── PSTree
-    d----        168.69 KB ├── output
-    d----         92.50 KB │   ├── TestResults
-    d----          0.00  B │   └── PSTree
-    d----          6.26 KB ├── module
-    d----          0.00  B ├── docs
-    d----          7.37 KB │   └── en-US
-    d----          4.11 KB ├── .vscode
-    d----          0.00  B └── .github
-    d----          4.10 KB     └── workflows
-    ```
+      Mode            Length Hierarchy
+      ----            ------ ---------
+      d----         25.27 KB PSTree
+      d----          3.72 KB ├── tools
+      d----         16.96 KB │   ├── ProjectBuilder
+      d----          0.00  B │   └── Modules
+      d----         13.66 KB ├── tests
+      d----          0.00  B ├── src
+      d----         13.26 KB │   └── PSTree
+      d----        168.69 KB ├── output
+      d----         92.50 KB │   ├── TestResults
+      d----          0.00  B │   └── PSTree
+      d----          6.26 KB ├── module
+      d----          0.00  B ├── docs
+      d----          7.37 KB │   └── en-US
+      d----          4.11 KB ├── .vscode
+      d----          0.00  B └── .github
+      d----          4.10 KB     └── workflows
+      ```
 
     - PSTree v2.1.17
 
-    ```powershell
-    PS ..\PSTree> pstree -Directory -Depth 2
+      ```powershell
+      PS ..\PSTree> pstree -Directory -Depth 2
 
-      Source: D:\Zen\Documents\Scripts\PSTree
+        Source: D:\Zen\Documents\Scripts\PSTree
 
-    Mode            Length Hierarchy
-    ----            ------ ---------
-    d----         25.27 KB PSTree
-    d----          0.00  B ├── .github
-    d----          4.10 KB │   └── workflows
-    d----          4.11 KB ├── .vscode
-    d----          0.00  B ├── docs
-    d----          7.37 KB │   └── en-US
-    d----          6.26 KB ├── module
-    d----        168.69 KB ├── output
-    d----          0.00  B │   ├── PSTree
-    d----         92.50 KB │   └── TestResults
-    d----          0.00  B ├── src
-    d----         13.26 KB │   └── PSTree
-    d----         13.66 KB ├── tests
-    d----          3.72 KB └── tools
-    d----          0.00  B     ├── Modules
-    d----         16.96 KB     └── ProjectBuilder
-    ```
+      Mode            Length Hierarchy
+      ----            ------ ---------
+      d----         25.27 KB PSTree
+      d----          0.00  B ├── .github
+      d----          4.10 KB │   └── workflows
+      d----          4.11 KB ├── .vscode
+      d----          0.00  B ├── docs
+      d----          7.37 KB │   └── en-US
+      d----          6.26 KB ├── module
+      d----        168.69 KB ├── output
+      d----          0.00  B │   ├── PSTree
+      d----         92.50 KB │   └── TestResults
+      d----          0.00  B ├── src
+      d----         13.26 KB │   └── PSTree
+      d----         13.66 KB ├── tests
+      d----          3.72 KB └── tools
+      d----          0.00  B     ├── Modules
+      d----         16.96 KB     └── ProjectBuilder
+      ```
 
 - __02/26/2024__
   - Added method `.GetFormattedLength()`. Outputs the friendly `.Length` representation of `PSTreeFile` and `PSTreeDirectory` instances.
@@ -213,7 +213,6 @@ d----     └── Format                     1.83 Kb
   - `-Files` switch has been added to the Module, now you can display files in the hierarchy tree if desired.
   - `Type` property has been added to the output object and is now part of the _Default MemberSet_.
 
-[1]: https://github.com/santisq/PSTree/issues/9
 [2]: https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getdirectories?view=net-6.0
 [3]: https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-6.0
 [4]: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem
