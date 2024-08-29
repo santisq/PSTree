@@ -168,7 +168,7 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
             return _excludePatterns.Any(e => e.IsMatch(item.FullName));
         }
 
-        static IOrderedEnumerable<FileSystemInfo> GetSortEnumerator(PSTreeDirectory treedir) =>
+        static IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable(PSTreeDirectory treedir) =>
             treedir
                 .EnumerateFileSystemInfos()
                 .OrderBy(e => e is DirectoryInfo)
@@ -183,7 +183,7 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
 
             try
             {
-                enumerator = GetSortEnumerator(next);
+                enumerator = GetSortedEnumerable(next);
                 bool keepProcessing = level <= Depth;
 
                 foreach (FileSystemInfo item in enumerator)
