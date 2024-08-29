@@ -5,7 +5,7 @@ namespace PSTree;
 
 internal sealed class PSTreeIndexer
 {
-    private readonly Dictionary<string, PSTreeDirectory> _indexer = new();
+    private readonly Dictionary<string, PSTreeDirectory> _indexer = [];
 
     internal void Index(PSTreeDirectory directory, long length)
     {

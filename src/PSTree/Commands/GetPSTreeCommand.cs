@@ -13,10 +13,6 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
 {
     private bool _isLiteral;
 
-    private bool _withExclude;
-
-    private bool _withInclude;
-
     private string[]? _paths;
 
     private WildcardPattern[]? _excludePatterns;
@@ -28,6 +24,8 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
     private readonly Stack<PSTreeDirectory> _stack = new();
 
     private readonly PSTreeCache _cache = new();
+
+    private readonly PSTreeComparer _comparer = new();
 
     [Parameter(
         ParameterSetName = "Path",
@@ -104,25 +102,20 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
             _excludePatterns = Exclude
                 .Select(e => new WildcardPattern(e, wpoptions))
                 .ToArray();
-
-            _withExclude = true;
         }
 
-        // this Parameter only targets files, there is no reason to use it
-        // if -Directory is in use
+        // this Parameter only targets files, there is no reason to use it if -Directory is in use
         if (Include is not null && !Directory.IsPresent)
         {
             _includePatterns = Include
                 .Select(e => new WildcardPattern(e, wpoptions))
                 .ToArray();
-
-            _withInclude = true;
         }
     }
 
     protected override void ProcessRecord()
     {
-        _paths ??= new[] { SessionState.Path.CurrentLocation.Path };
+        _paths ??= [SessionState.Path.CurrentLocation.Path];
 
         foreach (string path in _paths.NormalizePath(_isLiteral, this))
         {
@@ -148,32 +141,6 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
         _cache.Clear();
         _stack.Push(new PSTreeDirectory(directory, source));
 
-        bool ShouldInclude(FileInfo file)
-        {
-            if (!_withInclude)
-            {
-                return true;
-            }
-
-            return _includePatterns.Any(e => e.IsMatch(file.FullName));
-        }
-
-        bool ShouldExclude(FileSystemInfo item)
-        {
-            if (!_withExclude)
-            {
-                return false;
-            }
-
-            return _excludePatterns.Any(e => e.IsMatch(item.FullName));
-        }
-
-        static IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable(PSTreeDirectory treedir) =>
-            treedir
-                .EnumerateFileSystemInfos()
-                .OrderBy(e => e is DirectoryInfo)
-                .ThenBy(e => e, new FileSystemEntryComparer());
-
         while (_stack.Count > 0)
         {
             IOrderedEnumerable<FileSystemInfo> enumerator;
@@ -183,7 +150,7 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
 
             try
             {
-                enumerator = GetSortedEnumerable(next);
+                enumerator = next.GetSortedEnumerable(_comparer);
                 bool keepProcessing = level <= Depth;
 
                 foreach (FileSystemInfo item in enumerator)
@@ -193,7 +160,7 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
                         continue;
                     }
 
-                    if (ShouldExclude(item))
+                    if (ShouldExclude(item, _excludePatterns))
                     {
                         continue;
                     }
@@ -207,7 +174,7 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
                             continue;
                         }
 
-                        if (keepProcessing && ShouldInclude(file))
+                        if (keepProcessing && ShouldInclude(file, _includePatterns))
                         {
                             _cache.AddFile(file, level, source);
                         }
@@ -251,5 +218,44 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
         }
 
         return _cache.GetTree();
+    }
+
+    private static bool MatchAny(
+        FileSystemInfo item,
+        WildcardPattern[] patterns)
+    {
+        foreach (WildcardPattern pattern in patterns)
+        {
+            if (pattern.IsMatch(item.FullName))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool ShouldInclude(
+        FileInfo file,
+        WildcardPattern[]? patterns)
+    {
+        if (patterns is null)
+        {
+            return true;
+        }
+
+        return MatchAny(file, patterns);
+    }
+
+    private static bool ShouldExclude(
+        FileSystemInfo item,
+        WildcardPattern[]? patterns)
+    {
+        if (patterns is null)
+        {
+            return false;
+        }
+
+        return MatchAny(item, patterns);
     }
 }

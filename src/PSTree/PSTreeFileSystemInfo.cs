@@ -1,20 +1,14 @@
 namespace PSTree;
 
-public abstract class PSTreeFileSystemInfo
+public abstract class PSTreeFileSystemInfo(string hierarchy, string source)
 {
-    internal string Source { get; set; }
+    internal string Source { get; set; } = source;
 
     internal int Depth { get; set; }
 
-    public string Hierarchy { get; internal set; }
+    public string Hierarchy { get; internal set; } = hierarchy;
 
     public long Length { get; internal set; }
-
-    protected PSTreeFileSystemInfo(string hierarchy, string source)
-    {
-        Hierarchy = hierarchy;
-        Source = source;
-    }
 
     public string GetFormattedLength() =>
         Internal._FormattingInternals.GetFormattedLength(Length);

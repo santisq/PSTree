@@ -22,7 +22,7 @@ internal static class PathExtensions
         bool throwOnInvalidPath = false,
         bool throwOnInvalidProvider = false)
     {
-        s_normalizedPaths ??= new();
+        s_normalizedPaths ??= [];
         s_normalizedPaths.Clear();
 
         Collection<string> resolvedPaths;
@@ -88,7 +88,7 @@ internal static class PathExtensions
             }
         }
 
-        return s_normalizedPaths.ToArray();
+        return [.. s_normalizedPaths];
     }
 
     internal static string NormalizePath(
@@ -98,7 +98,7 @@ internal static class PathExtensions
         bool throwOnInvalidPath = false,
         bool throwOnInvalidProvider = false) =>
         NormalizePath(
-            new[] { path },
+            [path],
             isLiteral,
             cmdlet,
             throwOnInvalidProvider,

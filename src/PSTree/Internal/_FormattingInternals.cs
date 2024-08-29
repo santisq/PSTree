@@ -11,7 +11,7 @@ namespace PSTree.Internal;
 public static class _FormattingInternals
 {
     private readonly static string[] s_suffix =
-    {
+    [
         "B",
         "KB",
         "MB",
@@ -21,7 +21,7 @@ public static class _FormattingInternals
         "EB",
         "ZB",
         "YB"
-    };
+    ];
 
     [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
     public static string GetFormattedDate(DateTime date) =>
