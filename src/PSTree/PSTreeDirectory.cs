@@ -39,6 +39,6 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
     internal IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable(PSTreeComparer comparer) =>
         Instance
             .EnumerateFileSystemInfos()
-            .OrderBy(e => e is DirectoryInfo)
-            .ThenBy(e => e, comparer);
+            .OrderBy(static e => e is DirectoryInfo)
+            .ThenBy(static e => e, comparer);
 }

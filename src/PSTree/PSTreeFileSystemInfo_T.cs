@@ -50,6 +50,8 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
     public bool HasFlag(FileAttributes flag) =>
         Instance.Attributes.HasFlag(flag);
 
+    public T GetUnderlyingObject() => Instance;
+
     public override string ToString() => FullName;
 
     public void Refresh() => Instance.Refresh();
