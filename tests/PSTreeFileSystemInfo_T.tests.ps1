@@ -70,4 +70,9 @@ Describe 'PSTreeFileSystemInfo<T>' {
         $pattern = '(?:{0}$)' -f ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' -join '|')
         (Get-PSTree $testPath).GetFormattedLength() | Should -Match $pattern
     }
+
+    It 'GetUnderlyingObject() Method' {
+        Get-PSTree $testPath | ForEach-Object GetUnderlyingObject |
+            Should -BeOfType ([System.IO.FileSystemInfo])
+    }
 }

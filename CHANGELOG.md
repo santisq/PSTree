@@ -1,12 +1,69 @@
 # CHANGELOG
 
+- __08/29/2024__
+  - Added method `.GetUnderlyingObject()`. Outputs the underlying `FileSystemInfo` instance.
+  - Fixes [__Issue #9: Sort by ascending values__][1]:
+    - PSTree v2.1.16
+
+      ```powershell
+      PS ..\PSTree> pstree -Directory -Depth 2
+
+        Source: D:\...\PSTree
+
+      Mode            Length Hierarchy
+      ----            ------ ---------
+      d----         25.27 KB PSTree
+      d----          3.72 KB ├── tools
+      d----         16.96 KB │   ├── ProjectBuilder
+      d----          0.00  B │   └── Modules
+      d----         13.66 KB ├── tests
+      d----          0.00  B ├── src
+      d----         13.26 KB │   └── PSTree
+      d----        168.69 KB ├── output
+      d----         92.50 KB │   ├── TestResults
+      d----          0.00  B │   └── PSTree
+      d----          6.26 KB ├── module
+      d----          0.00  B ├── docs
+      d----          7.37 KB │   └── en-US
+      d----          4.11 KB ├── .vscode
+      d----          0.00  B └── .github
+      d----          4.10 KB     └── workflows
+      ```
+
+    - PSTree v2.1.17
+
+      ```powershell
+      PS ..\PSTree> pstree -Directory -Depth 2
+
+        Source: D:\Zen\Documents\Scripts\PSTree
+
+      Mode            Length Hierarchy
+      ----            ------ ---------
+      d----         25.27 KB PSTree
+      d----          0.00  B ├── .github
+      d----          4.10 KB │   └── workflows
+      d----          4.11 KB ├── .vscode
+      d----          0.00  B ├── docs
+      d----          7.37 KB │   └── en-US
+      d----          6.26 KB ├── module
+      d----        168.69 KB ├── output
+      d----          0.00  B │   ├── PSTree
+      d----         92.50 KB │   └── TestResults
+      d----          0.00  B ├── src
+      d----         13.26 KB │   └── PSTree
+      d----         13.66 KB ├── tests
+      d----          3.72 KB └── tools
+      d----          0.00  B     ├── Modules
+      d----         16.96 KB     └── ProjectBuilder
+      ```
+
 - __02/26/2024__
   - Added method `.GetFormattedLength()`. Outputs the friendly `.Length` representation of `PSTreeFile` and `PSTreeDirectory` instances.
 
-  ```powershell
-  PS ..\PSTree> (Get-PSTree D:\ -RecursiveSize -Depth 0).GetFormattedLength()
-  629.59 GB
-  ```
+    ```powershell
+    PS ..\PSTree> (Get-PSTree D:\ -RecursiveSize -Depth 0).GetFormattedLength()
+    629.59 GB
+    ```
 
 - __10/05/2023__
   - Added Parameter `-Include`. Works very similar to `-Exclude`, the patterns are evaluated against the items `.FullName` property, however this parameter targets only files (`FileInfo` instances).
@@ -19,20 +76,20 @@
     - [x] <https://github.com/santisq/PSTree/issues/20> `-Depth` parameter type was changed from `int` to `uint` and the documentation was updated accordingly.
 
 - __07/28/2023__
-  - Added `.ToString()` method to `PSTreeFileSystemInfo<T>` instances, the method resolves to the instances `.FullName` property similar to [`FileSystemInfo.ToString` Method](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.tostring?view=net-7.0#system-io-filesysteminfo-tostring). Now it should be possible to pipe `Get-PSTree` output to `Get-Item` and `Get-ChildItem` when needed:
+  - Added `.ToString()` method to `PSTreeFileSystemInfo<T>` instances, the method resolves to the instances `.FullName` property similar to [`FileSystemInfo.ToString` Method][14]. Now it should be possible to pipe `Get-PSTree` output to `Get-Item` and `Get-ChildItem` when needed:
 
     ```powershell
     Get-PStree -Depth 0 | Get-Item
     ```
 
-  - Added `.Refresh()` method to `PSTreeFileSystemInfo<T>`, functionality is the same as [`FileSystemInfo.Refresh` Method](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.refresh?view=net-7.0#system-io-filesysteminfo-refresh).
+  - Added `.Refresh()` method to `PSTreeFileSystemInfo<T>`, functionality is the same as [`FileSystemInfo.Refresh` Method][15].
   - Reorganizing source files and Pester tests.
   - Added more Pester tests.
   - Fixed a few documentation typos.
 
 - __07/03/2023__
   - Added `-Path` parameter, now both `-Path` and `-LiteralPath` parameters take `string[]` as input and support pipeline input.
-  - Added Pester tests, Code Coverage and coverage upload to [codecov.io](https://app.codecov.io/gh/santisq/PSTree).
+  - Added Pester tests, Code Coverage and coverage upload to [codecov.io][16].
   - Removed `.Size` Property from `PSTreeFile` and `PSTreeDirectory` instances. The `Size` column has been renamed to `Length` and moved to the left-hand side of the `Hierarchy` column (I know it looks much better on the right-hand side :expressionless: but having it in the left allows for fixed width in the first 2 columns, which in turn brings less formatting issues :man_shrugging:...).
 
     The default display for this column is available through `[PSTree.Internal._Format]::GetFormattedLength(...)`, for example:
@@ -76,15 +133,15 @@
     ```
 
 - __03/22/2023__
-  - `Get-PSTree` is now a binary cmdlet. Functionality remains the same. Big thanks to [SeeminglyScience](https://github.com/SeeminglyScience/) and [jborean93](https://github.com/jborean93/) for all their help!
-  - Added `-Exclude` parameter to the cmdlet. The parameter accepts wildcards and patterns are matched with the object's `.FullName` property. For more details checkout [cmdlet docs](/docs/en-US/Get-PSTree.md).
+  - `Get-PSTree` is now a binary cmdlet. Functionality remains the same. Big thanks to [SeeminglyScience][17] and [jborean93][18] for all their help!
+  - Added `-Exclude` parameter to the cmdlet. The parameter accepts wildcards and patterns are matched with the object's `.FullName` property. For more details checkout [cmdlet docs][19].
 
 - __02/25/2023__
   - Fixed a bug that made `Get-PSTree` use `-Recurse` by default.
   - Added [ETS properties](./PSTree/PSTree.Types.ps1xml) to `PSTreeDirectory` and `PSTreeFile` instances that would make exporting the output easier.
 
 - __10/23/2022__
-  - __PSTree Module__ is now published to the [PowerShell Gallery](https://www.powershellgallery.com/)!
+  - __PSTree Module__ is now published to the [PowerShell Gallery][20]!
   - Introducing `-RecursiveSize` switch parameter to `Get-PSTree`. By default, `Get-PSTree` only displays the size of folders __based on the sum of the files length in each Directory__.
   This parameter allows to calculate the recursive size of folders in the hierarchy, similar to how explorer does it. __It's important to note that this is a more expensive operation__, in order to calculate the recursive size, all folders in the hierarchy need to be traversed.
 
@@ -111,8 +168,8 @@ d----     └── Format    1.83 Kb
 ```
 
 - __06/19/2022__
-  - Added [format view](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_format.ps1xml?view=powershell-7.2&viewFallbackFrom=powershell-6) for the Module - [`PSTree.Format.ps1xml`](PSTree/PSTree.Format.ps1xml).
-  - The module now uses [`EnumerateFileSystemInfos()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.enumeratefilesysteminfos?view=net-6.0#system-io-directoryinfo-enumeratefilesysteminfos) instance method.
+  - Added [format view][12] for the Module - [`PSTree.Format.ps1xml`][13].
+  - The module now uses [`EnumerateFileSystemInfos()`][11] instance method.
   - Improved error handling (a lot).
   - `-Files` parameter has been replaced with `-Directory` parameter, now the module displays files by default.
   - `-Deep` parameter has been replaced with `-Recurse` parameter, same functionality.
@@ -140,18 +197,39 @@ d----     └── Format                     1.83 Kb
 
 - __05/24/2022__
 
-  - Lots of code improvements have been done to the Module and improved error handling. Now uses the [`GetDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.getdirectories?view=net-6.0#system-io-directoryinfo-getdirectories) and [`GetFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.getfiles?view=net-6.0#system-io-directoryinfo-getfiles) methods from [`System.IO.DirectoryInfo`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo?view=net-6.0). Each `PSTreeDirectory` instance now holds an instance of `DirectoryInfo`. [`System.Collections.Stack`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.stack?view=net-6.0) has been changed for [`System.Collections.Generic.Stack<T>`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.stack-1?view=net-6.0).
+  - Lots of code improvements have been done to the Module and improved error handling. Now uses the [`GetDirectories()`][10] and [`GetFiles()`][9] methods from [`System.IO.DirectoryInfo`][8]. Each `PSTreeDirectory` instance now holds an instance of `DirectoryInfo`. [`System.Collections.Stack`][5] has been changed for [`System.Collections.Generic.Stack<T>`][7].
 
 - __04/21/2022__
 
-  - __PSTree Module__ now uses [`System.Collections.Stack`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.stack?view=net-6.0) instead of recursion, performance should be much better now and functionality remains the same. Special thanks to [IISResetMe](https://github.com/IISResetMe).
+  - __PSTree Module__ now uses [`System.Collections.Stack`][5] instead of recursion, performance should be much better now and functionality remains the same. Special thanks to [IISResetMe][6].
 
 - __01/02/2022__
 
   - __PSTree Module__ now has it's own classes, functionality remains the same however a lot has been improved.
-  - Recursion is now done using the static methods [`[System.IO.Directory]::GetDirectories()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getdirectories?view=net-6.0) and [`[System.IO.Directory]::GetFiles()`](https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-6.0) instead of [`Get-ChildItem`](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem).
+  - Recursion is now done using the static methods [`[System.IO.Directory]::GetDirectories()`][2] and [`[System.IO.Directory]::GetFiles()`][3] instead of [`Get-ChildItem`][4].
 
 - __12/25/2021__
 
   - `-Files` switch has been added to the Module, now you can display files in the hierarchy tree if desired.
   - `Type` property has been added to the output object and is now part of the _Default MemberSet_.
+
+[1]: https://github.com/santisq/PSTree/issues/9
+[2]: https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getdirectories?view=net-6.0
+[3]: https://docs.microsoft.com/en-us/dotnet/api/system.io.directory.getfiles?view=net-6.0
+[4]: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-childitem
+[5]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.stack?view=net-6.0
+[6]: https://github.com/IISResetMe
+[7]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.stack-1?view=net-6.0
+[8]: https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo?view=net-6.0
+[9]: https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.getfiles?view=net-6.0#system-io-directoryinfo-getfiles
+[10]: https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.getdirectories?view=net-6.0#system-io-directoryinfo-getdirectories
+[11]: https://docs.microsoft.com/en-us/dotnet/api/system.io.directoryinfo.enumeratefilesysteminfos?view=net-6.0#system-io-directoryinfo-enumeratefilesysteminfos
+[12]: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_format.ps1xml?view=powershell-7.2&viewFallbackFrom=powershell-6
+[13]: PSTree/PSTree.Format.ps1xml
+[14]: https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.tostring?view=net-7.0#system-io-filesysteminfo-tostring
+[15]: https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.refresh?view=net-7.0#system-io-filesysteminfo-refresh
+[16]: https://app.codecov.io/gh/santisq/PSTree
+[17]: https://github.com/SeeminglyScience/
+[18]: https://github.com/jborean93/
+[19]: /docs/en-US/Get-PSTree.md
+[20]: https://www.powershellgallery.com/

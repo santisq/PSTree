@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace PSTree;
 
@@ -34,4 +35,10 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
             yield return path.Substring(0, index);
         }
     }
+
+    internal IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable(PSTreeComparer comparer) =>
+        Instance
+            .EnumerateFileSystemInfos()
+            .OrderBy(static e => e is DirectoryInfo)
+            .ThenBy(static e => e, comparer);
 }

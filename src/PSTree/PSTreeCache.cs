@@ -11,8 +11,8 @@ internal sealed class PSTreeCache
 
     internal PSTreeCache()
     {
-        _items = new();
-        _files = new();
+        _items = [];
+        _files = [];
     }
 
     internal void AddFile(FileInfo file, int depth, string source) =>
@@ -25,7 +25,7 @@ internal sealed class PSTreeCache
     {
         if (_files.Count > 0)
         {
-            _items.AddRange(_files.ToArray());
+            _items.AddRange([.. _files]);
             _files.Clear();
         }
     }
