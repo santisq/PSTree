@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Management.Automation;
 
-namespace PSTree;
+namespace PSTree.Commands;
 
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Path")]
 [OutputType(typeof(PSTreeDirectory), typeof(PSTreeFile))]
