@@ -143,18 +143,17 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
 
         while (_stack.Count > 0)
         {
-            IOrderedEnumerable<FileSystemInfo> enumerator;
             PSTreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
             long size = 0;
+            int childCount = 0;
 
             try
             {
-                enumerator = next.GetSortedEnumerable(_comparer);
                 bool keepProcessing = level <= Depth;
-
-                foreach (FileSystemInfo item in enumerator)
+                foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
                 {
+                    childCount++;
                     if (!Force.IsPresent && item.IsHidden())
                     {
                         continue;
@@ -190,10 +189,11 @@ public sealed partial class GetPSTreeCommand : PSCmdlet
                 }
 
                 next.Length = size;
+                _indexer.IndexItemCount(next, childCount);
 
                 if (RecursiveSize.IsPresent)
                 {
-                    _indexer.Index(next, size);
+                    _indexer.IndexLength(next, size);
                 }
 
                 if (next.Depth <= Depth)

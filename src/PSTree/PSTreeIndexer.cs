@@ -7,15 +7,30 @@ internal sealed class PSTreeIndexer
 {
     private readonly Dictionary<string, PSTreeDirectory> _indexer = [];
 
-    internal void Index(PSTreeDirectory directory, long length)
+    internal void IndexLength(PSTreeDirectory directory, long length)
     {
         _indexer[directory.FullName.TrimEnd(Path.DirectorySeparatorChar)] = directory;
 
-        foreach (string parent in directory.GetParents())
+        foreach (string parent in directory.Parents)
         {
-            if (_indexer.ContainsKey(parent))
+            if (_indexer.TryGetValue(parent, out PSTreeDirectory paretDir))
             {
-                _indexer[parent].Length += length;
+                paretDir.Length += length;
+            }
+        }
+    }
+
+    internal void IndexItemCount(PSTreeDirectory directory, int count)
+    {
+        directory.ItemCount = count;
+        directory.RecursiveItemCount = count;
+        _indexer[directory.FullName.TrimEnd(Path.DirectorySeparatorChar)] = directory;
+
+        foreach (string parent in directory.Parents)
+        {
+            if (_indexer.TryGetValue(parent, out PSTreeDirectory parentDir))
+            {
+                parentDir.RecursiveItemCount += count;
             }
         }
     }
