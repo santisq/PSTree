@@ -1,5 +1,42 @@
 # CHANGELOG
 
+- __09/03/2024__
+  - Makes `.Depth` property public for `PSTreeFileSystemInfo` instances.
+  - Makes `.GetParents()` method private, absolutely no reason to have it public.
+  - Added property `ItemCount` and `TotalItemCount` to `PSTreeDirectory` instances, requested in [__Issue #34__][2].
+
+    ```powershell
+    PS ..\PSTree> pstree -Recurse -Force -Directory | Select-Object Hierarchy, Depth, ItemCount, TotalItemCount -First 15
+
+    Hierarchy                  Depth ItemCount TotalItemCount
+    ---------                  ----- --------- --------------
+    PSTree                         0        15           1476
+    ├── .git                       1        13           1078
+    │   ├── hooks                  2        13             13
+    │   ├── info                   2         1              1
+    │   ├── logs                   2         2             24
+    │   │   └── refs               3         2             22
+    │   │       ├── heads          4         9              9
+    │   │       └── remotes        4         1             11
+    │   │           └── origin     5        10             10
+    │   ├── objects                2       244            995
+    │   │   ├── 00                 3         3              3
+    │   │   ├── 01                 3         2              2
+    │   │   ├── 02                 3         3              3
+    │   │   ├── 03                 3         4              4
+    │   │   ├── 04                 3         2              2
+
+    PS ..\PSTree> (Get-ChildItem -Force).Count
+    15
+    PS ..\PSTree> (Get-ChildItem -Force -Recurse).Count
+    1476
+    PS ..\PSTree> (Get-ChildItem .git -Force -Recurse).Count
+    1078
+    PS ..\PSTree> (Get-ChildItem .git -Force).Count
+    13
+    PS ..\PSTree>
+    ```
+
 - __08/29/2024__
   - Added method `.GetUnderlyingObject()`. Outputs the underlying `FileSystemInfo` instance.
   - Fixes [__Issue #9: Sort by ascending values__][1]:
@@ -233,3 +270,4 @@ d----     └── Format                     1.83 Kb
 [18]: https://github.com/jborean93/
 [19]: /docs/en-US/Get-PSTree.md
 [20]: https://www.powershellgallery.com/
+[2]: https://github.com/santisq/PSTree/issues/34
