@@ -23,6 +23,10 @@ Describe 'PSTreeDirectory' {
             Should -BeIn ([System.IO.FileInfo], [System.IO.DirectoryInfo])
     }
 
+    It '.Parent property gets the PSTreeDirectory Parent DirectoryInfo instance' {
+        (Get-PSTree $testPath -Depth 0).Parent | Should -BeOfType ([System.IO.DirectoryInfo])
+    }
+
     It 'ItemCount gets the count of direct childs' {
         $childCount = @(Get-ChildItem -Force $testPath).Count
         (Get-PSTree $testPath -Depth 1 -Force)[0].ItemCount | Should -BeExactly $childCount
