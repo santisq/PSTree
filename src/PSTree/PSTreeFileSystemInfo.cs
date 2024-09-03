@@ -4,7 +4,7 @@ public abstract class PSTreeFileSystemInfo(string hierarchy, string source)
 {
     internal string Source { get; set; } = source;
 
-    public int Depth { get; set; }
+    public int Depth { get; protected set; }
 
     public string Hierarchy { get; internal set; } = hierarchy;
 
