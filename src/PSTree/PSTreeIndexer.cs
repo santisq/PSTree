@@ -23,14 +23,14 @@ internal sealed class PSTreeIndexer
     internal void IndexItemCount(PSTreeDirectory directory, int count)
     {
         directory.ItemCount = count;
-        directory.RecursiveItemCount = count;
+        directory.TotalItemCount = count;
         _indexer[directory.FullName.TrimEnd(Path.DirectorySeparatorChar)] = directory;
 
         foreach (string parent in directory.Parents)
         {
             if (_indexer.TryGetValue(parent, out PSTreeDirectory parentDir))
             {
-                parentDir.RecursiveItemCount += count;
+                parentDir.TotalItemCount += count;
             }
         }
     }

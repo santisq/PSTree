@@ -9,7 +9,7 @@ namespace PSTree.Commands;
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Path")]
 [OutputType(typeof(PSTreeDirectory), typeof(PSTreeFile))]
 [Alias("pstree")]
-public sealed partial class GetPSTreeCommand : PSCmdlet
+public sealed class GetPSTreeCommand : PSCmdlet
 {
     private bool _isLiteral;
 
