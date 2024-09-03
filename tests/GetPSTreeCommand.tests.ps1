@@ -95,19 +95,14 @@ Describe 'Get-PSTree' {
             Should -BeIn ([PSTree.PSTreeFile], [PSTree.PSTreeDirectory])
     }
 
-    It 'Excludes PSTressFile instances with -Directory' {
+    It 'Excludes PSTreeFile instances with -Directory' {
         Get-PSTree -LiteralPath $testPath -Directory |
             Should -BeOfType ([PSTree.PSTreeDirectory])
     }
 
     It 'Controls recursion with -Depth parameter' {
-        $method = [PSTree.PSTreeFileSystemInfo].GetProperty(
-            'Depth',
-            [System.Reflection.BindingFlags] 'NonPublic, Instance')
-
         $tree = Get-PSTree $testPath -Depth 1
-
-        $tree | ForEach-Object { $method.GetValue($_) } |
+        $tree | ForEach-Object Depth |
             Should -Not -BeGreaterThan 2
 
         $ref = (Get-ChildItem $testPath -Directory | Get-ChildItem).FullName

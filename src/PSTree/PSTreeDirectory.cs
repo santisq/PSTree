@@ -6,7 +6,15 @@ namespace PSTree;
 
 public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 {
+    private string[]? _parents;
+
+    internal string[] Parents { get => _parents ??= GetParents(FullName); }
+
     public DirectoryInfo Parent => Instance.Parent;
+
+    public int ItemCount { get; internal set; }
+
+    public int TotalItemCount { get; internal set; }
 
     internal PSTreeDirectory(DirectoryInfo directoryInfo, int depth, string source) :
         base(directoryInfo, depth, source)
@@ -25,15 +33,17 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
     public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() =>
         Instance.EnumerateFileSystemInfos();
 
-    public IEnumerable<string> GetParents()
+    private static string[] GetParents(string path)
     {
         int index = -1;
-        string path = Instance.FullName;
+        List<string> parents = [];
 
         while ((index = path.IndexOf(Path.DirectorySeparatorChar, index + 1)) != -1)
         {
-            yield return path.Substring(0, index);
+            parents.Add(path.Substring(0, index));
         }
+
+        return [.. parents];
     }
 
     internal IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable(PSTreeComparer comparer) =>

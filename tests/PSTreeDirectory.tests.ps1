@@ -23,11 +23,17 @@ Describe 'PSTreeDirectory' {
             Should -BeIn ([System.IO.FileInfo], [System.IO.DirectoryInfo])
     }
 
-    It 'Can enumerate its parent directories with .GetParents()' {
-        $treedir = $testPath | Get-PSTree -Depth 0
-        $parent = $treedir.Parent
-        $parent | Should -BeOfType ([System.IO.DirectoryInfo])
-        $paths = $parent.FullName.Split([System.IO.Path]::DirectorySeparatorChar)
-        $treedir.GetParents() | Should -HaveCount $paths.Count
+    It '.Parent property gets the PSTreeDirectory Parent DirectoryInfo instance' {
+        (Get-PSTree $testPath -Depth 0).Parent | Should -BeOfType ([System.IO.DirectoryInfo])
+    }
+
+    It 'ItemCount gets the count of direct childs' {
+        $childCount = @(Get-ChildItem -Force $testPath).Count
+        (Get-PSTree $testPath -Depth 1 -Force)[0].ItemCount | Should -BeExactly $childCount
+    }
+
+    It 'TotalItemCount gets the recursive count of childs' {
+        $childCount = @(Get-ChildItem -Force $testPath -Recurse).Count
+        (Get-PSTree $testPath -Recurse -Force)[0].TotalItemCount | Should -BeExactly $childCount
     }
 }
