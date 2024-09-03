@@ -1,9 +1,9 @@
 # CHANGELOG
 
 - __09/03/2024__
-  - Makes `.Depth` property public for `PSTreeFileSystemInfo` instances.
-  - Makes `.GetParents()` method private, absolutely no reason to have it public.
-  - Added property `ItemCount` and `TotalItemCount` to `PSTreeDirectory` instances, requested in [__Issue #34__][2].
+  - Makes `Depth` property public for `PSTreeFileSystemInfo` instances.
+  - Makes `GetParents()` method private, absolutely no reason to have it public.
+  - Added properties `ItemCount` and `TotalItemCount` to `PSTreeDirectory` instances, requested in [__Issue #34__][2].
 
     ```powershell
     PS ..\PSTree> pstree -Recurse -Force -Directory | Select-Object Hierarchy, Depth, ItemCount, TotalItemCount -First 15
@@ -30,10 +30,10 @@
     15
     PS ..\PSTree> (Get-ChildItem -Force -Recurse).Count
     1476
-    PS ..\PSTree> (Get-ChildItem .git -Force -Recurse).Count
-    1078
     PS ..\PSTree> (Get-ChildItem .git -Force).Count
     13
+    PS ..\PSTree> (Get-ChildItem .git -Force -Recurse).Count
+    1078
     PS ..\PSTree>
     ```
 
