@@ -7,10 +7,14 @@ internal sealed class PSTreeIndexer
 {
     private readonly Dictionary<string, PSTreeDirectory> _indexer = [];
 
+    internal PSTreeDirectory this[string path]
+    {
+        get => _indexer[path];
+        set => _indexer[path.TrimEnd(Path.DirectorySeparatorChar)] = value;
+    }
+
     internal void IndexLength(PSTreeDirectory directory, long length)
     {
-        _indexer[directory.FullName.TrimEnd(Path.DirectorySeparatorChar)] = directory;
-
         foreach (string parent in directory.Parents)
         {
             if (_indexer.TryGetValue(parent, out PSTreeDirectory paretDir))
@@ -24,7 +28,6 @@ internal sealed class PSTreeIndexer
     {
         directory.ItemCount = count;
         directory.TotalItemCount = count;
-        _indexer[directory.FullName.TrimEnd(Path.DirectorySeparatorChar)] = directory;
 
         foreach (string parent in directory.Parents)
         {

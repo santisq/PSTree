@@ -189,6 +189,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
                 }
 
                 next.Length = size;
+                _indexer[next.FullName] = next;
                 _indexer.IndexItemCount(next, childCount);
 
                 if (RecursiveSize.IsPresent)
