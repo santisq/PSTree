@@ -14,9 +14,12 @@ public sealed partial class TreeStyle
 
     private string _directory = "\x1B[44;1m";
 
-    private static readonly Regex s_validate = new(@"^\x1B\[(?:[0-9]+;?){1,}m$", RegexOptions.Compiled);
+    private static readonly Regex s_validate = new(
+        @"^\x1B\[(?:[0-9]+;?){1,}m$",
+        RegexOptions.Compiled);
 
-    internal static StringComparer Comparer { get; } = StringComparer.InvariantCultureIgnoreCase;
+    internal static StringComparer Comparer { get; } =
+        StringComparer.InvariantCultureIgnoreCase;
 
     public string Directory
     {
