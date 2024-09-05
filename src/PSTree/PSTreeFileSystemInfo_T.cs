@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Management.Automation;
 using Microsoft.PowerShell.Commands;
-using PSTree.Style;
 
 namespace PSTree;
 
@@ -38,16 +37,16 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
     public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
 
     private protected PSTreeFileSystemInfo(
-        T fileSystemInfo, string hierarchy, int depth, string source) :
-        base(hierarchy, source)
+        T fileSystemInfo, string hierarchy, string source, int depth)
+        : base(hierarchy, source)
     {
         Instance = fileSystemInfo;
         Depth = depth;
     }
 
     private protected PSTreeFileSystemInfo(
-        T fileSystemInfo, string hierarchy, string source) :
-        base(hierarchy, source)
+        T fileSystemInfo, string hierarchy, string source)
+        : base(hierarchy, source)
     {
         Instance = fileSystemInfo;
     }

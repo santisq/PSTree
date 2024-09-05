@@ -9,11 +9,25 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
 
     public string DirectoryName => Instance.DirectoryName;
 
-    internal PSTreeFile(FileInfo file, int depth, string source) :
-        base(file, file.GetColoredName().Indent(depth), depth, source) =>
+    private PSTreeFile(
+        FileInfo file, string hierarchy, string source, int depth)
+        : base(file, hierarchy, source, depth) =>
         Length = file.Length;
 
-    internal PSTreeFile(FileInfo file, string source) :
-        base(file, file.GetColoredName(), source) =>
+    private PSTreeFile(
+        FileInfo file, string hierarchy, string source)
+        : base(file, hierarchy, source) =>
         Length = file.Length;
+
+    internal static PSTreeFile Create(FileInfo file, string source)
+    {
+        string styled = PSTreeStyle.Instance.GetColoredName(file);
+        return new PSTreeFile(file, styled, source);
+    }
+
+    internal static PSTreeFile Create(FileInfo file, string source, int depth)
+    {
+        string styled = PSTreeStyle.Instance.GetColoredName(file).Indent(depth);
+        return new PSTreeFile(file, styled, source, depth);
+    }
 }

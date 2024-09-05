@@ -9,8 +9,7 @@ internal sealed class PSTreeCache
 
     private readonly List<PSTreeFile> _files = [];
 
-    internal void AddFile(FileInfo file, int depth, string source) =>
-        _files.Add(new PSTreeFile(file, depth, source));
+    internal void AddFile(PSTreeFile file) => _files.Add(file);
 
     internal void Add(PSTreeFileSystemInfo item) => _items.Add(item);
 
