@@ -57,13 +57,13 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 
     internal static PSTreeDirectory Create(DirectoryInfo dir, string source)
     {
-        string styled = PSTreeStyle.Instance.GetColoredName(dir);
+        string styled = TreeStyle.Instance.GetColoredName(dir);
         return new PSTreeDirectory(dir, styled, source);
     }
 
     internal static PSTreeDirectory Create(DirectoryInfo dir, string source, int depth)
     {
-        string styled = PSTreeStyle.Instance.GetColoredName(dir).Indent(depth);
+        string styled = TreeStyle.Instance.GetColoredName(dir).Indent(depth);
         return new PSTreeDirectory(dir, styled, source, depth);
     }
 }

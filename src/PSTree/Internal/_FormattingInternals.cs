@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Management.Automation;
+using PSTree.Style;
 
 namespace PSTree.Internal;
 

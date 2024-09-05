@@ -21,13 +21,13 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
 
     internal static PSTreeFile Create(FileInfo file, string source)
     {
-        string styled = PSTreeStyle.Instance.GetColoredName(file);
+        string styled = TreeStyle.Instance.GetColoredName(file);
         return new PSTreeFile(file, styled, source);
     }
 
     internal static PSTreeFile Create(FileInfo file, string source, int depth)
     {
-        string styled = PSTreeStyle.Instance.GetColoredName(file).Indent(depth);
+        string styled = TreeStyle.Instance.GetColoredName(file).Indent(depth);
         return new PSTreeFile(file, styled, source, depth);
     }
 }

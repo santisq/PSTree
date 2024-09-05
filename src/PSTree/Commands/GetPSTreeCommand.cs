@@ -203,18 +203,18 @@ public sealed class GetPSTreeCommand : PSCmdlet
                     _cache.TryAddFiles();
                 }
             }
-            catch (Exception e) when (e is PipelineStoppedException or FlowControlException)
+            catch (Exception _) when (_ is PipelineStoppedException or FlowControlException)
             {
                 throw;
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
                 if (next.Depth <= Depth)
                 {
                     _cache.Add(next);
                 }
 
-                WriteError(ExceptionHelpers.EnumerationError(next, e));
+                WriteError(exception.ToEnumerationError(next));
             }
         }
 

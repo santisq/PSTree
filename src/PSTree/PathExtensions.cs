@@ -39,12 +39,10 @@ internal static class PathExtensions
                 {
                     if (throwOnInvalidProvider)
                     {
-                        cmdlet.ThrowTerminatingError(ExceptionHelpers
-                            .InvalidProviderError(path, provider));
+                        cmdlet.ThrowTerminatingError(provider.ToInvalidProviderError(path));
                     }
 
-                    cmdlet.WriteError(ExceptionHelpers
-                        .InvalidProviderError(path, provider));
+                    cmdlet.WriteError(provider.ToInvalidProviderError(path));
                     continue;
                 }
 
@@ -52,13 +50,10 @@ internal static class PathExtensions
                 {
                     if (throwOnInvalidPath)
                     {
-                        cmdlet.ThrowTerminatingError(ExceptionHelpers
-                            .InvalidPathError(resolvedPath));
-                        continue;
+                        cmdlet.ThrowTerminatingError(resolvedPath.ToInvalidPathError());
                     }
 
-                    cmdlet.WriteError(ExceptionHelpers
-                        .InvalidPathError(resolvedPath));
+                    cmdlet.WriteError(resolvedPath.ToInvalidPathError());
                     continue;
                 }
 
@@ -74,17 +69,16 @@ internal static class PathExtensions
                 {
                     if (!provider.IsFileSystem())
                     {
-                        cmdlet.WriteError(ExceptionHelpers.InvalidProviderError(
-                            resolvedPath, provider));
+                        cmdlet.WriteError(provider.ToInvalidProviderError(resolvedPath));
                         continue;
                     }
 
                     s_normalizedPaths.Add(resolvedPath);
                 }
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                cmdlet.WriteError(ExceptionHelpers.ResolvePathError(path, e));
+                cmdlet.WriteError(exception.ToResolvePathError(path));
             }
         }
 
