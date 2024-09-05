@@ -45,7 +45,29 @@
       </TableControl>
     </View>
     <View>
-      <Name>PSTree.Style.TreeStyle</Name>
+      <Name>PSTree.Style.Palette</Name>
+      <ViewSelectedBy>
+        <TypeName>PSTree.Style.Palette</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>Foreground</Label>
+                <PropertyName>Foreground</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Background</Label>
+                <PropertyName>Background</PropertyName>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
+      <Name>PSTree.Style.Palette.Palettes</Name>
       <ViewSelectedBy>
         <TypeName>PSTree.Style.Palette+ForegroundPalette</TypeName>
         <TypeName>PSTree.Style.Palette+BackgroundPalette</TypeName>
@@ -149,6 +171,40 @@
                 <ScriptBlock>
                   [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.BrightYellow)
                 </ScriptBlock>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
+      <Name>PSTree.Style.TreeStyle</Name>
+      <ViewSelectedBy>
+        <TypeName>PSTree.Style.TreeStyle</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>Directory</Label>
+                <ScriptBlock>
+                  [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Directory)
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Reset</Label>
+                <ScriptBlock>
+                  [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Reset)
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>Palette</Label>
+                <PropertyName>Palette</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>FileExtension</Label>
+                <PropertyName>FileExtension</PropertyName>
               </ListItem>
             </ListItems>
           </ListEntry>
