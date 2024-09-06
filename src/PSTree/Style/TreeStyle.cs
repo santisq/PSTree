@@ -21,10 +21,12 @@ public sealed partial class TreeStyle
     internal static StringComparer Comparer { get; } =
         StringComparer.InvariantCultureIgnoreCase;
 
+    public OutputRendering OutputRendering { get; set; } = OutputRendering.Host;
+
     public string Directory
     {
         get => _directory;
-        set => _directory = ValidateSequence(value);
+        set => _directory = ThrowIfInvalidSequence(value);
     }
 
     public FileExtension FileExtension { get; } = new();
@@ -37,7 +39,8 @@ public sealed partial class TreeStyle
 
     internal string GetColoredName(FileInfo file)
     {
-        if (FileExtension.TryGetValue(file.Extension, out string vt))
+        if (OutputRendering is OutputRendering.Host
+            && FileExtension.TryGetValue(file.Extension, out string vt))
         {
             return $"{vt}{file.Name}{Reset}";
         }
@@ -45,20 +48,23 @@ public sealed partial class TreeStyle
         return file.Name;
     }
 
-    internal string GetColoredName(DirectoryInfo directory) =>
-        $"{Directory}{directory.Name}{Reset}";
+    internal string GetColoredName(DirectoryInfo directory)
+    {
+        if (OutputRendering is OutputRendering.PlainText)
+        {
+            return directory.Name;
+        }
 
-    private static void ThrowIfInvalidSequence(string vt)
+        return $"{Directory}{directory.Name}{Reset}";
+    }
+
+    internal static string ThrowIfInvalidSequence(string vt)
     {
         if (!s_validate.IsMatch(vt))
         {
-            Exceptions.ThrowInvalidSequence(vt);
+            vt.ThrowInvalidSequence();
         }
-    }
 
-    private static string ValidateSequence(string vt)
-    {
-        ThrowIfInvalidSequence(vt);
         return vt;
     }
 

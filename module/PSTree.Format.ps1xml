@@ -187,6 +187,10 @@
           <ListEntry>
             <ListItems>
               <ListItem>
+                <Label>OutputRendering</Label>
+                <PropertyName>OutputRendering</PropertyName>
+              </ListItem>
+              <ListItem>
                 <Label>Directory</Label>
                 <ScriptBlock>
                   [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Directory)

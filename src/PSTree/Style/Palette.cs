@@ -1,3 +1,5 @@
+using System;
+
 namespace PSTree.Style;
 
 public sealed class Palette
@@ -80,7 +82,12 @@ public sealed class Palette
         public override string ToString() => _toString ??= TreeStyle.FormatType(this);
     }
 
+    private string? _toString;
+
     public ForegroundPalette Foreground { get; } = new();
 
     public BackgroundPalette Background { get; } = new();
+
+    public override string ToString() =>
+        _toString ??= $"{Foreground}{Environment.NewLine}{Background}";
 }
