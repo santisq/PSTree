@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Management.Automation;
 using System.Text;
 
 namespace PSTree.Style;
@@ -10,6 +13,12 @@ public sealed class FileExtension
     private const string _yellow = "\x1B[33;1m";
 
     private readonly Dictionary<string, string> _extension;
+
+    public ICollection<string> Keys => _extension.Keys;
+
+    public ICollection<string> Values => _extension.Values;
+
+    public int Count => _extension.Count;
 
     public string this[string extension]
     {
@@ -35,8 +44,6 @@ public sealed class FileExtension
         };
     }
 
-    // public ReadOnlyDictionary<string, string> Extension { get => new(_extension); }
-
     public override string ToString()
     {
         StringBuilder sb = new(_extension.Count);
@@ -48,6 +55,44 @@ public sealed class FileExtension
 
         return sb.ToString();
     }
+
+    [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
+    public static string GetEscapedValues(FileExtension extension)
+    {
+        StringBuilder builder = new(extension.Count);
+        foreach (string value in extension.Values)
+        {
+            builder.AppendLine(TreeStyle.Instance.EscapeSequence(value));
+        }
+        return builder.ToString();
+    }
+
+
+    // [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
+    // public static string FormatTable(FileExtension extension)
+    // {
+    //     int len = extension.Keys.Max(e => e.Length) + 3;
+    //     StringBuilder builder = new(extension.Count + 3);
+    //     builder
+    //         .AppendLine()
+    //         .Append("\x1B[32;1m")
+    //         .Append("Extension".PadRight(len))
+    //         .Append("Style")
+    //         .AppendLine("\x1B[0m")
+    //         .Append("\x1B[32;1m")
+    //         .Append(new string('-', 9).PadRight(len))
+    //         .Append(new string('-', 5))
+    //         .AppendLine("\x1B[0m");
+
+    //     foreach (KeyValuePair<string, string> pair in extension._extension)
+    //     {
+    //         builder
+    //             .Append(pair.Key.PadRight(len))
+    //             .AppendLine(TreeStyle.Instance.EscapeSequence(pair.Value));
+    //     }
+
+    //     return builder.ToString();
+    // }
 
     private string ValidateExtension(string extension)
     {
@@ -69,4 +114,6 @@ public sealed class FileExtension
             TreeStyle.ThrowIfInvalidSequence(vt));
 
     public bool Remove(string extension) => _extension.Remove(ValidateExtension(extension));
+
+    public void Clear() => _extension.Clear();
 }
