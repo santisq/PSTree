@@ -6,7 +6,7 @@ using System.Text;
 
 namespace PSTree.Style;
 
-public sealed class FileExtension
+public sealed class Extension
 {
     private const string _red = "\x1B[31;1m";
 
@@ -26,7 +26,7 @@ public sealed class FileExtension
         set => _extension[ValidateExtension(extension)] = TreeStyle.ThrowIfInvalidSequence(value);
     }
 
-    internal FileExtension()
+    internal Extension()
     {
         _extension = new(TreeStyle.Comparer)
         {
@@ -57,7 +57,7 @@ public sealed class FileExtension
     }
 
     [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
-    public static string GetEscapedValues(FileExtension extension)
+    public static string GetEscapedValues(Extension extension)
     {
         StringBuilder builder = new(extension.Count);
         foreach (string value in extension.Values)

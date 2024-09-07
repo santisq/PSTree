@@ -207,8 +207,8 @@
                 <PropertyName>Palette</PropertyName>
               </ListItem>
               <ListItem>
-                <Label>FileExtension</Label>
-                <PropertyName>FileExtension</PropertyName>
+                <Label>Extension</Label>
+                <PropertyName>Extension</PropertyName>
               </ListItem>
             </ListItems>
           </ListEntry>
@@ -216,9 +216,9 @@
       </ListControl>
     </View>
     <View>
-      <Name>Test</Name>
+      <Name>PSTree.Style.Extension</Name>
       <ViewSelectedBy>
-        <TypeName>PSTree.Style.FileExtension</TypeName>
+        <TypeName>PSTree.Style.Extension</TypeName>
       </ViewSelectedBy>
       <TableControl>
         <TableHeaders>
@@ -238,7 +238,7 @@
                 <ScriptBlock>$_.Keys -join [Environment]::NewLine</ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
-                <ScriptBlock>[PSTree.Style.FileExtension]::GetEscapedValues($_)</ScriptBlock>
+                <ScriptBlock>[PSTree.Style.Extension]::GetEscapedValues($_)</ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>

@@ -29,7 +29,7 @@ public sealed partial class TreeStyle
         set => _directory = ThrowIfInvalidSequence(value);
     }
 
-    public FileExtension FileExtension { get; } = new();
+    public Extension Extension { get; } = new();
 
     public Palette Palette { get; } = new();
 
@@ -40,7 +40,7 @@ public sealed partial class TreeStyle
     internal string GetColoredName(FileInfo file)
     {
         if (OutputRendering is OutputRendering.Host
-            && FileExtension.TryGetValue(file.Extension, out string vt))
+            && Extension.TryGetValue(file.Extension, out string vt))
         {
             return $"{vt}{file.Name}{Reset}";
         }
