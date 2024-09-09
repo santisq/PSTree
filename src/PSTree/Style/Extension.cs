@@ -46,14 +46,17 @@ public sealed class Extension
 
     public override string ToString()
     {
-        StringBuilder sb = new(_extension.Count);
+        StringBuilder builder = new(_extension.Count);
+        int len = _extension.Keys.Max(e => e.Length);
         foreach (KeyValuePair<string, string> pair in _extension)
         {
-            string value = $"{pair.Value}{pair.Key}{TreeStyle.Instance.Reset}";
-            sb.AppendLine(value);
+            builder
+                .Append(pair.Key.PadRight(len + 1))
+                .Append(" → ")
+                .AppendLine(TreeStyle.Instance.EscapeSequence(pair.Value));
         }
 
-        return sb.ToString();
+        return builder.ToString();
     }
 
     [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
@@ -66,33 +69,6 @@ public sealed class Extension
         }
         return builder.ToString();
     }
-
-
-    // [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
-    // public static string FormatTable(FileExtension extension)
-    // {
-    //     int len = extension.Keys.Max(e => e.Length) + 3;
-    //     StringBuilder builder = new(extension.Count + 3);
-    //     builder
-    //         .AppendLine()
-    //         .Append("\x1B[32;1m")
-    //         .Append("Extension".PadRight(len))
-    //         .Append("Style")
-    //         .AppendLine("\x1B[0m")
-    //         .Append("\x1B[32;1m")
-    //         .Append(new string('-', 9).PadRight(len))
-    //         .Append(new string('-', 5))
-    //         .AppendLine("\x1B[0m");
-
-    //     foreach (KeyValuePair<string, string> pair in extension._extension)
-    //     {
-    //         builder
-    //             .Append(pair.Key.PadRight(len))
-    //             .AppendLine(TreeStyle.Instance.EscapeSequence(pair.Value));
-    //     }
-
-    //     return builder.ToString();
-    // }
 
     private string ValidateExtension(string extension)
     {

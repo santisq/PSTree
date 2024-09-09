@@ -197,6 +197,12 @@
                 </ScriptBlock>
               </ListItem>
               <ListItem>
+                <Label>Executable</Label>
+                <ScriptBlock>
+                  [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Executable)
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
                 <Label>Reset</Label>
                 <ScriptBlock>
                   [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Reset)

@@ -89,5 +89,5 @@ public sealed class Palette
     public BackgroundPalette Background { get; } = new();
 
     public override string ToString() =>
-        _toString ??= $"{Foreground}{Environment.NewLine}{Background}";
+        _toString ??= $"{Foreground}{Environment.NewLine}{Environment.NewLine}{Background}";
 }

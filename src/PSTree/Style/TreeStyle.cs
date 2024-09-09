@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -13,6 +15,26 @@ public sealed partial class TreeStyle
     private static readonly TreeStyle s_instance = new();
 
     private string _directory = "\x1B[44;1m";
+
+    private string _executable = "\x1B[32;1m";
+
+    private readonly HashSet<string> _exec = new(Comparer)
+    {
+        ".com",
+        ".exe",
+        ".bat",
+        ".cmd",
+        ".vbs",
+        ".vbe",
+        ".js",
+        ".jse",
+        ".wsf",
+        ".wsh",
+        ".msc",
+        ".cpl"
+    };
+
+    private readonly bool _isWin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
     private static readonly Regex s_validate = new(
         @"^\x1B\[(?:[0-9]+;?){1,}m$",
@@ -29,6 +51,12 @@ public sealed partial class TreeStyle
         set => _directory = ThrowIfInvalidSequence(value);
     }
 
+    public string Executable
+    {
+        get => _executable;
+        set => _executable = ThrowIfInvalidSequence(value);
+    }
+
     public Extension Extension { get; } = new();
 
     public Palette Palette { get; } = new();
@@ -39,10 +67,19 @@ public sealed partial class TreeStyle
 
     internal string GetColoredName(FileInfo file)
     {
-        if (OutputRendering is OutputRendering.Host
-            && Extension.TryGetValue(file.Extension, out string vt))
+        if (OutputRendering is not OutputRendering.Host)
+        {
+            return file.Name;
+        }
+
+        if (Extension.TryGetValue(file.Extension, out string vt))
         {
             return $"{vt}{file.Name}{Reset}";
+        }
+
+        if (_isWin && _exec.Contains(file.Extension))
+        {
+            return $"{Executable}{file.Name}{Reset}";
         }
 
         return file.Name;
@@ -79,7 +116,7 @@ public sealed partial class TreeStyle
             string value = Instance.EscapeSequence(
                 (string)property.GetValue(instance), 10);
 
-            if (i++ % 5 == 0)
+            if (i++ % 4 == 0)
             {
                 sb.AppendLine(value);
                 continue;
