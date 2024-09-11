@@ -9,7 +9,6 @@ internal sealed class PSTreeIndexer
 
     internal PSTreeDirectory this[string path]
     {
-        get => _indexer[path];
         set => _indexer[path.TrimEnd(Path.DirectorySeparatorChar)] = value;
     }
 

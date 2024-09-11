@@ -18,9 +18,7 @@ internal static class PathExtensions
     internal static string[] NormalizePath(
         this string[] paths,
         bool isLiteral,
-        PSCmdlet cmdlet,
-        bool throwOnInvalidPath = false,
-        bool throwOnInvalidProvider = false)
+        PSCmdlet cmdlet)
     {
         s_normalizedPaths ??= [];
         s_normalizedPaths.Clear();
@@ -37,22 +35,12 @@ internal static class PathExtensions
 
                 if (!provider.IsFileSystem())
                 {
-                    if (throwOnInvalidProvider)
-                    {
-                        cmdlet.ThrowTerminatingError(provider.ToInvalidProviderError(path));
-                    }
-
                     cmdlet.WriteError(provider.ToInvalidProviderError(path));
                     continue;
                 }
 
                 if (!resolvedPath.Exists())
                 {
-                    if (throwOnInvalidPath)
-                    {
-                        cmdlet.ThrowTerminatingError(resolvedPath.ToInvalidPathError());
-                    }
-
                     cmdlet.WriteError(resolvedPath.ToInvalidPathError());
                     continue;
                 }
@@ -85,18 +73,9 @@ internal static class PathExtensions
         return [.. s_normalizedPaths];
     }
 
-    internal static string NormalizePath(
-        this string path,
-        bool isLiteral,
-        PSCmdlet cmdlet,
-        bool throwOnInvalidPath = false,
-        bool throwOnInvalidProvider = false) =>
-        NormalizePath(
-            [path],
-            isLiteral,
-            cmdlet,
-            throwOnInvalidProvider,
-            throwOnInvalidPath).FirstOrDefault();
+    internal static string NormalizePath(this string path, bool isLiteral, PSCmdlet cmdlet) =>
+        NormalizePath([path], isLiteral, cmdlet)
+            .FirstOrDefault();
 
     internal static bool IsFileSystem(this ProviderInfo provider) =>
         provider.ImplementingType == typeof(FileSystemProvider);
