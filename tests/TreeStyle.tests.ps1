@@ -43,6 +43,30 @@ Describe 'TreeStyle Type' {
     }
 }
 
+Describe 'Palette Type' {
+    BeforeAll {
+        $palette = [PSTree.Style.TreeStyle]::Instance.Palette
+        $palette | Out-Null
+    }
+
+    It 'Foreground Type' {
+        $palette.Foreground.ToString() | Should -Not -BeNullOrEmpty
+        $palette.Foreground.GetType().GetProperties() |
+            ForEach-Object GetValue($palette.Foreground) |
+            Should -Match '^\x1B\[(?:[0-9]+;?){1,}m$'
+    }
+
+    It 'Background Type' {
+        $palette.Background.ToString() | Should -Not -BeNullOrEmpty
+        $palette.Background.GetType().GetProperties() |
+            ForEach-Object GetValue($palette.Foreground) |
+            Should -Match '^\x1B\[(?:[0-9]+;?){1,}m$'
+    }
+
+    It 'Palette Type' {
+        $palette.ToString() | Should -Not -BeNullOrEmpty
+    }
+}
 
 Describe 'Extension Type' {
     BeforeAll {
