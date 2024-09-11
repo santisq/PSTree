@@ -51,15 +51,13 @@ Describe 'Palette Type' {
 
     It 'Foreground Type' {
         $palette.Foreground.ToString() | Should -Not -BeNullOrEmpty
-        $palette.Foreground.GetType().GetProperties() |
-            ForEach-Object GetValue($palette.Foreground) |
+        $palette.Foreground.PSObject.Properties.Value |
             Should -Match '^\x1B\[(?:[0-9]+;?){1,}m$'
     }
 
     It 'Background Type' {
         $palette.Background.ToString() | Should -Not -BeNullOrEmpty
-        $palette.Background.GetType().GetProperties() |
-            ForEach-Object GetValue($palette.Foreground) |
+        $palette.Background.PSObject.Properties.Value |
             Should -Match '^\x1B\[(?:[0-9]+;?){1,}m$'
     }
 
