@@ -4,6 +4,12 @@ $moduleName = (Get-Item ([IO.Path]::Combine($PSScriptRoot, '..', 'module', '*.ps
 $manifestPath = [IO.Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
 Import-Module $manifestPath
 
+Describe 'GetPSTreeStyle Command' {
+    It 'Outputs a session TreeStyle instance' {
+        Get-PSTreeStyle | Should -BeOfType ([PSTree.Style.TreeStyle])
+    }
+}
+
 Describe 'TreeStyle Type' {
     BeforeAll {
         $style = [PSTree.Style.TreeStyle]::Instance
