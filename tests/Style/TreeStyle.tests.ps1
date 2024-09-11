@@ -9,7 +9,7 @@ Describe 'TreeStyle' {
         $style = [PSTree.Style.TreeStyle]::Instance
         $style, $escape | Out-Null
 
-        $path = Join-Path $pwd 'teststyle'
+        $path = Join-Path $TestDrive 'teststyle'
         '.exe', '.ps1' | New-Item -Path { Join-Path $path "file$_" } -Force | Out-Null
     }
 
