@@ -108,7 +108,7 @@ public sealed partial class TreeStyle
     internal static string FormatType(object instance)
     {
         PropertyInfo[] properties = instance.GetType().GetProperties();
-        StringBuilder sb = new(properties.Length);
+        StringBuilder builder = new(properties.Length);
         int i = 1;
 
         foreach (PropertyInfo property in properties)
@@ -118,14 +118,16 @@ public sealed partial class TreeStyle
 
             if (i++ % 4 == 0)
             {
-                sb.AppendLine(value);
+                builder
+                    .Append(value)
+                    .AppendLine(Instance.Reset);
                 continue;
             }
 
-            sb.Append(value);
+            builder.Append(value);
         }
 
-        return sb.ToString();
+        return builder.ToString();
     }
 
     public string EscapeSequence(string vt) =>
