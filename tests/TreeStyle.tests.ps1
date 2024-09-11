@@ -1,10 +1,50 @@
 ﻿$ErrorActionPreference = 'Stop'
 
-$moduleName = (Get-Item ([IO.Path]::Combine($PSScriptRoot, '..', '..', 'module', '*.psd1'))).BaseName
-$manifestPath = [IO.Path]::Combine($PSScriptRoot, '..', '..', 'output', $moduleName)
+$moduleName = (Get-Item ([IO.Path]::Combine($PSScriptRoot, '..', 'module', '*.psd1'))).BaseName
+$manifestPath = [IO.Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
 Import-Module $manifestPath
 
-Describe 'Extension' {
+Describe 'TreeStyle Type' {
+    BeforeAll {
+        $style = [PSTree.Style.TreeStyle]::Instance
+        $style, $escape | Out-Null
+
+        $path = Join-Path $TestDrive 'teststyle'
+        '.exe', '.ps1' | New-Item -Path { Join-Path $path "file$_" } -Force | Out-Null
+    }
+
+    It 'Directory property can be set' {
+        $style.Directory | Should -Not -BeNullOrEmpty
+        { $style.Directory = 'Invalid' } | Should -Throw
+        { $style.Directory = $style.Palette.Background.BrightGreen } | Should -Not -Throw
+    }
+
+    It 'Executable property can be set' {
+        $style.Executable | Should -Not -BeNullOrEmpty
+        { $style.Executable = 'Invalid' } | Should -Throw
+        { $style.Executable = $style.Palette.Background.BrightGreen } | Should -Not -Throw
+    }
+
+    It 'OutputRendering defines if output is colored' {
+        $style.OutputRendering = [PSTree.Style.OutputRendering]::Host
+
+        Get-PSTree $TestDrive -Recurse -Include *.ps1, *.exe | ForEach-Object {
+            if ($_.Extension -eq '.exe' -and $IsLinux) {
+                return
+            }
+
+            $_.Hierarchy | Should -Match '\b\x1B\[(?:[0-9]+;?){1,}m'
+        }
+
+        $style.OutputRendering = [PSTree.Style.OutputRendering]::PlainText
+
+        Get-PSTree $TestDrive -Recurse -Include *.ps1, *.exe | ForEach-Object Hierarchy |
+            Should -Not -Match '\b\x1B\[(?:[0-9]+;?){1,}m'
+    }
+}
+
+
+Describe 'Extension Type' {
     BeforeAll {
         $extension = [PSTree.Style.TreeStyle]::Instance.Extension
         $escape = "$([char] 27)"
@@ -25,7 +65,7 @@ Describe 'Extension' {
 
     It 'Supports setting extension sequence by index' {
         { $extension['.ps1'] = "$escape[33;1m" } | Should -Not -Throw
-        { $extension['.ps1'] = "Invalid" } | Should -Throw
+        { $extension['.ps1'] = 'Invalid' } | Should -Throw
         { $extension['Invalid'] = "$escape[33;1m" } | Should -Throw
     }
 
