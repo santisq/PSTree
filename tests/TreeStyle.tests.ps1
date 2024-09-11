@@ -126,5 +126,12 @@ Describe 'Extension Type' {
         $extension.Clear()
         $extension.Count | Should -BeExactly 0
     }
+
+    It 'CombineSequence() can combine 2 VT Sequences' {
+        $vt = $style.CombineSequence(
+            $style.Palette.Background.BrightRed,
+            $style.Palette.Foreground.White)
+        $vt | Should -Match '^\x1B\[101;37m$'
+    }
 }
 

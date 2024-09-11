@@ -116,18 +116,25 @@ public sealed partial class TreeStyle
             string value = Instance.EscapeSequence(
                 (string)property.GetValue(instance), 10);
 
+            builder.Append(value);
+
             if (i++ % 4 == 0)
             {
-                builder
-                    .Append(value)
-                    .AppendLine(Instance.Reset);
+                builder.AppendLine(Instance.Reset);
                 continue;
             }
 
-            builder.Append(value);
+            builder.Append(Instance.Reset);
         }
 
         return builder.ToString();
+    }
+
+    public string CombineSequence(string left, string right)
+    {
+        ThrowIfInvalidSequence(left);
+        ThrowIfInvalidSequence(right);
+        return $"{left.TrimEnd('m')};{right.Substring(2)}";
     }
 
     public string EscapeSequence(string vt) =>

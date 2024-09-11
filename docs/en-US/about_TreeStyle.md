@@ -10,9 +10,17 @@ PSTree v2.2.0 adds support for coloring the hierarchy output from `Get-PSTree` c
 
 The instance of this type can be accessed via the [`Get-PSTreeStyle`][3] cmdlet or the `[PSTree.Style.TreeStyle]::Instance` property:
 
-[![TreeStyle][4]][4]
+<img src="../../assets/TreeStyle.png" alt="TreeStyle" width="40%" height="40%">
 
-Similarly to `PSStyle` you can update the
+## CUSTOMIZING OUTPUT
+
+Similar to `PSStyle` you can update the properties of `TreeStyle` as well as add an remove coloring for different extensions.
+
+<img src="../../assets/Example1.Before.png" alt="Example1.Before" width="40%" height="40%">
+
+
+> [!NOTE]
+> For now, customizing the output of files that are a __SymbolicLink__ is not supported.
 
 ## EXAMPLES
 
@@ -46,4 +54,3 @@ Similarly to `PSStyle` you can update the
 [1]: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_ansi_terminals
 [2]: https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.psstyle.fileinfoformatting
 [3]: ./Get-PSTreeStyle.md
-[4]: ../../assets/TreeStyle.png
