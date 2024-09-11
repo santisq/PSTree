@@ -7,7 +7,9 @@ Import-Module $manifestPath
 Describe 'TreeStyle' {
     BeforeAll {
         $style = [PSTree.Style.TreeStyle]::Instance
-        $style, $escape | Out-Null
+        $isWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+            [System.Runtime.InteropServices.OSPlatform]::Windows)
+        $style, $escape, $isWin | Out-Null
 
         $path = Join-Path $TestDrive 'teststyle'
         '.exe', '.ps1' | New-Item -Path { Join-Path $path "file$_" } -Force | Out-Null
@@ -26,8 +28,13 @@ Describe 'TreeStyle' {
     }
 
     It 'OutputRendering defines if output is colored' {
-        Get-PSTree $TestDrive -Recurse | ForEach-Object Hierarchy |
-            Should -Match '^\x1B\[(?:[0-9]+;?){1,}m'
+        Get-PSTree $TestDrive -Recurse | ForEach-Object {
+            if ($_.Extension -eq '.exe' -and -not $isWin) {
+                return
+            }
+
+            $_ | Should -Match '^\x1B\[(?:[0-9]+;?){1,}m'
+        }
 
         $style.OutputRendering = [PSTree.Style.OutputRendering]::PlainText
 
