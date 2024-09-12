@@ -20,7 +20,7 @@ Get-PSTreeStyle
 
 ## DESCRIPTION
 
-The `Get-PSTreeStyle` cmdlet can be used to access the instance of `TreeStyle` used for rendering and customizing the `Get-PSTree` output. For more information see [__about_TreeStyle__](./about_TreeStyle.md).
+The `Get-PSTreeStyle` cmdlet can be used to access the instance of `TreeStyle` used for rendering and customizing the `Get-PSTree` output. See [__about_TreeStyle__](./about_TreeStyle.md) for more information.
 
 ## EXAMPLES
 
