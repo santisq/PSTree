@@ -43,7 +43,7 @@ The `EscapeSequence()` method can be used to see the escape sequence used to pro
 
 <div>
   &nbsp;&nbsp;&nbsp;
-  <img src="../../assets/EscapeSequence.png" alt="TreeStyle" width="100%" height="100%">
+  <img src="../../assets/EscapeSequence.png" alt="TreeStyle" width="45%" height="45%">
 </div>
 
 ## CUSTOMIZING OUTPUT
