@@ -8,45 +8,33 @@ schema: 2.0.0
 # Get-PSTreeStyle
 
 ## SYNOPSIS
-{{ Fill in the Synopsis }}
+
+Gets the instance of `TreeStyle` used for output rendering.
 
 ## SYNTAX
 
-```
-Get-PSTreeStyle [-ProgressAction <ActionPreference>] [<CommonParameters>]
+```powershell
+Get-PSTreeStyle
+    [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-{{ Fill in the Description }}
+
+The `Get-PSTreeStyle` cmdlet can be used to access the instance of `TreeStyle` used for rendering and customizing the `Get-PSTree` output. For more information see [__about_TreeStyle__](./about_TreeStyle.md).
 
 ## EXAMPLES
 
 ### Example 1
-```powershell
-PS C:\> {{ Add example code here }}
-```
 
-{{ Add example description here }}
+```powershell
+PS ..\PSTree> $style = Get-PSTreeStyle
+```
 
 ## PARAMETERS
 
-### -ProgressAction
-{{ Fill ProgressAction Description }}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### CommonParameters
-This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
+This cmdlet supports the common parameters. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
@@ -54,8 +42,4 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ## OUTPUTS
 
-### PSTree.Style.TreeStyle
-
-## NOTES
-
-## RELATED LINKS
+### TreeStyle
