@@ -10,7 +10,10 @@ PSTree v2.2.0 adds support for coloring the hierarchy output from `Get-PSTree` c
 
 The instance of this type can be accessed via the [`Get-PSTreeStyle`][3] cmdlet or the `[PSTree.Style.TreeStyle]::Instance` property:
 
-<img src="../../assets/TreeStyle.png" alt="TreeStyle" width="40%" height="40%">
+<div>
+  &nbsp;&nbsp;&nbsp;
+  <img src="../../assets/TreeStyle.png" alt="TreeStyle" width="40%" height="40%">
+</div>
 
 ## CUSTOMIZING OUTPUT
 
@@ -22,7 +25,10 @@ Similar to `PSStyle` you can update the properties of `TreeStyle` as well as add
 
 For example, take the standard output:
 
-<img src="../../assets/Example1.Before.png" alt="Example1.Before" width="40%" height="40%">
+<div>
+  &nbsp;&nbsp;&nbsp;
+  <img src="../../assets/Example1.Before.png" alt="Example1.Before" width="40%" height="40%">
+</div>
 
 We can make a few changes to the style object:
 
@@ -37,13 +43,16 @@ PS ..\PSTree> $style.Directory = "`e[45m"
 
 Then, if we re-run the same command we can see those changes in the PSTree output:
 
-<img src="../../assets/Example1.After.png" alt="Example1.Before" width="40%" height="40%">
+<div>
+  &nbsp;&nbsp;&nbsp;
+  <img src="../../assets/Example1.After.png" alt="Example1.Before" width="40%" height="40%">
+</div>
 
 > [!TIP]
 >
 > The `TreeStyle` type has 3 public methods that you can use to add accents or combine VT sequences, `ToItalic()`, `ToBold()` and `CombineSequence()`.
 >
-> You can also reset the style instance to its initial state using `.ResetSettings()` however if you had the instance stored in a variable you will need to re-assign it's value, i.e.: `$style.ResetSettings()` then `$style = treestyle`.
+> You can also reset the style instance to its initial state using `.ResetSettings()` however if you had the instance stored in a variable you will need to re-assign its value, i.e.: `$style.ResetSettings()` then `$style = treestyle`.
 
 
 ## EXAMPLES
