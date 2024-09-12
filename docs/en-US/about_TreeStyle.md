@@ -75,13 +75,6 @@ $style.Extension['.cs'] = $style.ToItalic($style.ToBold($palette.ForeGround.Brig
 $style.Directory = "`e[45m"
 ```
 
-Then, if we re-run the same command we can see those changes in the PSTree output:
-
-<div>
-  &nbsp;&nbsp;&nbsp;
-  <img src="../../assets/Example.After.png" alt="Example.Before" width="45%" height="45%">
-</div>
-
 > [!TIP]
 >
 > - The `` `e `` escape character was added in PowerShell 6. __Windows PowerShell 5.1__ users can use `[char] 27` instead, for example from previous example, instead of ``"`e[45m"`` you can use `"$([char] 27)[45m"`.
@@ -89,7 +82,20 @@ Then, if we re-run the same command we can see those changes in the PSTree outpu
 > - The `TreeStyle` type has 3 public methods that you can use to add accents or combine VT sequences, `ToItalic()`, `ToBold()` and `CombineSequence()`.
 > - You can also reset the style instance to its initial state using `.ResetSettings()` however if you had the instance stored in a variable you will need to re-assign its value, i.e.: `$style.ResetSettings()` then `$style = treestyle`.
 
+Then, if we re-run the same command we can see those changes in the PSTree output:
+
+<div>
+  &nbsp;&nbsp;&nbsp;
+  <img src="../../assets/Example.After.png" alt="Example.Before" width="45%" height="45%">
+</div>
+
 ## DISABLING ANSI OUTPUT
+
+Similarly to `PSStyle`, you can disable the ANSI rendering by updating the `OutputRendering` property:
+
+```powershell
+(Get-PSTreeStyle).OutputRendering = 'PlainText'
+```
 
 [1]: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_ansi_terminals
 [2]: https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.psstyle.fileinfoformatting
