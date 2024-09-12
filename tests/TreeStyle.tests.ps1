@@ -54,6 +54,18 @@ Describe 'TreeStyle Type' {
             $style.Palette.Foreground.White)
         $vt | Should -Match '^\x1B\[101;37m$'
     }
+
+    It 'ResetSettings() resets TreeStyle to its initial state' {
+        { $style.ResetSettings() } | Should -Not -Throw
+    }
+
+    It 'ToBold() adds bold accent' {
+        $style.ToBold($style.Palette.Background.White) | Should -Match ';1m$'
+    }
+
+    It 'ToItalic() adds italic accent' {
+        $style.ToItalic($style.Palette.Background.White) | Should -Match ';3m$'
+    }
 }
 
 Describe 'Palette Type' {

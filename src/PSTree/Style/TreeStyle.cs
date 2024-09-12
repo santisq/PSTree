@@ -12,7 +12,7 @@ public sealed partial class TreeStyle
 {
     private const string s_esc = "\x1B";
 
-    private static readonly TreeStyle s_instance = new();
+    private static TreeStyle s_instance = new();
 
     private string _directory = "\x1B[44;1m";
 
@@ -135,6 +135,20 @@ public sealed partial class TreeStyle
         ThrowIfInvalidSequence(left);
         ThrowIfInvalidSequence(right);
         return $"{left.TrimEnd('m')};{right.Substring(2)}";
+    }
+
+    public void ResetSettings() => s_instance = new();
+
+    public string ToItalic(string vt)
+    {
+        ThrowIfInvalidSequence(vt);
+        return $"{vt.TrimEnd('m')};3m";
+    }
+
+    public string ToBold(string vt)
+    {
+        ThrowIfInvalidSequence(vt);
+        return $"{vt.TrimEnd('m')};1m";
     }
 
     public string EscapeSequence(string vt) =>
