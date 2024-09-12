@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using PSTree.Style;
 
 namespace PSTree;
 
@@ -16,12 +17,14 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 
     public int TotalItemCount { get; internal set; }
 
-    internal PSTreeDirectory(DirectoryInfo directoryInfo, int depth, string source) :
-        base(directoryInfo, depth, source)
+    private PSTreeDirectory(
+        DirectoryInfo dir, string hierarchy, string source, int depth)
+        : base(dir, hierarchy, source, depth)
     { }
 
-    internal PSTreeDirectory(DirectoryInfo directoryInfo, string source) :
-        base(directoryInfo, source)
+    private PSTreeDirectory(
+        DirectoryInfo dir, string hierarchy, string source)
+        : base(dir, hierarchy, source)
     { }
 
     public IEnumerable<FileInfo> EnumerateFiles() =>
@@ -51,4 +54,16 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
             .EnumerateFileSystemInfos()
             .OrderBy(static e => e is DirectoryInfo)
             .ThenBy(static e => e, comparer);
+
+    internal static PSTreeDirectory Create(DirectoryInfo dir, string source)
+    {
+        string styled = TreeStyle.Instance.GetColoredName(dir);
+        return new PSTreeDirectory(dir, styled, source);
+    }
+
+    internal static PSTreeDirectory Create(DirectoryInfo dir, string source, int depth)
+    {
+        string styled = TreeStyle.Instance.GetColoredName(dir).Indent(depth);
+        return new PSTreeDirectory(dir, styled, source, depth);
+    }
 }

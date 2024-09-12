@@ -123,7 +123,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
             if (source.IsArchive())
             {
-                WriteObject(new PSTreeFile(new FileInfo(source), source));
+                WriteObject(PSTreeFile.Create(new FileInfo(source), source));
                 continue;
             }
 
@@ -139,7 +139,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
     {
         _indexer.Clear();
         _cache.Clear();
-        _stack.Push(new PSTreeDirectory(directory, source));
+        _stack.Push(PSTreeDirectory.Create(directory, source));
 
         while (_stack.Count > 0)
         {
@@ -175,7 +175,7 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
                         if (keepProcessing && ShouldInclude(file, _includePatterns))
                         {
-                            _cache.AddFile(file, level, source);
+                            _cache.AddFile(PSTreeFile.Create(file, source, level));
                         }
 
                         continue;
@@ -183,12 +183,13 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
                     if (keepProcessing || RecursiveSize.IsPresent)
                     {
-                        _stack.Push(new PSTreeDirectory(
-                            (DirectoryInfo)item, level, source));
+                        _stack.Push(PSTreeDirectory.Create(
+                            (DirectoryInfo)item, source, level));
                     }
                 }
 
                 next.Length = size;
+                _indexer[next.FullName] = next;
                 _indexer.IndexItemCount(next, childCount);
 
                 if (RecursiveSize.IsPresent)
@@ -202,18 +203,18 @@ public sealed class GetPSTreeCommand : PSCmdlet
                     _cache.TryAddFiles();
                 }
             }
-            catch (Exception e) when (e is PipelineStoppedException or FlowControlException)
+            catch (Exception _) when (_ is PipelineStoppedException or FlowControlException)
             {
                 throw;
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
                 if (next.Depth <= Depth)
                 {
                     _cache.Add(next);
                 }
 
-                WriteError(ExceptionHelpers.EnumerationError(next, e));
+                WriteError(exception.ToEnumerationError(next));
             }
         }
 

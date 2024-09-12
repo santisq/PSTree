@@ -18,9 +18,7 @@ internal static class PathExtensions
     internal static string[] NormalizePath(
         this string[] paths,
         bool isLiteral,
-        PSCmdlet cmdlet,
-        bool throwOnInvalidPath = false,
-        bool throwOnInvalidProvider = false)
+        PSCmdlet cmdlet)
     {
         s_normalizedPaths ??= [];
         s_normalizedPaths.Clear();
@@ -37,28 +35,13 @@ internal static class PathExtensions
 
                 if (!provider.IsFileSystem())
                 {
-                    if (throwOnInvalidProvider)
-                    {
-                        cmdlet.ThrowTerminatingError(ExceptionHelpers
-                            .InvalidProviderError(path, provider));
-                    }
-
-                    cmdlet.WriteError(ExceptionHelpers
-                        .InvalidProviderError(path, provider));
+                    cmdlet.WriteError(provider.ToInvalidProviderError(path));
                     continue;
                 }
 
                 if (!resolvedPath.Exists())
                 {
-                    if (throwOnInvalidPath)
-                    {
-                        cmdlet.ThrowTerminatingError(ExceptionHelpers
-                            .InvalidPathError(resolvedPath));
-                        continue;
-                    }
-
-                    cmdlet.WriteError(ExceptionHelpers
-                        .InvalidPathError(resolvedPath));
+                    cmdlet.WriteError(resolvedPath.ToInvalidPathError());
                     continue;
                 }
 
@@ -74,35 +57,25 @@ internal static class PathExtensions
                 {
                     if (!provider.IsFileSystem())
                     {
-                        cmdlet.WriteError(ExceptionHelpers.InvalidProviderError(
-                            resolvedPath, provider));
+                        cmdlet.WriteError(provider.ToInvalidProviderError(resolvedPath));
                         continue;
                     }
 
                     s_normalizedPaths.Add(resolvedPath);
                 }
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                cmdlet.WriteError(ExceptionHelpers.ResolvePathError(path, e));
+                cmdlet.WriteError(exception.ToResolvePathError(path));
             }
         }
 
         return [.. s_normalizedPaths];
     }
 
-    internal static string NormalizePath(
-        this string path,
-        bool isLiteral,
-        PSCmdlet cmdlet,
-        bool throwOnInvalidPath = false,
-        bool throwOnInvalidProvider = false) =>
-        NormalizePath(
-            [path],
-            isLiteral,
-            cmdlet,
-            throwOnInvalidProvider,
-            throwOnInvalidPath).FirstOrDefault();
+    internal static string NormalizePath(this string path, bool isLiteral, PSCmdlet cmdlet) =>
+        NormalizePath([path], isLiteral, cmdlet)
+            .FirstOrDefault();
 
     internal static bool IsFileSystem(this ProviderInfo provider) =>
         provider.ImplementingType == typeof(FileSystemProvider);

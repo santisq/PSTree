@@ -1,25 +1,16 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 
 namespace PSTree;
 
 internal sealed class PSTreeCache
 {
-    private readonly List<PSTreeFileSystemInfo> _items;
+    private readonly List<PSTreeFileSystemInfo> _items = [];
 
-    private readonly List<PSTreeFile> _files;
+    private readonly List<PSTreeFile> _files = [];
 
-    internal PSTreeCache()
-    {
-        _items = [];
-        _files = [];
-    }
+    internal void AddFile(PSTreeFile file) => _files.Add(file);
 
-    internal void AddFile(FileInfo file, int depth, string source) =>
-        _files.Add(new PSTreeFile(file, depth, source));
-
-    internal void Add(PSTreeFileSystemInfo item) =>
-        _items.Add(item);
+    internal void Add(PSTreeFileSystemInfo item) => _items.Add(item);
 
     internal void TryAddFiles()
     {
@@ -30,8 +21,7 @@ internal sealed class PSTreeCache
         }
     }
 
-    internal PSTreeFileSystemInfo[] GetTree() =>
-        _items.ToArray().ConvertToTree();
+    internal PSTreeFileSystemInfo[] GetTree() => _items.ToArray().ConvertToTree();
 
     internal void Clear()
     {

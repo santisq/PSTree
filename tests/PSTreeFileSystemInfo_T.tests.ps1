@@ -63,6 +63,8 @@ Describe 'PSTreeFileSystemInfo<T>' {
     It 'AccessTime properties should be DateTime' {
         $instance = Get-PSTree -Depth 0
         $instance.LastAccessTime | Should -BeOfType ([datetime])
+        $instance.LastAccessTimeUtc | Should -BeOfType ([datetime])
+        $instance.LastWriteTime | Should -BeOfType ([datetime])
         $instance.LastWriteTimeUtc | Should -BeOfType ([datetime])
     }
 
