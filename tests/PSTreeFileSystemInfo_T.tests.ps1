@@ -19,8 +19,6 @@ Describe 'PSTreeFileSystemInfo<T>' {
             'CreationTimeUtc'
             'LastWriteTime'
             'LastWriteTimeUtc'
-            'LastAccessTime'
-            'LastAccessTimeUtc'
         )
 
         $standardProperties | Out-Null

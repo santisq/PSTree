@@ -47,6 +47,13 @@ Describe 'TreeStyle Type' {
         Get-PSTree $TestDrive -Recurse -Include *.ps1, *.exe | ForEach-Object Hierarchy |
             Should -Not -Match '\b\x1B\[(?:[0-9]+;?){1,}m'
     }
+
+    It 'CombineSequence() can combine 2 VT Sequences' {
+        $vt = $style.CombineSequence(
+            $style.Palette.Background.BrightRed,
+            $style.Palette.Foreground.White)
+        $vt | Should -Match '^\x1B\[101;37m$'
+    }
 }
 
 Describe 'Palette Type' {
@@ -125,13 +132,6 @@ Describe 'Extension Type' {
     It 'Clear() clears the internal dictionary' {
         $extension.Clear()
         $extension.Count | Should -BeExactly 0
-    }
-
-    It 'CombineSequence() can combine 2 VT Sequences' {
-        $vt = $style.CombineSequence(
-            $style.Palette.Background.BrightRed,
-            $style.Palette.Foreground.White)
-        $vt | Should -Match '^\x1B\[101;37m$'
     }
 }
 
