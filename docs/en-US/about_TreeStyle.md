@@ -16,11 +16,35 @@ The instance of this type can be accessed via the [`Get-PSTreeStyle`][3] cmdlet 
 
 Similar to `PSStyle` you can update the properties of `TreeStyle` as well as add an remove coloring for different extensions.
 
+> [!NOTE]
+>
+> For now, customizing the output of files that are a __SymbolicLink__ is not supported.
+
+For example, take the standard output:
+
 <img src="../../assets/Example1.Before.png" alt="Example1.Before" width="40%" height="40%">
 
+We can make a few changes to the style object:
 
-> [!NOTE]
-> For now, customizing the output of files that are a __SymbolicLink__ is not supported.
+```powershell
+PS ..\PSTree> # update the .ps1 extension
+PS ..\PSTree> $style.Extension['.ps1'] = $style.CombineSequence($palette.Foreground.White, $palette.Background.Red)
+PS ..\PSTree> # add the .cs extension
+PS ..\PSTree> $style.Extension['.cs'] = $style.ToItalic($style.ToBold($palette.ForeGround.BrightCyan))
+PS ..\PSTree> # update the Directory style
+PS ..\PSTree> $style.Directory = "`e[45m"
+```
+
+Then, if we re-run the same command we can see those changes in the PSTree output:
+
+<img src="../../assets/Example1.After.png" alt="Example1.Before" width="40%" height="40%">
+
+> [!TIP]
+>
+> The `TreeStyle` type has 3 public methods that you can use to add accents or combine VT sequences, `ToItalic()`, `ToBold()` and `CombineSequence()`.
+>
+> You can also reset the style instance to its initial state using `.ResetSettings()` however if you had the instance stored in a variable you will need to re-assign it's value, i.e.: `$style.ResetSettings()` then `$style = treestyle`.
+
 
 ## EXAMPLES
 
