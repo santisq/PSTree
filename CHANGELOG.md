@@ -1,5 +1,10 @@
 # CHANGELOG
 
+- __09/12/2024__
+  - Added `TreeStyle` type and `Get-PSTreeStyle` cmdlet for rendering output.
+  - Added Pester tests for `TreeStyle`.
+  - Documented changes.
+
 - __09/03/2024__
   - Makes `Depth` property public for `PSTreeFileSystemInfo` instances.
   - Makes `GetParents()` method private, absolutely no reason to have it public.
