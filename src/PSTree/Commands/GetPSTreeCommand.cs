@@ -61,7 +61,8 @@ public sealed class GetPSTreeCommand : PSCmdlet
     }
 
     [Parameter]
-    public uint Depth { get; set; } = 3;
+    [ValidateRange(0, int.MaxValue)]
+    public int Depth { get; set; } = 3;
 
     [Parameter]
     public SwitchParameter Recurse { get; set; }
