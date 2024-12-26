@@ -15,7 +15,9 @@ PSTree is a PowerShell Module that includes the `Get-PSTree` cmdlet that intends
 
 ## Documentation
 
-Check out [__the docs__](./docs/en-US/Get-PSTree.md) for information about how to use this Module. For customizing the cmdlet's rendering output see [__about_TreeStyle__](./docs/en-US/about_TreeStyle.md).
+Check out [__the docs__](./docs/en-US/Get-PSTree.md) for information about how to use this Module.
+
+For customizing the cmdlet's rendering output see [__about_TreeStyle__](./docs/en-US/about_TreeStyle.md).
 
 ## Installation
 
