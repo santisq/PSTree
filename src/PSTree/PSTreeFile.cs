@@ -1,4 +1,5 @@
 using System.IO;
+using PSTree.Extensions;
 using PSTree.Style;
 
 namespace PSTree;
@@ -11,13 +12,17 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
 
     private PSTreeFile(
         FileInfo file, string hierarchy, string source, int depth)
-        : base(file, hierarchy, source, depth) =>
+        : base(file, hierarchy, source, depth)
+    {
         Length = file.Length;
+    }
 
     private PSTreeFile(
         FileInfo file, string hierarchy, string source)
-        : base(file, hierarchy, source) =>
+        : base(file, hierarchy, source)
+    {
         Length = file.Length;
+    }
 
     internal static PSTreeFile Create(FileInfo file, string source)
     {

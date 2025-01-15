@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Management.Automation;
 using System.Text;
+using PSTree.Extensions;
 
 namespace PSTree.Style;
 

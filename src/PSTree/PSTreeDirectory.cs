@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using PSTree.Extensions;
 using PSTree.Style;
 
 namespace PSTree;

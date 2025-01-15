@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace PSTree;
+namespace PSTree.Extensions;
 
-internal static class PSTreeExtensions
+internal static class TreeExtensions
 {
     private static readonly StringBuilder s_sb = new();
 
