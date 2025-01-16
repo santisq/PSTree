@@ -16,9 +16,9 @@ internal static class PathExtensions
         return false;
     }
 
-    internal static string Normalize(this string path)
+    internal static string NormalizePath(this string path)
     {
-        if (path.ValidateExists())
+        if (!path.ValidateExists())
         {
             return path;
         }
@@ -32,7 +32,7 @@ internal static class PathExtensions
 
         if (Path.GetPathRoot(path) == path)
         {
-            return string.Concat(path, Path.DirectorySeparatorChar);
+            return string.Concat(path.ToUpper(), Path.DirectorySeparatorChar);
         }
 
         return path;
