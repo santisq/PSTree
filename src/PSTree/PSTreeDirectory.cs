@@ -8,9 +8,7 @@ namespace PSTree;
 
 public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 {
-    private string[]? _parents;
-
-    internal string[] Parents { get => _parents ??= GetParents(FullName); }
+    private PSTreeDirectory? _parent;
 
     public DirectoryInfo Parent => Instance.Parent;
 
@@ -37,24 +35,13 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
     public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() =>
         Instance.EnumerateFileSystemInfos();
 
-    private static string[] GetParents(string path)
-    {
-        int index = -1;
-        List<string> parents = [];
-
-        while ((index = path.IndexOf(Path.DirectorySeparatorChar, index + 1)) != -1)
-        {
-            parents.Add(path.Substring(0, index));
-        }
-
-        return [.. parents];
-    }
-
     internal IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable(PSTreeComparer comparer) =>
         Instance
             .EnumerateFileSystemInfos()
             .OrderBy(static e => e is DirectoryInfo)
             .ThenBy(static e => e, comparer);
+
+    internal static PSTreeDirectory Create(string path) => Create(new DirectoryInfo(path), path);
 
     internal static PSTreeDirectory Create(DirectoryInfo dir, string source)
     {
@@ -66,5 +53,30 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
     {
         string styled = TreeStyle.Instance.GetColoredName(dir).Indent(depth);
         return new PSTreeDirectory(dir, styled, source, depth);
+    }
+
+    internal PSTreeDirectory WithParent(PSTreeDirectory parent)
+    {
+        _parent = parent;
+        return this;
+    }
+
+    internal void IndexItemCount(int count)
+    {
+        ItemCount = count;
+        TotalItemCount = count;
+
+        for (PSTreeDirectory? parent = _parent; parent is not null; parent = parent._parent)
+        {
+            parent.TotalItemCount += count;
+        }
+    }
+
+    internal void IndexLength(long length)
+    {
+        for (PSTreeDirectory? parent = _parent; parent is not null; parent = parent._parent)
+        {
+            parent.Length += length;
+        }
     }
 }

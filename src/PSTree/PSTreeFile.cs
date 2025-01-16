@@ -24,6 +24,8 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
         Length = file.Length;
     }
 
+    internal static PSTreeFile Create(string path) => Create(new FileInfo(path), path);
+
     internal static PSTreeFile Create(FileInfo file, string source)
     {
         string styled = TreeStyle.Instance.GetColoredName(file);

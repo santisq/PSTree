@@ -16,8 +16,6 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     private WildcardPattern[]? _includePatterns;
 
-    private readonly PSTreeIndexer _indexer = new();
-
     private readonly Stack<PSTreeDirectory> _stack = new();
 
     private readonly PSTreeCache _cache = new();
@@ -77,27 +75,23 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
     {
         foreach (string path in EnumerateResolvedPaths())
         {
-            string source = path.TrimExcess();
-
-            if (File.Exists(source))
+            if (File.Exists(path))
             {
-                WriteObject(PSTreeFile.Create(new FileInfo(source), source));
+                WriteObject(PSTreeFile.Create(path));
                 continue;
             }
 
             WriteObject(
-                Traverse(new DirectoryInfo(source), source),
+                Traverse(PSTreeDirectory.Create(path)),
                 enumerateCollection: true);
         }
     }
 
-    private PSTreeFileSystemInfo[] Traverse(
-        DirectoryInfo directory,
-        string source)
+    private PSTreeFileSystemInfo[] Traverse(PSTreeDirectory directory)
     {
-        _indexer.Clear();
         _cache.Clear();
-        _stack.Push(PSTreeDirectory.Create(directory, source));
+        _stack.Push(directory);
+        string source = directory.FullName;
 
         while (_stack.Count > 0)
         {
@@ -112,6 +106,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                 foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
                 {
                     childCount++;
+
                     if (!Force.IsPresent && item.IsHidden())
                     {
                         continue;
@@ -141,18 +136,20 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
                     if (keepProcessing || RecursiveSize.IsPresent)
                     {
-                        _stack.Push(PSTreeDirectory.Create(
-                            (DirectoryInfo)item, source, level));
+                        PSTreeDirectory dir = PSTreeDirectory
+                            .Create((DirectoryInfo)item, source, level)
+                            .WithParent(next);
+
+                        _stack.Push(dir);
                     }
                 }
 
                 next.Length = size;
-                _indexer[next.FullName] = next;
-                _indexer.IndexItemCount(next, childCount);
+                next.IndexItemCount(childCount);
 
                 if (RecursiveSize.IsPresent)
                 {
-                    _indexer.IndexLength(next, size);
+                    next.IndexLength(size);
                 }
 
                 if (next.Depth <= Depth)

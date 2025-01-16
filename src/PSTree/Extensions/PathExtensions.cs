@@ -6,8 +6,6 @@ namespace PSTree.Extensions;
 
 internal static class PathExtensions
 {
-    private static readonly char[] _dirSeparator = @"\/".ToCharArray();
-
     internal static bool Validate(
         this ProviderInfo provider,
         string path,
@@ -28,23 +26,6 @@ internal static class PathExtensions
 
     internal static bool IsHidden(this FileSystemInfo item) =>
         item.Attributes.HasFlag(FileAttributes.Hidden);
-
-    internal static string TrimExcess(this string path)
-    {
-        path = path.TrimEnd(_dirSeparator);
-
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            return System.IO.Path.DirectorySeparatorChar.ToString();
-        }
-
-        if (System.IO.Path.GetPathRoot(path) == path)
-        {
-            return string.Concat(path.ToUpper(), System.IO.Path.DirectorySeparatorChar);
-        }
-
-        return path;
-    }
 
     private static bool MatchAny(
         FileSystemInfo item,
