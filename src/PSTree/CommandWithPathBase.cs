@@ -54,17 +54,17 @@ public abstract class CommandWithPathBase : PSCmdlet
             if (IsLiteral)
             {
                 string resolved = SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-                    path: path.NormalizePath(),
+                    path: path,
                     provider: out provider,
                     drive: out _);
 
-                if (!provider.ValidateProvider())
+                if (!provider.IsFileSystem())
                 {
                     WriteError(provider.ToInvalidProviderError(resolved));
                     continue;
                 }
 
-                if (!resolved.ValidateExists())
+                if (!resolved.Exists())
                 {
                     WriteError(resolved.ToInvalidPathError());
                     continue;
@@ -76,7 +76,7 @@ public abstract class CommandWithPathBase : PSCmdlet
 
             try
             {
-                resolvedPaths = GetResolvedProviderPathFromPSPath(path.NormalizePath(), out provider);
+                resolvedPaths = GetResolvedProviderPathFromPSPath(path, out provider);
             }
             catch (Exception exception)
             {
@@ -86,7 +86,7 @@ public abstract class CommandWithPathBase : PSCmdlet
 
             foreach (string resolved in resolvedPaths)
             {
-                if (!provider.ValidateProvider())
+                if (!provider.IsFileSystem())
                 {
                     WriteError(provider.ToInvalidProviderError(resolved));
                     continue;

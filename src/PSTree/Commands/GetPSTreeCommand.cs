@@ -64,8 +64,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
             _excludePatterns = [.. Exclude.Select(e => new WildcardPattern(e, options))];
         }
 
-        // this Parameter only targets files, there is no reason to use it if -Directory is in use
-        if (Include is not null && !Directory.IsPresent)
+        if (Include is not null)
         {
             _includePatterns = [.. Include.Select(e => new WildcardPattern(e, options))];
         }
@@ -105,30 +104,33 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                 bool keepProcessing = level <= Depth;
                 foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
                 {
-                    childCount++;
-
                     if (!Force.IsPresent && item.IsHidden())
                     {
                         continue;
                     }
 
-                    if (item.ShouldExclude(_excludePatterns))
+                    if (ShouldExclude(item))
                     {
                         continue;
                     }
 
-                    if (item is FileInfo file)
+                    if (item is FileInfo fileInfo)
                     {
-                        size += file.Length;
-
                         if (Directory.IsPresent)
                         {
                             continue;
                         }
 
-                        if (keepProcessing && file.ShouldInclude(_includePatterns))
+                        if (keepProcessing && ShouldInclude(fileInfo))
                         {
-                            _cache.AddFile(PSTreeFile.Create(file, source, level));
+                            childCount++;
+                            size += fileInfo.Length;
+
+                            PSTreeFile file = PSTreeFile
+                                .Create(fileInfo, source, level)
+                                .WithParent(next);
+
+                            _cache.AddFile(file);
                         }
 
                         continue;
@@ -139,6 +141,12 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                         PSTreeDirectory dir = PSTreeDirectory
                             .Create((DirectoryInfo)item, source, level)
                             .WithParent(next);
+
+                        if (_includePatterns is null)
+                        {
+                            dir._shouldInclude = true;
+                            childCount++;
+                        }
 
                         _stack.Push(dir);
                     }
@@ -171,4 +179,23 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
         return _cache.GetTree();
     }
+
+    private static bool MatchAny(string name, WildcardPattern[] patterns)
+    {
+        foreach (WildcardPattern pattern in patterns)
+        {
+            if (pattern.IsMatch(name))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool ShouldInclude(FileInfo item) =>
+        _includePatterns is null || MatchAny(item.Name, _includePatterns);
+
+    private bool ShouldExclude(FileSystemInfo item) =>
+        _excludePatterns is not null && MatchAny(item.Name, _excludePatterns);
 }

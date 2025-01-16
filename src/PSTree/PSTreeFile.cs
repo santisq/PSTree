@@ -11,17 +11,19 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
     public string DirectoryName => Instance.DirectoryName;
 
     private PSTreeFile(
-        FileInfo file, string hierarchy, string source, int depth)
-        : base(file, hierarchy, source, depth)
-    {
-        Length = file.Length;
-    }
-
-    private PSTreeFile(
         FileInfo file, string hierarchy, string source)
         : base(file, hierarchy, source)
     {
         Length = file.Length;
+        _shouldInclude = true;
+    }
+
+    private PSTreeFile(
+        FileInfo file, string hierarchy, string source, int depth)
+        : base(file, hierarchy, source, depth)
+    {
+        Length = file.Length;
+        _shouldInclude = true;
     }
 
     internal static PSTreeFile Create(string path) => Create(new FileInfo(path), path);
@@ -36,5 +38,12 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
     {
         string styled = TreeStyle.Instance.GetColoredName(file).Indent(depth);
         return new PSTreeFile(file, styled, source, depth);
+    }
+
+    internal PSTreeFile WithParent(PSTreeDirectory parent)
+    {
+        _parent = parent;
+        _parent.SetIncludeFlag();
+        return this;
     }
 }

@@ -8,8 +8,6 @@ namespace PSTree;
 
 public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 {
-    private PSTreeDirectory? _parent;
-
     public DirectoryInfo Parent => Instance.Parent;
 
     public int ItemCount { get; internal set; }
@@ -77,6 +75,20 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
         for (PSTreeDirectory? parent = _parent; parent is not null; parent = parent._parent)
         {
             parent.Length += length;
+        }
+    }
+
+    internal void SetIncludeFlag()
+    {
+        _shouldInclude = true;
+        for (PSTreeDirectory? parent = _parent; parent is not null; parent = parent._parent)
+        {
+            if (parent._shouldInclude)
+            {
+                return;
+            }
+
+            parent._shouldInclude = true;
         }
     }
 }

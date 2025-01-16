@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using PSTree.Extensions;
 
 namespace PSTree;
@@ -22,7 +23,10 @@ internal sealed class Cache
         }
     }
 
-    internal PSTreeFileSystemInfo[] GetTree() => _items.ToArray().ConvertToTree();
+    internal PSTreeFileSystemInfo[] GetTree() => _items
+        .Where(e => e._shouldInclude)
+        .ToArray()
+        .ConvertToTree();
 
     internal void Clear()
     {
