@@ -53,22 +53,30 @@ public abstract class CommandWithPathBase : PSCmdlet
         {
             if (IsLiteral)
             {
-                string resolvedPath = SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-                    path: path,
+                string resolved = SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+                    path: path.Normalize(),
                     provider: out provider,
                     drive: out _);
 
-                if (provider.Validate(resolvedPath, this))
+                if (!provider.ValidateProvider())
                 {
-                    yield return resolvedPath;
+                    WriteError(provider.ToInvalidProviderError(resolved));
+                    continue;
                 }
 
+                if (!resolved.ValidateExists())
+                {
+                    WriteError(resolved.ToInvalidPathError());
+                    continue;
+                }
+
+                yield return resolved;
                 continue;
             }
 
             try
             {
-                resolvedPaths = GetResolvedProviderPathFromPSPath(path, out provider);
+                resolvedPaths = GetResolvedProviderPathFromPSPath(path.Normalize(), out provider);
             }
             catch (Exception exception)
             {
@@ -76,13 +84,15 @@ public abstract class CommandWithPathBase : PSCmdlet
                 continue;
             }
 
-
-            foreach (string resolvedPath in resolvedPaths)
+            foreach (string resolved in resolvedPaths)
             {
-                if (provider.Validate(resolvedPath, this))
+                if (!provider.ValidateProvider())
                 {
-                    yield return resolvedPath;
+                    WriteError(provider.ToInvalidProviderError(resolved));
+                    continue;
                 }
+
+                yield return resolved;
             }
         }
     }
