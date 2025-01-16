@@ -18,9 +18,9 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     private readonly Stack<PSTreeDirectory> _stack = new();
 
-    private readonly PSTreeCache _cache = new();
+    private readonly Cache _cache = new();
 
-    private readonly PSTreeComparer _comparer = new();
+    private readonly TreeComparer _comparer = new();
 
     [Parameter]
     [ValidateRange(0, int.MaxValue)]

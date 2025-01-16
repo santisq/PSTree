@@ -3,7 +3,7 @@ using PSTree.Extensions;
 
 namespace PSTree;
 
-internal sealed class PSTreeCache
+internal sealed class Cache
 {
     private readonly List<PSTreeFileSystemInfo> _items = [];
 
