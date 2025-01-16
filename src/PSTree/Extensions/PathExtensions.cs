@@ -18,7 +18,7 @@ internal static class PathExtensions
 
     internal static string Normalize(this string path)
     {
-        if (!path.ValidateExists())
+        if (path.ValidateExists())
         {
             return path;
         }
