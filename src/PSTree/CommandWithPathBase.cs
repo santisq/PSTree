@@ -49,12 +49,12 @@ public abstract class CommandWithPathBase : PSCmdlet
         Collection<string> resolvedPaths;
         ProviderInfo provider;
 
-        foreach (string path in _paths ?? [SessionState.Path.CurrentLocation.Path])
+        foreach (string path in NormalizePath(_paths ?? [SessionState.Path.CurrentLocation.Path]))
         {
             if (IsLiteral)
             {
                 string resolved = SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-                    path: path.Normalize(),
+                    path: path,
                     provider: out provider,
                     drive: out _);
 
@@ -76,7 +76,7 @@ public abstract class CommandWithPathBase : PSCmdlet
 
             try
             {
-                resolvedPaths = GetResolvedProviderPathFromPSPath(path.Normalize(), out provider);
+                resolvedPaths = GetResolvedProviderPathFromPSPath(path, out provider);
             }
             catch (Exception exception)
             {
@@ -94,6 +94,14 @@ public abstract class CommandWithPathBase : PSCmdlet
 
                 yield return resolved;
             }
+        }
+    }
+
+    private static IEnumerable<string> NormalizePath(string[] paths)
+    {
+        foreach (string path in paths)
+        {
+            yield return path.Normalize();
         }
     }
 }
