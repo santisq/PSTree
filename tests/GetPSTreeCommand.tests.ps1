@@ -113,6 +113,10 @@ Describe 'Get-PSTree' {
                 [string[]] $exclude,
                 [System.Func[string, bool]] { $_.FullName -like $args[0] })
         } | Should -Not -BeTrue
+
+        Get-ChildItem $testPath -Filter *.ps1 -Recurse |
+            Get-PSTree -Exclude *.ps1 |
+            Should -BeNullOrEmpty
     }
 
     It 'Includes child items with -Include parameter' {
@@ -125,6 +129,10 @@ Describe 'Get-PSTree' {
                 }
             )
         } | Should -BeTrue
+
+        Get-ChildItem $testPath -Filter *.ps1 -Recurse |
+            Get-PSTree -Include *.ps1 |
+            Should -Not -BeNullOrEmpty
     }
 
     It 'Should prioritize -Depth if used together with -Recurse' {

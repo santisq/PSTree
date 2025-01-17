@@ -15,7 +15,7 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
         : base(file, hierarchy, source)
     {
         Length = file.Length;
-        _shouldInclude = true;
+        ShouldInclude = true;
     }
 
     private PSTreeFile(
@@ -23,10 +23,8 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
         : base(file, hierarchy, source, depth)
     {
         Length = file.Length;
-        _shouldInclude = true;
+        ShouldInclude = true;
     }
-
-    internal static PSTreeFile Create(string path) => Create(new FileInfo(path), path);
 
     internal static PSTreeFile Create(FileInfo file, string source)
     {
@@ -43,7 +41,16 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
     internal PSTreeFile WithParent(PSTreeDirectory parent)
     {
         _parent = parent;
-        _parent.SetIncludeFlag();
+        return this;
+    }
+
+    internal PSTreeFile WithIncludeFlagIf(bool condition)
+    {
+        if (condition)
+        {
+            _parent?.SetIncludeFlag();
+        }
+
         return this;
     }
 }

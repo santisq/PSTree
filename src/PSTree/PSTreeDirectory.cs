@@ -22,7 +22,9 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
     private PSTreeDirectory(
         DirectoryInfo dir, string hierarchy, string source)
         : base(dir, hierarchy, source)
-    { }
+    {
+        ShouldInclude = true;
+    }
 
     public IEnumerable<FileInfo> EnumerateFiles() =>
         Instance.EnumerateFiles();
@@ -59,7 +61,7 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
         return this;
     }
 
-    internal void IndexItemCount(int count)
+    internal void IndexCount(int count)
     {
         ItemCount = count;
         TotalItemCount = count;
@@ -80,15 +82,15 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 
     internal void SetIncludeFlag()
     {
-        _shouldInclude = true;
+        ShouldInclude = true;
         for (PSTreeDirectory? parent = _parent; parent is not null; parent = parent._parent)
         {
-            if (parent._shouldInclude)
+            if (parent.ShouldInclude)
             {
                 return;
             }
 
-            parent._shouldInclude = true;
+            parent.ShouldInclude = true;
         }
     }
 }

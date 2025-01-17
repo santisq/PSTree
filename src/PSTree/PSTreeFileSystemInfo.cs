@@ -4,7 +4,7 @@ public abstract class PSTreeFileSystemInfo(string hierarchy, string source)
 {
     protected PSTreeDirectory? _parent;
 
-    internal bool _shouldInclude;
+    internal bool ShouldInclude { get; set; }
 
     internal string Source { get; set; } = source;
 

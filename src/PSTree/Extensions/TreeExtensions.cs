@@ -21,6 +21,7 @@ internal static class TreeExtensions
     {
         int index;
         PSTreeFileSystemInfo current;
+
         for (int i = 0; i < inputObject.Length; i++)
         {
             current = inputObject[i];

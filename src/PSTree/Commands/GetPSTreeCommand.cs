@@ -76,7 +76,12 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
         {
             if (File.Exists(path))
             {
-                WriteObject(PSTreeFile.Create(path));
+                FileInfo file = new(path);
+                if (!ShouldExclude(file) && ShouldInclude(file))
+                {
+                    WriteObject(PSTreeFile.Create(file, path));
+                }
+
                 continue;
             }
 
@@ -118,6 +123,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                     {
                         if (Directory.IsPresent)
                         {
+                            size += fileInfo.Length;
                             continue;
                         }
 
@@ -128,9 +134,10 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
                             PSTreeFile file = PSTreeFile
                                 .Create(fileInfo, source, level)
-                                .WithParent(next);
+                                .WithParent(next)
+                                .WithIncludeFlagIf(_includePatterns is not null);
 
-                            _cache.AddFile(file);
+                            _cache.Add(file);
                         }
 
                         continue;
@@ -144,7 +151,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
                         if (_includePatterns is null)
                         {
-                            dir._shouldInclude = true;
+                            dir.ShouldInclude = true;
                             childCount++;
                         }
 
@@ -153,7 +160,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                 }
 
                 next.Length = size;
-                next.IndexItemCount(childCount);
+                next.IndexCount(childCount);
 
                 if (RecursiveSize.IsPresent)
                 {
@@ -163,7 +170,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                 if (next.Depth <= Depth)
                 {
                     _cache.Add(next);
-                    _cache.TryAddFiles();
+                    _cache.Flush();
                 }
             }
             catch (Exception exception)
@@ -177,7 +184,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
             }
         }
 
-        return _cache.GetTree();
+        return _cache.GetTree(_includePatterns is not null);
     }
 
     private static bool MatchAny(string name, WildcardPattern[] patterns)

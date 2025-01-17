@@ -10,11 +10,11 @@ internal sealed class Cache
 
     private readonly List<PSTreeFile> _files = [];
 
-    internal void AddFile(PSTreeFile file) => _files.Add(file);
+    internal void Add(PSTreeFile file) => _files.Add(file);
 
-    internal void Add(PSTreeFileSystemInfo item) => _items.Add(item);
+    internal void Add(PSTreeDirectory directory) => _items.Add(directory);
 
-    internal void TryAddFiles()
+    internal void Flush()
     {
         if (_files.Count > 0)
         {
@@ -23,10 +23,10 @@ internal sealed class Cache
         }
     }
 
-    internal PSTreeFileSystemInfo[] GetTree() => _items
-        .Where(e => e._shouldInclude)
-        .ToArray()
-        .ConvertToTree();
+    internal PSTreeFileSystemInfo[] GetTree(bool filterInclude) =>
+        filterInclude
+            ? _items.Where(e => e.ShouldInclude).ToArray().ConvertToTree()
+            : _items.ToArray().ConvertToTree();
 
     internal void Clear()
     {
