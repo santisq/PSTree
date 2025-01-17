@@ -48,7 +48,7 @@ public sealed class Extension
     public override string ToString()
     {
         StringBuilder builder = new(_extension.Count);
-        int len = _extension.Keys.Max(e => e.Length);
+        int len = _extension.Keys.Max(static e => e.Length);
         foreach (KeyValuePair<string, string> pair in _extension)
         {
             builder

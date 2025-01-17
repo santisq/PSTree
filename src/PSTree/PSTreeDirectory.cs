@@ -55,7 +55,7 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
         return new PSTreeDirectory(dir, styled, source, depth);
     }
 
-    internal PSTreeDirectory WithParent(PSTreeDirectory parent)
+    internal PSTreeDirectory AddParent(PSTreeDirectory parent)
     {
         _parent = parent;
         return this;
@@ -66,31 +66,46 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
         ItemCount = count;
         TotalItemCount = count;
 
-        for (PSTreeDirectory? parent = _parent; parent is not null; parent = parent._parent)
+        for (PSTreeDirectory? i = _parent; i is not null; i = i._parent)
         {
-            parent.TotalItemCount += count;
+            i.TotalItemCount += count;
         }
     }
 
     internal void IndexLength(long length)
     {
-        for (PSTreeDirectory? parent = _parent; parent is not null; parent = parent._parent)
+        Length += length;
+        for (PSTreeDirectory? i = _parent; i is not null; i = i._parent)
         {
-            parent.Length += length;
+            i.Length += length;
         }
     }
 
     internal void SetIncludeFlag()
     {
         ShouldInclude = true;
-        for (PSTreeDirectory? parent = _parent; parent is not null; parent = parent._parent)
+        for (PSTreeDirectory? i = _parent; i is not null; i = i._parent)
         {
-            if (parent.ShouldInclude)
+            if (i.ShouldInclude)
             {
                 return;
             }
 
-            parent.ShouldInclude = true;
+            i.ShouldInclude = true;
+        }
+    }
+
+    internal void IncrementItemCount()
+    {
+        if (_parent is null)
+        {
+            return;
+        }
+
+        _parent.ItemCount++;
+        for (PSTreeDirectory? i = _parent; i is not null; i = i._parent)
+        {
+            i.TotalItemCount++;
         }
     }
 }

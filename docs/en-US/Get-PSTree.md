@@ -18,7 +18,7 @@ schema: 2.0.0
 ```powershell
 Get-PSTree
     [[-Path] <String[]>]
-    [-Depth <UInt32>]
+    [-Depth <Int32>]
     [-Recurse]
     [-Force]
     [-Directory]
@@ -33,7 +33,7 @@ Get-PSTree
 ```powershell
 Get-PSTree
     [-LiteralPath <String[]>]
-    [-Depth <UInt32>]
+    [-Depth <Int32>]
     [-Recurse]
     [-Force]
     [-Directory]
@@ -110,7 +110,7 @@ Similar to `-Exclude`, the `-Include` parameter supports [wildcard patterns](htt
 Determines the number of subdirectory levels that are included in the recursion.
 
 ```yaml
-Type: UInt32
+Type: Int32
 Parameter Sets: (All)
 Aliases:
 

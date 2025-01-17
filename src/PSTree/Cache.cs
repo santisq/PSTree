@@ -25,7 +25,18 @@ internal sealed class Cache
 
     internal PSTreeFileSystemInfo[] GetTree(bool filterInclude) =>
         filterInclude
-            ? _items.Where(e => e.ShouldInclude).ToArray().ConvertToTree()
+            ? _items
+                .Where(static e =>
+                {
+                    if (e.ShouldInclude && e is PSTreeDirectory dir)
+                    {
+                        dir.IncrementItemCount();
+                    }
+
+                    return e.ShouldInclude;
+                })
+                .ToArray()
+                .ConvertToTree()
             : _items.ToArray().ConvertToTree();
 
     internal void Clear()

@@ -38,7 +38,7 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
         return new PSTreeFile(file, styled, source, depth);
     }
 
-    internal PSTreeFile WithParent(PSTreeDirectory parent)
+    internal PSTreeFile AddParent(PSTreeDirectory parent)
     {
         _parent = parent;
         return this;

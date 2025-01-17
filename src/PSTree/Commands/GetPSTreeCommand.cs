@@ -50,7 +50,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     protected override void BeginProcessing()
     {
-        if (Recurse.IsPresent && !MyInvocation.BoundParameters.ContainsKey("Depth"))
+        if (Recurse && !MyInvocation.BoundParameters.ContainsKey("Depth"))
         {
             Depth = int.MaxValue;
         }
@@ -109,7 +109,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                 bool keepProcessing = level <= Depth;
                 foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
                 {
-                    if (!Force.IsPresent && item.IsHidden())
+                    if (!Force && item.IsHidden())
                     {
                         continue;
                     }
@@ -121,33 +121,41 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
                     if (item is FileInfo fileInfo)
                     {
-                        if (Directory.IsPresent)
+                        if (Directory)
                         {
                             size += fileInfo.Length;
                             continue;
                         }
 
-                        if (keepProcessing && ShouldInclude(fileInfo))
+                        bool include = ShouldInclude(fileInfo);
+                        if (keepProcessing && include)
                         {
                             childCount++;
                             size += fileInfo.Length;
 
                             PSTreeFile file = PSTreeFile
                                 .Create(fileInfo, source, level)
-                                .WithParent(next)
+                                .AddParent(next)
                                 .WithIncludeFlagIf(_includePatterns is not null);
 
                             _cache.Add(file);
+                            continue;
+                        }
+
+                        if (RecursiveSize && include)
+                        {
+                            size += fileInfo.Length;
+                            // childCount++;
                         }
 
                         continue;
                     }
 
-                    if (keepProcessing || RecursiveSize.IsPresent)
+                    if (keepProcessing)
                     {
                         PSTreeDirectory dir = PSTreeDirectory
                             .Create((DirectoryInfo)item, source, level)
-                            .WithParent(next);
+                            .AddParent(next);
 
                         if (_includePatterns is null)
                         {
@@ -156,13 +164,23 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                         }
 
                         _stack.Push(dir);
+                        continue;
+                    }
+
+                    if (RecursiveSize)
+                    {
+                        PSTreeDirectory dir = PSTreeDirectory
+                            .Create((DirectoryInfo)item, source, level)
+                            .AddParent(next);
+
+                        _stack.Push(dir);
                     }
                 }
 
                 next.Length = size;
                 next.IndexCount(childCount);
 
-                if (RecursiveSize.IsPresent)
+                if (RecursiveSize)
                 {
                     next.IndexLength(size);
                 }
