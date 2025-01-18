@@ -74,7 +74,6 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 
     internal void IndexLength(long length)
     {
-        Length += length;
         for (PSTreeDirectory? i = _parent; i is not null; i = i._parent)
         {
             i.Length += length;
@@ -84,6 +83,7 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
     internal void SetIncludeFlag()
     {
         ShouldInclude = true;
+
         for (PSTreeDirectory? i = _parent; i is not null; i = i._parent)
         {
             if (i.ShouldInclude)
@@ -103,6 +103,7 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
         }
 
         _parent.ItemCount++;
+
         for (PSTreeDirectory? i = _parent; i is not null; i = i._parent)
         {
             i.TotalItemCount++;

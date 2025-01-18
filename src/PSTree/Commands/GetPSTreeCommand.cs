@@ -145,7 +145,6 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                         if (RecursiveSize && include)
                         {
                             size += fileInfo.Length;
-                            // childCount++;
                         }
 
                         continue;
@@ -157,7 +156,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                             .Create((DirectoryInfo)item, source, level)
                             .AddParent(next);
 
-                        if (_includePatterns is null)
+                        if (Directory || _includePatterns is null)
                         {
                             dir.ShouldInclude = true;
                             childCount++;
