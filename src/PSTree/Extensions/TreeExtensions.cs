@@ -1,13 +1,16 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace PSTree.Extensions;
 
 internal static class TreeExtensions
 {
-    private static readonly StringBuilder s_sb = new();
+    [ThreadStatic]
+    private static StringBuilder? s_sb;
 
     internal static string Indent(this string inputString, int indentation)
     {
+        s_sb ??= new StringBuilder();
         s_sb.Clear();
 
         return s_sb.Append(' ', (4 * indentation) - 4)
@@ -20,43 +23,41 @@ internal static class TreeExtensions
         this PSTreeFileSystemInfo[] inputObject)
     {
         int index;
-        PSTreeFileSystemInfo current;
-
         for (int i = 0; i < inputObject.Length; i++)
         {
-            current = inputObject[i];
+            PSTreeFileSystemInfo current = inputObject[i];
             if ((index = current.Hierarchy.IndexOf('└')) == -1)
             {
                 continue;
             }
 
-            int z;
-            char[] replace;
-            for (z = i - 1; z >= 0; z--)
+            for (int z = i - 1; z >= 0; z--)
             {
                 current = inputObject[z];
-                if (!char.IsWhiteSpace(current.Hierarchy[index]))
+                string hierarchy = current.Hierarchy;
+
+                if (char.IsWhiteSpace(hierarchy[index]))
                 {
-                    UpdateCorner(index, current);
-                    break;
+                    current.Hierarchy = hierarchy.ReplaceAt(index, '│');
+                    continue;
                 }
 
-                replace = current.Hierarchy.ToCharArray();
-                replace[index] = '│';
-                current.Hierarchy = new string(replace);
+                if (hierarchy[index] == '└')
+                {
+                    current.Hierarchy = hierarchy.ReplaceAt(index, '├');
+                }
+
+                break;
             }
         }
 
         return inputObject;
     }
 
-    private static void UpdateCorner(int index, PSTreeFileSystemInfo current)
+    private static string ReplaceAt(this string input, int index, char newChar)
     {
-        if (current.Hierarchy[index] == '└')
-        {
-            char[] replace = current.Hierarchy.ToCharArray();
-            replace[index] = '├';
-            current.Hierarchy = new string(replace);
-        }
+        char[] chars = input.ToCharArray();
+        chars[index] = newChar;
+        return new string(chars);
     }
 }

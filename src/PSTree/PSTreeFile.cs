@@ -44,7 +44,7 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
         return this;
     }
 
-    internal PSTreeFile WithIncludeFlagIf(bool condition)
+    internal PSTreeFile SetIncludeFlagIf(bool condition)
     {
         if (condition)
         {

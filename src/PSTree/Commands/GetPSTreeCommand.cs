@@ -12,6 +12,10 @@ namespace PSTree.Commands;
 [Alias("pstree")]
 public sealed class GetPSTreeCommand : CommandWithPathBase
 {
+    private bool _withExclude;
+
+    private bool _withInclude;
+
     private WildcardPattern[]? _excludePatterns;
 
     private WildcardPattern[]? _includePatterns;
@@ -62,11 +66,13 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
         if (Exclude is not null)
         {
             _excludePatterns = [.. Exclude.Select(e => new WildcardPattern(e, options))];
+            _withExclude = true;
         }
 
         if (Include is not null)
         {
             _includePatterns = [.. Include.Select(e => new WildcardPattern(e, options))];
+            _withInclude = true;
         }
     }
 
@@ -136,7 +142,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                             PSTreeFile file = PSTreeFile
                                 .Create(fileInfo, source, level)
                                 .AddParent(next)
-                                .WithIncludeFlagIf(_includePatterns is not null);
+                                .SetIncludeFlagIf(_withInclude);
 
                             _cache.Add(file);
                             continue;
@@ -156,7 +162,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                             .Create((DirectoryInfo)item, source, level)
                             .AddParent(next);
 
-                        if (Directory || _includePatterns is null)
+                        if (Directory || !_withInclude)
                         {
                             dir.ShouldInclude = true;
                             childCount++;
@@ -201,7 +207,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
             }
         }
 
-        return _cache.GetTree(_includePatterns is not null);
+        return _cache.GetTree(_withInclude);
     }
 
     private static bool MatchAny(string name, WildcardPattern[] patterns)
@@ -218,8 +224,8 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
     }
 
     private bool ShouldInclude(FileInfo item) =>
-        _includePatterns is null || MatchAny(item.Name, _includePatterns);
+        !_withInclude || MatchAny(item.Name, _includePatterns!);
 
     private bool ShouldExclude(FileSystemInfo item) =>
-        _excludePatterns is not null && MatchAny(item.Name, _excludePatterns);
+        _withExclude && MatchAny(item.Name, _excludePatterns!);
 }
