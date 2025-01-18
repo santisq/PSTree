@@ -157,6 +157,15 @@ Describe 'Get-PSTree' {
         }
     }
 
+    It '-RecursiveSize and -Include can work together' {
+        $measure = Get-ChildItem -Recurse -Include *.cs, *.ps1 |
+            Measure-Object Length -Sum
+
+        Get-PSTree -Include *.cs, *.ps1 -RecursiveSize -Depth 0 |
+            ForEach-Object Length |
+            Should -BeExactly $measure.Sum
+    }
+
     It 'Should traverse all tree when -Recurse is used' {
         (Get-PSTree $testPath -Recurse | Select-Object -Skip 1 | Measure-Object).Count |
             Should -BeExactly (Get-ChildItem $testPath -Recurse | Measure-Object).Count
