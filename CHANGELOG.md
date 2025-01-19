@@ -5,7 +5,7 @@
   - Updates to `-Include` and `-Exclude` parameters, with this update the patterns are evaluated using the
   object's `.Name` property instead of `.FullName`.
   - In addition to the above, this update improves how the cmdlet displays trees when `-Include` is used.
-  Before, the cmdlet would display trees where no file was matched by the include patterns. Now, only trees having files matched by the include patterns are displayed.
+  Before, the cmdlet would display sub-trees where no file was matched by the include patterns. Now, only trees having files matched by the patterns are displayed.
 
     ```powershell
     # PSTree v2.2.0
