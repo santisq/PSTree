@@ -3,62 +3,28 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
+using PSTree.Extensions;
 
 namespace PSTree.Commands;
 
-[Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = "Path")]
+[Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = PathSet)]
 [OutputType(typeof(PSTreeDirectory), typeof(PSTreeFile))]
 [Alias("pstree")]
-public sealed class GetPSTreeCommand : PSCmdlet
+public sealed class GetPSTreeCommand : CommandWithPathBase
 {
-    private bool _isLiteral;
+    private bool _withExclude;
 
-    private string[]? _paths;
+    private bool _withInclude;
 
     private WildcardPattern[]? _excludePatterns;
 
     private WildcardPattern[]? _includePatterns;
 
-    private readonly PSTreeIndexer _indexer = new();
-
     private readonly Stack<PSTreeDirectory> _stack = new();
 
-    private readonly PSTreeCache _cache = new();
+    private readonly Cache _cache = new();
 
-    private readonly PSTreeComparer _comparer = new();
-
-    [Parameter(
-        ParameterSetName = "Path",
-        Position = 0,
-        ValueFromPipeline = true
-    )]
-    [SupportsWildcards]
-    [ValidateNotNullOrEmpty]
-    public string[]? Path
-    {
-        get => _paths;
-        set
-        {
-            _paths = value;
-            _isLiteral = false;
-        }
-    }
-
-    [Parameter(
-        ParameterSetName = "LiteralPath",
-        ValueFromPipelineByPropertyName = true
-    )]
-    [Alias("PSPath")]
-    [ValidateNotNullOrEmpty]
-    public string[]? LiteralPath
-    {
-        get => _paths;
-        set
-        {
-            _paths = value;
-            _isLiteral = true;
-        }
-    }
+    private readonly TreeComparer _comparer = new();
 
     [Parameter]
     [ValidateRange(0, int.MaxValue)]
@@ -88,125 +54,133 @@ public sealed class GetPSTreeCommand : PSCmdlet
 
     protected override void BeginProcessing()
     {
-        if (Recurse.IsPresent && !MyInvocation.BoundParameters.ContainsKey("Depth"))
+        if (Recurse && !MyInvocation.BoundParameters.ContainsKey("Depth"))
         {
             Depth = int.MaxValue;
         }
 
-        const WildcardOptions wpoptions =
-            WildcardOptions.Compiled
+        const WildcardOptions options = WildcardOptions.Compiled
             | WildcardOptions.CultureInvariant
             | WildcardOptions.IgnoreCase;
 
         if (Exclude is not null)
         {
-            _excludePatterns = Exclude
-                .Select(e => new WildcardPattern(e, wpoptions))
-                .ToArray();
+            _excludePatterns = [.. Exclude.Select(e => new WildcardPattern(e, options))];
+            _withExclude = true;
         }
 
-        // this Parameter only targets files, there is no reason to use it if -Directory is in use
-        if (Include is not null && !Directory.IsPresent)
+        if (Include is not null)
         {
-            _includePatterns = Include
-                .Select(e => new WildcardPattern(e, wpoptions))
-                .ToArray();
+            _includePatterns = [.. Include.Select(e => new WildcardPattern(e, options))];
+            _withInclude = true;
         }
     }
 
     protected override void ProcessRecord()
     {
-        _paths ??= [SessionState.Path.CurrentLocation.Path];
-
-        foreach (string path in _paths.NormalizePath(_isLiteral, this))
+        foreach (string path in EnumerateResolvedPaths())
         {
-            string source = path.TrimExcess();
-
-            if (source.IsArchive())
+            if (File.Exists(path))
             {
-                WriteObject(PSTreeFile.Create(new FileInfo(source), source));
+                FileInfo file = new(path);
+                if (!ShouldExclude(file) && ShouldInclude(file))
+                {
+                    WriteObject(PSTreeFile.Create(file, path));
+                }
+
                 continue;
             }
 
             WriteObject(
-                Traverse(new DirectoryInfo(source), source),
+                Traverse(PSTreeDirectory.Create(path)),
                 enumerateCollection: true);
         }
     }
 
-    private PSTreeFileSystemInfo[] Traverse(
-        DirectoryInfo directory,
-        string source)
+    private PSTreeFileSystemInfo[] Traverse(PSTreeDirectory directory)
     {
-        _indexer.Clear();
         _cache.Clear();
-        _stack.Push(PSTreeDirectory.Create(directory, source));
+        _stack.Push(directory);
+        string source = directory.FullName;
 
         while (_stack.Count > 0)
         {
             PSTreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
-            long size = 0;
-            int childCount = 0;
+            long totalLength = 0;
 
             try
             {
                 bool keepProcessing = level <= Depth;
                 foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
                 {
-                    childCount++;
-                    if (!Force.IsPresent && item.IsHidden())
+                    if (!Force && item.IsHidden() || ShouldExclude(item))
                     {
                         continue;
                     }
 
-                    if (ShouldExclude(item, _excludePatterns))
+                    if (item is FileInfo fileInfo)
                     {
-                        continue;
-                    }
+                        if (Directory)
+                        {
+                            totalLength += fileInfo.Length;
+                            continue;
+                        }
 
-                    if (item is FileInfo file)
-                    {
-                        size += file.Length;
-
-                        if (Directory.IsPresent)
+                        if (!ShouldInclude(fileInfo))
                         {
                             continue;
                         }
 
-                        if (keepProcessing && ShouldInclude(file, _includePatterns))
+                        if (!keepProcessing && !RecursiveSize)
                         {
-                            _cache.AddFile(PSTreeFile.Create(file, source, level));
+                            continue;
+                        }
+
+                        totalLength += fileInfo.Length;
+
+                        if (keepProcessing)
+                        {
+                            PSTreeFile file = PSTreeFile
+                                .Create(fileInfo, source, level)
+                                .AddParent(next)
+                                .SetIncludeFlagIf(_withInclude);
+
+                            _cache.Add(file);
                         }
 
                         continue;
                     }
 
-                    if (keepProcessing || RecursiveSize.IsPresent)
+                    if (!keepProcessing && !RecursiveSize)
                     {
-                        _stack.Push(PSTreeDirectory.Create(
-                            (DirectoryInfo)item, source, level));
+                        continue;
                     }
+
+                    PSTreeDirectory dir = PSTreeDirectory
+                        .Create((DirectoryInfo)item, source, level)
+                        .AddParent(next);
+
+                    if (keepProcessing && Directory || !_withInclude)
+                    {
+                        dir.ShouldInclude = true;
+                    }
+
+                    _stack.Push(dir);
                 }
 
-                next.Length = size;
-                _indexer[next.FullName] = next;
-                _indexer.IndexItemCount(next, childCount);
+                next.Length = totalLength;
 
-                if (RecursiveSize.IsPresent)
+                if (RecursiveSize)
                 {
-                    _indexer.IndexLength(next, size);
+                    next.IndexLength(totalLength);
                 }
 
                 if (next.Depth <= Depth)
                 {
                     _cache.Add(next);
-                    _cache.TryAddFiles();
+                    _cache.Flush();
                 }
-            }
-            catch (Exception _) when (_ is PipelineStoppedException or FlowControlException)
-            {
-                throw;
             }
             catch (Exception exception)
             {
@@ -219,16 +193,14 @@ public sealed class GetPSTreeCommand : PSCmdlet
             }
         }
 
-        return _cache.GetTree();
+        return _cache.GetTree(_withInclude && !Directory);
     }
 
-    private static bool MatchAny(
-        FileSystemInfo item,
-        WildcardPattern[] patterns)
+    private static bool MatchAny(string name, WildcardPattern[] patterns)
     {
         foreach (WildcardPattern pattern in patterns)
         {
-            if (pattern.IsMatch(item.FullName))
+            if (pattern.IsMatch(name))
             {
                 return true;
             }
@@ -237,27 +209,9 @@ public sealed class GetPSTreeCommand : PSCmdlet
         return false;
     }
 
-    private static bool ShouldInclude(
-        FileInfo file,
-        WildcardPattern[]? patterns)
-    {
-        if (patterns is null)
-        {
-            return true;
-        }
+    private bool ShouldInclude(FileInfo item) =>
+        !_withInclude || MatchAny(item.Name, _includePatterns!);
 
-        return MatchAny(file, patterns);
-    }
-
-    private static bool ShouldExclude(
-        FileSystemInfo item,
-        WildcardPattern[]? patterns)
-    {
-        if (patterns is null)
-        {
-            return false;
-        }
-
-        return MatchAny(item, patterns);
-    }
+    private bool ShouldExclude(FileSystemInfo item) =>
+        _withExclude && MatchAny(item.Name, _excludePatterns!);
 }

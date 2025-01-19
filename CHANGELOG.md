@@ -1,5 +1,79 @@
 # CHANGELOG
 
+- __01/19/2025__
+  - Big code refactoring, this update improves readability and simplicity.
+  - Updates to `-Include` and `-Exclude` parameters, with this update the patterns are evaluated using the
+  object's `.Name` property instead of `.FullName`.
+  - In addition to the above, this update improves how the cmdlet displays trees when `-Include` is used.
+  Before, the cmdlet would display trees where no file was matched by the include patterns. Now, only trees having files matched by the include patterns are displayed.
+
+    ```powershell
+    # PSTree v2.2.0
+    PS ..\pwsh> Get-PSTree ..\PSTree -Include *.ps1, *.cs -Exclude *tools, *output
+
+      Source: C:\User\PSTree
+
+    Mode            Length Hierarchy
+    ----            ------ ---------
+    d----         29.57 KB PSTree
+    -a---          1.34 KB ├── build.ps1
+    d----          0.00  B ├── .github
+    d----          4.10 KB │   └── workflows
+    d----          4.11 KB ├── .vscode
+    d----        229.32 KB ├── assets
+    d----          0.00  B ├── docs
+    d----         12.55 KB │   └── en-US
+    d----         13.63 KB ├── module
+    d----          0.00  B ├── src
+    d----         11.50 KB │   └── PSTree
+    -a---          1.06 KB │       ├── Cache.cs
+    -a---          2.65 KB │       ├── CommandWithPathBase.cs
+    -a---          2.98 KB │       ├── PSTreeDirectory.cs
+    -a---          1.42 KB │       ├── PSTreeFile.cs
+    -a---          1.69 KB │       ├── PSTreeFileSystemInfo_T.cs
+    -a---        524.00  B │       ├── PSTreeFileSystemInfo.cs
+    -a---        404.00  B │       ├── TreeComparer.cs
+    d----          0.00  B │       ├── bin
+    d----          6.54 KB │       ├── Commands
+    d----          3.63 KB │       ├── Extensions
+    d----          1.14 KB │       ├── Internal
+    d----         16.83 KB │       ├── obj
+    d----          9.28 KB │       └── Style
+    d----         17.87 KB └── tests
+    -a---        765.00  B     ├── FormattingInternals.tests.ps1
+    -a---          6.15 KB     ├── GetPSTreeCommand.tests.ps1
+    -a---          1.77 KB     ├── PSTreeDirectory.tests.ps1
+    -a---        920.00  B     ├── PSTreeFile.tests.ps1
+    -a---          2.63 KB     ├── PSTreeFileSystemInfo_T.tests.ps1
+    -a---          4.90 KB     └── TreeStyle.tests.ps1
+
+    # PSTree v2.2.1
+    PS ..\pwsh> Get-PSTree ..\PSTree -Include *.ps1, *.cs -Exclude tools, output
+
+      Source: C:\User\PSTree
+
+    Mode            Length Hierarchy
+    ----            ------ ---------
+    d----          1.34 KB PSTree
+    -a---          1.34 KB ├── build.ps1
+    d----          0.00  B ├── src
+    d----         10.70 KB │   └── PSTree
+    -a---          1.06 KB │       ├── Cache.cs
+    -a---          2.65 KB │       ├── CommandWithPathBase.cs
+    -a---          2.98 KB │       ├── PSTreeDirectory.cs
+    -a---          1.42 KB │       ├── PSTreeFile.cs
+    -a---          1.69 KB │       ├── PSTreeFileSystemInfo_T.cs
+    -a---        524.00  B │       ├── PSTreeFileSystemInfo.cs
+    -a---        404.00  B │       └── TreeComparer.cs
+    d----         17.10 KB └── tests
+    -a---        765.00  B     ├── FormattingInternals.tests.ps1
+    -a---          6.15 KB     ├── GetPSTreeCommand.tests.ps1
+    -a---          1.77 KB     ├── PSTreeDirectory.tests.ps1
+    -a---        920.00  B     ├── PSTreeFile.tests.ps1
+    -a---          2.63 KB     ├── PSTreeFileSystemInfo_T.tests.ps1
+    -a---          4.90 KB     └── TreeStyle.tests.ps1
+    ```
+
 - __09/12/2024__
   - Added `TreeStyle` type and `Get-PSTreeStyle` cmdlet for rendering output.
   - Added Pester tests for `TreeStyle`.
@@ -8,7 +82,7 @@
 - __09/03/2024__
   - Makes `Depth` property public for `PSTreeFileSystemInfo` instances.
   - Makes `GetParents()` method private, absolutely no reason to have it public.
-  - Added properties `ItemCount` and `TotalItemCount` to `PSTreeDirectory` instances, requested in [__Issue #34__][2].
+  - Added properties `ItemCount` and `TotalItemCount` to `PSTreeDirectory` instances, requested in [__Issue #34__][21].
 
     ```powershell
     PS ..\PSTree> pstree -Recurse -Force -Directory | Select-Object Hierarchy, Depth, ItemCount, TotalItemCount -First 15
@@ -275,4 +349,4 @@ d----     └── Format                     1.83 Kb
 [18]: https://github.com/jborean93/
 [19]: /docs/en-US/Get-PSTree.md
 [20]: https://www.powershellgallery.com/
-[2]: https://github.com/santisq/PSTree/issues/34
+[21]: https://github.com/santisq/PSTree/issues/34

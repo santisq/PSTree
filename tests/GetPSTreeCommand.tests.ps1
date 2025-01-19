@@ -71,16 +71,12 @@ Describe 'Get-PSTree' {
             Should -Not -BeNullOrEmpty
     }
 
-    It 'Should trim excess directory path separators' {
-        (Get-PSTree /\/\/\/\ -Depth 0).FullName | Should -BeExactly (Get-Item /\).FullName
-    }
-
     It '-Path should support wildcards' {
         Get-PSTree * | Should -Not -BeNullOrEmpty
     }
 
     It 'Can take pipeline input to -Path' {
-            (Get-ChildItem $testPath).FullName | Get-PSTree |
+        (Get-ChildItem $testPath).FullName | Get-PSTree |
             Should -Not -BeNullOrEmpty
     }
 
@@ -109,7 +105,7 @@ Describe 'Get-PSTree' {
         $tree.FullName | Should -Not -Contain $ref
     }
 
-    It 'Excludes childs with -Exclude parameter' {
+    It 'Excludes child items with -Exclude parameter' {
         $exclude = '*tools*', '*build*', '*.ps1'
         Get-PSTree $testPath -Exclude * | Should -HaveCount 1
         Get-PSTree $testPath -Exclude $exclude -Recurse | ForEach-Object {
@@ -117,9 +113,13 @@ Describe 'Get-PSTree' {
                 [string[]] $exclude,
                 [System.Func[string, bool]] { $_.FullName -like $args[0] })
         } | Should -Not -BeTrue
+
+        Get-ChildItem $testPath -Filter *.ps1 -Recurse |
+            Get-PSTree -Exclude *.ps1 |
+            Should -BeNullOrEmpty
     }
 
-    It 'Include childs with -Include parameter' {
+    It 'Includes child items with -Include parameter' {
         $include = '*.ps1', '*.cs'
         Get-PSTree $testPath -Include $include -Recurse | ForEach-Object {
             [System.Linq.Enumerable]::Any(
@@ -129,6 +129,10 @@ Describe 'Get-PSTree' {
                 }
             )
         } | Should -BeTrue
+
+        Get-ChildItem $testPath -Filter *.ps1 -Recurse |
+            Get-PSTree -Include *.ps1 |
+            Should -Not -BeNullOrEmpty
     }
 
     It 'Should prioritize -Depth if used together with -Recurse' {
@@ -138,7 +142,7 @@ Describe 'Get-PSTree' {
             Should -Not -Contain $ref
     }
 
-    It 'Calculates the recursive size of folders with -RecrusiveSize' {
+    It 'Calculates the recursive size of folders with -RecursiveSize' {
         $recursiveLengths = Join-Path $testPath src |
             Get-PSTree -Directory -Depth 1 -RecursiveSize
 
@@ -151,6 +155,15 @@ Describe 'Get-PSTree' {
             $recursiveLengths[$i].Length |
                 Should -BeGreaterThan $lengths[$i].Length
         }
+    }
+
+    It '-RecursiveSize and -Include can work together' {
+        $measure = Get-ChildItem -Recurse -Include *.cs, *.ps1 |
+            Measure-Object Length -Sum
+
+        Get-PSTree -Include *.cs, *.ps1 -RecursiveSize -Depth 0 |
+            ForEach-Object Length |
+            Should -BeExactly $measure.Sum
     }
 
     It 'Should traverse all tree when -Recurse is used' {
