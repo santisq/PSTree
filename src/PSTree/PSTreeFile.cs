@@ -40,7 +40,7 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
 
     internal PSTreeFile AddParent(PSTreeDirectory parent)
     {
-        _parent = parent;
+        ParentNode = parent;
         return this;
     }
 
@@ -48,7 +48,7 @@ public sealed class PSTreeFile : PSTreeFileSystemInfo<FileInfo>
     {
         if (condition)
         {
-            _parent?.SetIncludeFlag();
+            ParentNode?.SetIncludeFlag();
         }
 
         return this;

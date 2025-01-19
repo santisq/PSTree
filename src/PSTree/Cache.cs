@@ -23,19 +23,35 @@ internal sealed class Cache
         }
     }
 
-    internal PSTreeFileSystemInfo[] GetTree(bool condition) =>
-        condition
-            ? _items.Where(IsIncluded).ToArray().Format()
-            : _items.ToArray().Format();
-
-    private static bool IsIncluded(PSTreeFileSystemInfo item)
+    internal PSTreeFileSystemInfo[] GetTree(bool condition)
     {
-        if (item.ShouldInclude && item is PSTreeDirectory dir)
+        PSTreeFileSystemInfo[] result = condition
+            ? [.. _items.Where(static e => e.ShouldInclude)]
+            : [.. _items];
+
+        return result.Format(GetItemCount(result));
+    }
+
+    private static Dictionary<string, int> GetItemCount(PSTreeFileSystemInfo[] items)
+    {
+        Dictionary<string, int> counts = [];
+        foreach (PSTreeFileSystemInfo item in items)
         {
-            dir.IncrementItemCount();
+            string? path = item.ParentNode?.FullName;
+            if (path is null)
+            {
+                continue;
+            }
+
+            if (!counts.ContainsKey(path))
+            {
+                counts[path] = 0;
+            }
+
+            counts[path]++;
         }
 
-        return item.ShouldInclude;
+        return counts;
     }
 
     internal void Clear()

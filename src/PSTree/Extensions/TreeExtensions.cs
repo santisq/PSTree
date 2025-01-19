@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace PSTree.Extensions;
@@ -19,12 +20,21 @@ internal static class TreeExtensions
             .ToString();
     }
 
-    internal static PSTreeFileSystemInfo[] Format(this PSTreeFileSystemInfo[] tree)
+    internal static PSTreeFileSystemInfo[] Format(
+        this PSTreeFileSystemInfo[] tree,
+        Dictionary<string, int> itemCounts)
     {
         int index;
         for (int i = 0; i < tree.Length; i++)
         {
             PSTreeFileSystemInfo current = tree[i];
+
+            if (current is PSTreeDirectory directory &&
+                itemCounts.TryGetValue(directory.FullName, out int count))
+            {
+                directory.IndexCount(count);
+            }
+
             if ((index = current.Hierarchy.IndexOf('└')) == -1)
             {
                 continue;

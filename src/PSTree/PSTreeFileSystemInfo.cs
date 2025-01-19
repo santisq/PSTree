@@ -2,7 +2,7 @@ namespace PSTree;
 
 public abstract class PSTreeFileSystemInfo(string hierarchy, string source)
 {
-    protected PSTreeDirectory? _parent;
+    internal PSTreeDirectory? ParentNode { get; set; }
 
     internal bool ShouldInclude { get; set; }
 

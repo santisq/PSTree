@@ -108,7 +108,6 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
             PSTreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
             long totalLength = 0;
-            int childCount = 0;
 
             try
             {
@@ -142,8 +141,6 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
                         if (keepProcessing)
                         {
-                            childCount++;
-
                             PSTreeFile file = PSTreeFile
                                 .Create(fileInfo, source, level)
                                 .AddParent(next)
@@ -167,14 +164,12 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                     if (keepProcessing && Directory || !_withInclude)
                     {
                         dir.ShouldInclude = true;
-                        childCount++;
                     }
 
                     _stack.Push(dir);
                 }
 
                 next.Length = totalLength;
-                next.IndexCount(childCount);
 
                 if (RecursiveSize)
                 {
