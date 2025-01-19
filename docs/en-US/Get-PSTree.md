@@ -153,8 +153,8 @@ Excluded items do not add to the recursive folders size.
 
 > [!NOTE]
 >
-> - Patterns are tested against the object's `.FullName` property.
-> - The `-Include` and `-Exclude` parameters can be used together and the inclusions are applied after the exclusions.
+> - Patterns are evaluated using the object's `.Name` property.
+> - The `-Include` and `-Exclude` parameters can be used together, however the exclusions are applied before the inclusions.
 
 ```yaml
 Type: String[]
@@ -192,9 +192,9 @@ Wildcard characters are accepted.
 
 > [!NOTE]
 >
-> - Patterns are tested against the object's `.FullName` property.
-> - This parameter focuses only on files, the inclusion patterns are only evaluated against `FileInfo` instances.
-> - The `-Include` and `-Exclude` parameters can be used together and the inclusions are applied after the exclusions.
+> - __This parameter works only on files.__
+> - Patterns are evaluated using the object's `.Name` property.
+> - The `-Include` and `-Exclude` parameters can be used together, however the exclusions are applied before the inclusions.
 
 ```yaml
 Type: String[]
@@ -228,7 +228,8 @@ Accept wildcard characters: False
 
 ### -Path
 
-Specifies a path to one or more locations. Wildcards are accepted. The default location is the current directory (`.`).
+Specifies a path to one or more locations. Wildcards are accepted.
+The default location is the current directory (`$PWD`).
 
 ```yaml
 Type: String[]
@@ -237,7 +238,7 @@ Aliases:
 
 Required: False
 Position: 0
-Default value: Current directory
+Default value: $PWD
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: True
 ```
