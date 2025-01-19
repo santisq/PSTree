@@ -48,7 +48,7 @@ Compatible with __Windows PowerShell v5.1__ and [__PowerShell 7+__](https://gith
 ```powershell
 PS ..\PSTree> Get-PSTree | Select-Object -First 20
 
-   Source: C:\path\to\PSTree
+   Source: C:\User\Documents\PSTree
 
 Mode            Length Hierarchy
 ----            ------ ---------
@@ -77,71 +77,61 @@ d----          0.00  B ├── src
 ### Exclude `tools` and `tests` folders
 
 ```powershell
-PS ..\PSTree> Get-PSTree -Exclude *tools, *tests  | Select-Object -First 20
+PS ..\PSTree> Get-PSTree -Exclude tools, tests  | Select-Object -First 20
 
-   Source: C:\path\to\PSTree
+   Source: C:\User\Documents\PSTree
 
 Mode            Length Hierarchy
 ----            ------ ---------
-d----         31.20 KB PSTree
--a---          4.64 KB ├── .gitignore
+d----         33.23 KB PSTree
+-a---          4.75 KB ├── .gitignore
 -a---        137.00  B ├── .markdownlint.json
--a---          2.16 KB ├── build.ps1
--a---          7.90 KB ├── CHANGELOG.md
+-a---          1.34 KB ├── build.ps1
+-a---         18.08 KB ├── CHANGELOG.md
 -a---          1.07 KB ├── LICENSE
--a---          8.10 KB ├── PSTree.build.ps1
--a---          5.96 KB ├── README.md
--a---          1.23 KB ├── ScriptAnalyzerSettings.psd1
-d----          0.00  B ├── src
-d----         10.30 KB │   └── PSTree
--a---        931.00  B │       ├── ExceptionHelpers.cs
--a---        439.00  B │       ├── PSTree.csproj
--a---          1.06 KB │       ├── PSTreeDirectory.cs
--a---          4.01 KB │       ├── PSTreeExtensions.cs
--a---        517.00  B │       ├── PSTreeFile.cs
--a---        399.00  B │       ├── PSTreeFileSystemInfo.cs
--a---          1.51 KB │       ├── PSTreeFileSystemInfo_T.cs
--a---        897.00  B │       ├── PSTreeHelper.cs
--a---        619.00  B │       ├── PSTreeIndexer.cs
+-a---          7.85 KB ├── README.md
+d----          0.00  B ├── .github
+d----          4.10 KB │   └── workflows
+-a---          4.10 KB │       └── ci.yml
+d----          4.11 KB ├── .vscode
+-a---        275.00  B │   ├── extensions.json
+-a---          1.39 KB │   ├── launch.json
+-a---          1.02 KB │   ├── settings.json
+-a---          1.43 KB │   └── tasks.json
+d----        229.32 KB ├── assets
+-a---         10.00 KB │   ├── EscapeSequence.png
+-a---         78.08 KB │   ├── Example.After.png
+-a---         73.89 KB │   ├── Example.Before.png
+-a---         67.35 KB │   └── TreeStyle.png
 ```
 
-### Include `.ps1` and `.cs` files and exclude some folders
+### Include `.ps1` and `.cs` files and exclude `tools` folder
 
 ```powershell
-PS ..\PSTree> Get-PStree -Include *.ps1, *.cs -Exclude *output, *tools, *docs, *module
+PS ..\PSTree> Get-PStree -Include *.ps1, *.cs -Exclude tools
 
-   Source: C:\path\to\PSTree
+   Source: C:\User\Documents\PSTree
 
 Mode            Length Hierarchy
 ----            ------ ---------
-d----         33.15 KB PSTree
--a---          2.35 KB ├── build.ps1
--a---          8.10 KB ├── PSTree.build.ps1
-d----         13.29 KB ├── tests
--a---        765.00  B │   ├── FormattingInternals.tests.ps1
--a---          5.89 KB │   ├── GetPSTreeCommand.tests.ps1
--a---          1.51 KB │   ├── PathExtensions.tests.ps1
--a---          1.38 KB │   ├── PSTreeDirectory.ps1
--a---        920.00  B │   ├── PSTreeFile.tests.ps1
--a---          2.09 KB │   └── PSTreeFileSystemInfo_T.tests.ps1
+d----          1.34 KB PSTree
+-a---          1.34 KB ├── build.ps1
 d----          0.00  B ├── src
-d----         12.15 KB │   └── PSTree
--a---        931.00  B │       ├── ExceptionHelpers.cs
--a---          4.09 KB │       ├── PathExtensions.cs
--a---        900.00  B │       ├── PSTreeCache.cs
--a---          1.06 KB │       ├── PSTreeDirectory.cs
--a---          1.66 KB │       ├── PSTreeExtensions.cs
--a---        517.00  B │       ├── PSTreeFile.cs
--a---        399.00  B │       ├── PSTreeFileSystemInfo.cs
--a---          1.61 KB │       ├── PSTreeFileSystemInfo_T.cs
--a---        626.00  B │       ├── PSTreeIndexer.cs
-d----         16.53 KB │       ├── obj
-d----          1.15 KB │       ├── Internal
-d----          6.43 KB │       ├── Commands
-d----          0.00  B │       └── bin
-d----          4.07 KB ├── .vscode
-d----          0.00  B └── .github
-d----          4.17 KB     └── workflows
+d----         10.70 KB │   └── PSTree
+-a---          1.06 KB │       ├── Cache.cs
+-a---          2.65 KB │       ├── CommandWithPathBase.cs
+-a---          2.98 KB │       ├── PSTreeDirectory.cs
+-a---          1.42 KB │       ├── PSTreeFile.cs
+-a---          1.69 KB │       ├── PSTreeFileSystemInfo_T.cs
+-a---        524.00  B │       ├── PSTreeFileSystemInfo.cs
+-a---        404.00  B │       └── TreeComparer.cs
+d----         17.10 KB └── tests
+-a---        765.00  B     ├── FormattingInternals.tests.ps1
+-a---          6.15 KB     ├── GetPSTreeCommand.tests.ps1
+-a---          1.77 KB     ├── PSTreeDirectory.tests.ps1
+-a---        920.00  B     ├── PSTreeFile.tests.ps1
+-a---          2.63 KB     ├── PSTreeFileSystemInfo_T.tests.ps1
+-a---          4.90 KB     └── TreeStyle.tests.ps1
 ```
 
 ### Get the `src` tree recursively displaying only folders
@@ -149,21 +139,23 @@ d----          4.17 KB     └── workflows
 ```powershell
 PS ..\PSTree> Get-PSTree .\src\ -Recurse -Directory
 
-   Source: C:\path\to\PSTree\src
+   Source: C:\User\Documents\PSTree\src
 
 Mode            Length Hierarchy
 ----            ------ ---------
 d----          0.00  B src
-d----         10.30 KB └── PSTree
-d----         16.53 KB     ├── obj
+d----         11.50 KB └── PSTree
+d----          0.00  B     ├── bin
 d----          0.00  B     │   └── Debug
-d----         88.02 KB     │       └── netstandard2.0
-d----          1.13 KB     ├── Internal
-d----          5.68 KB     ├── Commands
-d----          0.00  B     └── bin
-d----          0.00  B         └── Debug
-d----         33.31 KB             └── netstandard2.0
-d----         33.11 KB                 └── publish
+d----         56.49 KB     │       └── netstandard2.0
+d----         56.29 KB     │           └── publish
+d----          6.54 KB     ├── Commands
+d----          3.63 KB     ├── Extensions
+d----          1.14 KB     ├── Internal
+d----         16.83 KB     ├── obj
+d----          0.00  B     │   └── Debug
+d----        112.44 KB     │       └── netstandard2.0
+d----          9.28 KB     └── Style
 ```
 
 ### Display subdirectories only 2 levels deep
@@ -171,7 +163,7 @@ d----         33.11 KB                 └── publish
 ```powershell
 PS ..\PSTree> Get-PSTree .\src\ -Depth 2 -Directory
 
-   Source: C:\path\to\PSTree\src
+   Source: C:\User\Documents\PSTree\src
 
 Mode            Length Hierarchy
 ----            ------ ---------
@@ -188,7 +180,7 @@ d----          0.00  B     └── bin
 ```powershell
 PS ..\PSTree> Get-PSTree .\src\ -Depth 2 -Directory -RecursiveSize
 
-   Source: C:\path\to\PSTree\src
+   Source: C:\User\Documents\PSTree\src
 
 Mode            Length Hierarchy
 ----            ------ ---------
@@ -207,4 +199,4 @@ d----         66.42 KB     └── bin
 
 ## Contributing
 
-Contributions are more than welcome, if you wish to contribute, fork this repository and submit a pull request with the changes.
+Contributions are welcome, if you wish to contribute, fork this repository and submit a pull request with the changes.

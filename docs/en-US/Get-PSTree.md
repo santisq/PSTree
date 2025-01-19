@@ -71,7 +71,8 @@ In this example `$HOME` is bound positionally to the `-Path` parameter.
 PS ..\PSTree> Get-PSTree -Depth 2 -Force
 ```
 
-The `-Force` switch is needed to display hidden files and folders. In addition, hidden child items do not add up to the folders size without this switch.
+> [!TIP]
+> The `-Force` switch is needed to display hidden files and folders. In addition, hidden child items do not add up to the folders size without this switch.
 
 ### Example 4: Get the `C:\` drive tree 2 levels in depth displaying only folders calculating the recursive size
 
@@ -85,7 +86,10 @@ PS ..\PSTree> Get-PSTree C:\ -Depth 2 -RecursiveSize -Directory
 PS ..\PSTree> Get-PSTree $HOME -Recurse -Exclude *.jpg, *.png
 ```
 
-The `-Exclude` parameter supports [wildcard patterns](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_wildcards?view=powershell-7.3), exclusion patterns are tested against the items `.FullName` property. Excluded items do not do not add to the folders size.
+> [!NOTE]
+>
+> - The `-Exclude` parameter supports [wildcard patterns](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_wildcards?view=powershell-7.3), exclusion patterns are evaluated using the items `.Name` property.
+> - __Excluded items do not do not add to the folders size.__
 
 ### Example 6: Get the tree of all folders in a location
 
@@ -93,7 +97,8 @@ The `-Exclude` parameter supports [wildcard patterns](https://learn.microsoft.co
 PS ..\PSTree> Get-ChildItem -Directory | Get-PSTree
 ```
 
-`DirectoryInfo` and `FileInfo` instances having the `PSPath` Property are bound to the `-LiteralPath` parameter.
+> [!TIP]
+> Output from `Get-ChildItem` can be piped to this cmdlet. Pipeline input is bound to `-LiteralPath` parameter if the items have a `PSPath` property.
 
 ### Example 7: Get the tree of all folders in a location including only `*.ps1` files
 
@@ -101,7 +106,8 @@ PS ..\PSTree> Get-ChildItem -Directory | Get-PSTree
 PS ..\PSTree> Get-ChildItem -Directory | Get-PSTree -Include *.ps1
 ```
 
-Similar to `-Exclude`, the `-Include` parameter supports [wildcard patterns](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_wildcards?view=powershell-7.3), however, __this parameter works only with Files__.
+> [!IMPORTANT]
+> Similar to `-Exclude`, the `-Include` parameter supports [wildcard patterns](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_wildcards?view=powershell-7.3), however, __this parameter works only with Files__.
 
 ## PARAMETERS
 
