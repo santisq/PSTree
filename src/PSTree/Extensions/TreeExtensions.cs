@@ -19,13 +19,12 @@ internal static class TreeExtensions
             .ToString();
     }
 
-    internal static PSTreeFileSystemInfo[] ConvertToTree(
-        this PSTreeFileSystemInfo[] inputObject)
+    internal static PSTreeFileSystemInfo[] Format(this PSTreeFileSystemInfo[] tree)
     {
         int index;
-        for (int i = 0; i < inputObject.Length; i++)
+        for (int i = 0; i < tree.Length; i++)
         {
-            PSTreeFileSystemInfo current = inputObject[i];
+            PSTreeFileSystemInfo current = tree[i];
             if ((index = current.Hierarchy.IndexOf('└')) == -1)
             {
                 continue;
@@ -33,7 +32,7 @@ internal static class TreeExtensions
 
             for (int z = i - 1; z >= 0; z--)
             {
-                current = inputObject[z];
+                current = tree[z];
                 string hierarchy = current.Hierarchy;
 
                 if (char.IsWhiteSpace(hierarchy[index]))
@@ -51,7 +50,7 @@ internal static class TreeExtensions
             }
         }
 
-        return inputObject;
+        return tree;
     }
 
     private static string ReplaceAt(this string input, int index, char newChar)

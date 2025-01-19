@@ -107,7 +107,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
         {
             PSTreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
-            long size = 0;
+            long totalLength = 0;
             int childCount = 0;
 
             try
@@ -115,12 +115,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                 bool keepProcessing = level <= Depth;
                 foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
                 {
-                    if (!Force && item.IsHidden())
-                    {
-                        continue;
-                    }
-
-                    if (ShouldExclude(item))
+                    if (!Force && item.IsHidden() || ShouldExclude(item))
                     {
                         continue;
                     }
@@ -129,15 +124,25 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                     {
                         if (Directory)
                         {
-                            size += fileInfo.Length;
+                            totalLength += fileInfo.Length;
                             continue;
                         }
 
-                        bool include = ShouldInclude(fileInfo);
-                        if (keepProcessing && include)
+                        if (!ShouldInclude(fileInfo))
+                        {
+                            continue;
+                        }
+
+                        if (!keepProcessing && !RecursiveSize)
+                        {
+                            continue;
+                        }
+
+                        totalLength += fileInfo.Length;
+
+                        if (keepProcessing)
                         {
                             childCount++;
-                            size += fileInfo.Length;
 
                             PSTreeFile file = PSTreeFile
                                 .Create(fileInfo, source, level)
@@ -145,49 +150,35 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                                 .SetIncludeFlagIf(_withInclude);
 
                             _cache.Add(file);
-                            continue;
-                        }
-
-                        if (RecursiveSize && include)
-                        {
-                            size += fileInfo.Length;
                         }
 
                         continue;
                     }
 
-                    if (keepProcessing)
+                    if (!keepProcessing && !RecursiveSize)
                     {
-                        PSTreeDirectory dir = PSTreeDirectory
-                            .Create((DirectoryInfo)item, source, level)
-                            .AddParent(next);
-
-                        if (Directory || !_withInclude)
-                        {
-                            dir.ShouldInclude = true;
-                            childCount++;
-                        }
-
-                        _stack.Push(dir);
                         continue;
                     }
 
-                    if (RecursiveSize)
-                    {
-                        PSTreeDirectory dir = PSTreeDirectory
-                            .Create((DirectoryInfo)item, source, level)
-                            .AddParent(next);
+                    PSTreeDirectory dir = PSTreeDirectory
+                        .Create((DirectoryInfo)item, source, level)
+                        .AddParent(next);
 
-                        _stack.Push(dir);
+                    if (keepProcessing && Directory || !_withInclude)
+                    {
+                        dir.ShouldInclude = true;
+                        childCount++;
                     }
+
+                    _stack.Push(dir);
                 }
 
-                next.Length = size;
+                next.Length = totalLength;
                 next.IndexCount(childCount);
 
                 if (RecursiveSize)
                 {
-                    next.IndexLength(size);
+                    next.IndexLength(totalLength);
                 }
 
                 if (next.Depth <= Depth)
@@ -207,7 +198,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
             }
         }
 
-        return _cache.GetTree(_withInclude);
+        return _cache.GetTree(_withInclude && !Directory);
     }
 
     private static bool MatchAny(string name, WildcardPattern[] patterns)

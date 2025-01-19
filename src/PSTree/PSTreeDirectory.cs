@@ -41,7 +41,8 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
             .OrderBy(static e => e is DirectoryInfo)
             .ThenBy(static e => e, comparer);
 
-    internal static PSTreeDirectory Create(string path) => Create(new DirectoryInfo(path), path);
+    internal static PSTreeDirectory Create(string path) =>
+        Create(new DirectoryInfo(path), path);
 
     internal static PSTreeDirectory Create(DirectoryInfo dir, string source)
     {

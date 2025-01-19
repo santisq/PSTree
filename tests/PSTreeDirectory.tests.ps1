@@ -27,13 +27,16 @@ Describe 'PSTreeDirectory' {
         (Get-PSTree $testPath -Depth 0).Parent | Should -BeOfType ([System.IO.DirectoryInfo])
     }
 
-    It 'ItemCount gets the count of direct childs' {
+    It 'ItemCount gets the count of direct child items' {
         $childCount = @(Get-ChildItem -Force $testPath).Count
         (Get-PSTree $testPath -Depth 1 -Force)[0].ItemCount | Should -BeExactly $childCount
     }
 
-    It 'TotalItemCount gets the recursive count of childs' {
+    It 'TotalItemCount gets the recursive count of child items' {
         $childCount = @(Get-ChildItem -Force $testPath -Recurse).Count
         (Get-PSTree $testPath -Recurse -Force)[0].TotalItemCount | Should -BeExactly $childCount
+
+        $childCount = @(Get-ChildItem $testPath -Depth 2).Count
+        (Get-PSTree $testPath)[0].TotalItemCount | Should -BeExactly $childCount
     }
 }
