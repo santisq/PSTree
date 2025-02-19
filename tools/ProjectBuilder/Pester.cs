@@ -66,7 +66,7 @@ public sealed class Pester
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            arguments.AddRange([ "-ExecutionPolicy", "Bypass" ]);
+            arguments.AddRange(["-ExecutionPolicy", "Bypass"]);
         }
 
         arguments.AddRange([
@@ -99,7 +99,7 @@ public sealed class Pester
 
         if (File.Exists(unitCoveragePath))
         {
-            arguments.AddRange([ "--merge-with", unitCoveragePath ]);
+            arguments.AddRange(["--merge-with", unitCoveragePath]);
         }
 
         if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") is "true")

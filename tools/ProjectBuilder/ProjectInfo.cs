@@ -167,14 +167,18 @@ public sealed class ProjectInfo
     private static Version? GetManifestVersion(ProjectInfo builder)
     {
         using PowerShell powershell = PowerShell.Create(RunspaceMode.CurrentRunspace);
-        Hashtable? moduleInfo = powershell
-            .AddCommand("Import-PowerShellDataFile")
-            .AddArgument(builder.Module.Manifest?.FullName)
-            .Invoke<Hashtable>()
+        PSModuleInfo? moduleInfo = powershell
+            .AddCommand("Test-ModuleManifest")
+            .AddParameters(new Dictionary<string, object?>()
+            {
+                ["Path"] = builder.Module.Manifest?.FullName,
+                ["ErrorAction"] = "Ignore"
+            })
+            .Invoke<PSModuleInfo>()
             .FirstOrDefault();
 
-        return powershell.HadErrors
+        return powershell.Streams.Error is { Count: > 0 }
             ? throw powershell.Streams.Error.First().Exception
-            : LanguagePrimitives.ConvertTo<Version>(moduleInfo?["ModuleVersion"]);
+            : moduleInfo.Version;
     }
 }

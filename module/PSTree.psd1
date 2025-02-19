@@ -8,10 +8,15 @@
 
 @{
     # Script module or binary module file associated with this manifest.
-    RootModule = 'bin/netstandard2.0/PSTree.dll'
+    RootModule        = if ($PSEdition -eq 'Core') {
+        'bin/net8.0/PSTree.dll'
+    }
+    else {
+        'bin/net472/PSTree.dll'
+    }
 
     # Version number of this module.
-    ModuleVersion = '2.2.1'
+    ModuleVersion = '2.2.2'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -74,6 +79,7 @@
     CmdletsToExport = @(
         'Get-PSTree'
         'Get-PSTreeStyle'
+        'Get-PSTreeRegistry'
     )
 
     # Variables to export from this module
@@ -83,6 +89,7 @@
     AliasesToExport = @(
         'pstree'
         'treestyle'
+        'pstreereg'
     )
 
     # DSC resources to export from this module
