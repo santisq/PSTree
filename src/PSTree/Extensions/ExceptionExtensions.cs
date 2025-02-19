@@ -52,7 +52,7 @@ internal static class ExceptionExtensions
         }
 
         PlatformNotSupportedException exception = new(
-            "Please note, the 'Get-PSTreeRegistry' cmdlet is only supported on Windows platform.");
+            "The 'Get-PSTreeRegistry' cmdlet is only supported on Windows.");
 
         cmdlet.ThrowTerminatingError(new ErrorRecord(
             exception, "NotSupportedPlatform", ErrorCategory.InvalidOperation, null));
