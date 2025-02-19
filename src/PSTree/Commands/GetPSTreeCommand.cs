@@ -23,7 +23,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     private readonly Stack<PSTreeDirectory> _stack = new();
 
-    private readonly Cache _cache = new();
+    private readonly Cache<PSTreeFileSystemInfo, PSTreeFile> _cache = new();
 
     private readonly TreeComparer _comparer = new();
 
@@ -206,7 +206,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
             }
         }
 
-        return _cache.GetTree(_withInclude && !Directory);
+        return GetTree(_withInclude && !Directory);
     }
 
     private static bool IsHidden(FileSystemInfo item) =>
@@ -230,4 +230,35 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     private bool ShouldExclude(FileSystemInfo item) =>
         _withExclude && MatchAny(item.Name, _excludePatterns!);
+
+    private PSTreeFileSystemInfo[] GetTree(bool condition)
+    {
+        PSTreeFileSystemInfo[] result = condition
+            ? [.. _cache.Items.Where(static e => e.ShouldInclude)]
+            : [.. _cache.Items];
+
+        return result.Format(GetItemCount(result));
+    }
+
+    private static Dictionary<string, int> GetItemCount(PSTreeFileSystemInfo[] items)
+    {
+        Dictionary<string, int> counts = [];
+        foreach (PSTreeFileSystemInfo item in items)
+        {
+            string? path = item.ParentNode?.FullName;
+            if (path is null)
+            {
+                continue;
+            }
+
+            if (!counts.ContainsKey(path))
+            {
+                counts[path] = 0;
+            }
+
+            counts[path]++;
+        }
+
+        return counts;
+    }
 }

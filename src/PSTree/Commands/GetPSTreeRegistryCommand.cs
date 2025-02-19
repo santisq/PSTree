@@ -13,9 +13,7 @@ namespace PSTree.Commands;
 [Alias("pstreereg")]
 public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 {
-    private readonly List<PSTreeRegistryValue> _values = [];
-
-    private readonly List<PSTreeRegistryBase> _result = [];
+    private readonly Cache<PSTreeRegistryBase, PSTreeRegistryValue> _cache = new();
 
     private readonly Stack<(PSTreeRegistryKey, RegistryKey)> _stack = [];
 
@@ -95,7 +93,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 
     private PSTreeBase[] Traverse(RegistryKey key)
     {
-        Clear();
+        _cache.Clear();
         _stack.Push(key.CreateTreeKey(System.IO.Path.GetFileName(key.Name)));
 
         while (_stack.Count > 0)
@@ -103,33 +101,29 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
             (PSTreeRegistryKey tree, key) = _stack.Pop();
             int depth = tree.Depth + 1;
 
-            foreach (string value in key.GetValueNames())
+            using (key)
             {
-                if (string.IsNullOrEmpty(value))
+                if (depth <= Depth)
                 {
-                    continue;
+                    foreach (string value in key.GetValueNames())
+                    {
+                        if (string.IsNullOrEmpty(value))
+                        {
+                            continue;
+                        }
+
+                        _cache.Add(new PSTreeRegistryValue(key, value, depth));
+                    }
+
+                    PushSubKeys(key, depth);
                 }
-
-                _values.Add(new PSTreeRegistryValue(key, value, depth));
             }
 
-            if (depth <= Depth)
-            {
-                PushSubKeys(key, depth);
-            }
-
-            _result.Add(tree);
-
-            if (_values.Count > 0)
-            {
-                _result.AddRange([.. _values]);
-                _values.Clear();
-            }
-
-            key.Dispose();
+            _cache.Add(tree);
+            _cache.Flush();
         }
 
-        return _result.ToArray().Format();
+        return _cache.Items.ToArray().Format();
     }
 
     private void PushSubKeys(RegistryKey key, int depth)
@@ -139,6 +133,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
             try
             {
                 RegistryKey? subkey = key.OpenSubKey(keyname);
+
                 if (subkey is null)
                 {
                     continue;
@@ -151,12 +146,5 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
                 WriteError(exception.ToNotSpecifiedError(keyname));
             }
         }
-    }
-
-    private void Clear()
-    {
-        _stack.Clear();
-        _values.Clear();
-        _result.Clear();
     }
 }

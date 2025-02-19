@@ -1,62 +1,30 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using PSTree.Extensions;
 
 namespace PSTree;
 
-internal sealed class Cache
+internal sealed class Cache<TBase, TLeaf>
+    where TLeaf : TBase
 {
-    private readonly List<PSTreeFileSystemInfo> _items = [];
+    internal List<TBase> Items { get; } = [];
 
-    private readonly List<PSTreeFile> _files = [];
+    private readonly List<TLeaf> _leaves = [];
 
-    internal void Add(PSTreeFile file) => _files.Add(file);
+    internal void Add(TLeaf leaf) => _leaves.Add(leaf);
 
-    internal void Add(PSTreeDirectory directory) => _items.Add(directory);
+    internal void Add(TBase container) => Items.Add(container);
 
     internal void Flush()
     {
-        if (_files.Count > 0)
+        if (_leaves.Count > 0)
         {
-            _items.AddRange([.. _files]);
-            _files.Clear();
+            Items.AddRange([.. _leaves]);
+            _leaves.Clear();
         }
-    }
-
-    internal PSTreeFileSystemInfo[] GetTree(bool condition)
-    {
-        PSTreeFileSystemInfo[] result = condition
-            ? [.. _items.Where(static e => e.ShouldInclude)]
-            : [.. _items];
-
-        return result.Format(GetItemCount(result));
-    }
-
-    private static Dictionary<string, int> GetItemCount(PSTreeFileSystemInfo[] items)
-    {
-        Dictionary<string, int> counts = [];
-        foreach (PSTreeFileSystemInfo item in items)
-        {
-            string? path = item.ParentNode?.FullName;
-            if (path is null)
-            {
-                continue;
-            }
-
-            if (!counts.ContainsKey(path))
-            {
-                counts[path] = 0;
-            }
-
-            counts[path]++;
-        }
-
-        return counts;
     }
 
     internal void Clear()
     {
-        _files.Clear();
-        _items.Clear();
+        _leaves.Clear();
+        Items.Clear();
     }
 }
