@@ -1,11 +1,14 @@
 using System;
 using System.Management.Automation;
+using System.Runtime.InteropServices;
 using System.Security;
 
 namespace PSTree.Extensions;
 
 internal static class ExceptionExtensions
 {
+    private static readonly bool _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
     internal static ErrorRecord ToInvalidPathError(this string path) =>
         new(
             new Exception(
@@ -40,4 +43,18 @@ internal static class ExceptionExtensions
 
     internal static ErrorRecord ToSecurityError(this SecurityException exception, string path) =>
         new(exception, "SecurityException", ErrorCategory.OpenError, path);
+
+    internal static void ThrowIfNotSupportedPlatform(this PSCmdlet cmdlet)
+    {
+        if (_isWindows)
+        {
+            return;
+        }
+
+        PlatformNotSupportedException exception = new(
+            "Please note, the 'Get-PSTreeRegistry' cmdlet is only supported on Windows platform.");
+
+        cmdlet.ThrowTerminatingError(new ErrorRecord(
+            exception, "NotSupportedPlatform", ErrorCategory.InvalidOperation, null));
+    }
 }

@@ -102,9 +102,9 @@ public sealed class Pester
             arguments.AddRange(["--merge-with", unitCoveragePath]);
         }
 
-        if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") is "true")
+        if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == "true")
         {
-            arguments.AddRange([ "--source-mapping-file", sourceMappingFile ]);
+            arguments.AddRange(["--source-mapping-file", sourceMappingFile]);
             File.WriteAllText(
                 sourceMappingFile,
                 $"|{_info.Root.FullName}{Path.DirectorySeparatorChar}=/_/");

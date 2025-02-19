@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace ProjectBuilder;
 
@@ -15,7 +16,16 @@ public sealed class Project
 
     public string[]? TargetFrameworks { get; internal set; }
 
-    public string? TestFramework { get => TargetFrameworks.FirstOrDefault(); }
+    public string? TestFramework
+    {
+        get => _info.PowerShellVersion is { Major: 5, Minor: 1 }
+            ? TargetFrameworks
+                .Where(e => Regex.Match(e, "^net(?:4|standard)").Success)
+                .FirstOrDefault()
+            : TargetFrameworks
+                .Where(e => !e.StartsWith("net4"))
+                .FirstOrDefault();
+    }
 
     private Configuration Configuration { get => _info.Configuration; }
 
