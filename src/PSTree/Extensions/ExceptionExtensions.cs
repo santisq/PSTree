@@ -1,5 +1,6 @@
 using System;
 using System.Management.Automation;
+using System.Security;
 
 namespace PSTree.Extensions;
 
@@ -11,10 +12,13 @@ internal static class ExceptionExtensions
                 $"Cannot find path '{path}' because it does not exist."),
             "InvalidPath", ErrorCategory.InvalidArgument, path);
 
-    internal static ErrorRecord ToInvalidProviderError(this ProviderInfo provider, string path) =>
+    internal static ErrorRecord ToInvalidProviderError(
+        this ProviderInfo provider,
+        string path,
+        string expected = "FileSystem") =>
         new(
             new ArgumentException(
-                $"The resolved path '{path}' is not a FileSystem path but '{provider.Name}'."),
+                $"The resolved path '{path}' is not a {expected} path but '{provider.Name}'."),
             "InvalidProvider", ErrorCategory.InvalidArgument, path);
 
     internal static ErrorRecord ToResolvePathError(this Exception exception, string path) =>
@@ -30,4 +34,10 @@ internal static class ExceptionExtensions
     internal static void ThrowInvalidExtension(this string extension) =>
         throw new ArgumentException(
             $"When adding or removing extensions, the extension must start with a period: '{extension}'.");
+
+    internal static ErrorRecord ToNotSpecifiedError(this Exception exception, object? context = null) =>
+        new(exception, exception.GetType().Name, ErrorCategory.NotSpecified, context);
+
+    internal static ErrorRecord ToSecurityError(this SecurityException exception, string path) =>
+        new(exception, "SecurityException", ErrorCategory.OpenError, path);
 }

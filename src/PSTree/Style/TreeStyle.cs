@@ -9,7 +9,7 @@ using PSTree.Extensions;
 
 namespace PSTree.Style;
 
-public sealed partial class TreeStyle
+public sealed class TreeStyle
 {
     private const string s_esc = "\x1B";
 
@@ -73,7 +73,7 @@ public sealed partial class TreeStyle
             return file.Name;
         }
 
-        if (Extension.TryGetValue(file.Extension, out string vt))
+        if (Extension.TryGetValue(file.Extension, out string? vt))
         {
             return $"{vt}{file.Name}{Reset}";
         }
@@ -115,7 +115,8 @@ public sealed partial class TreeStyle
         foreach (PropertyInfo property in properties)
         {
             string value = Instance.EscapeSequence(
-                (string)property.GetValue(instance), 10);
+                vt: (string)property.GetValue(instance)!,
+                padding: 10);
 
             builder.Append(value);
 

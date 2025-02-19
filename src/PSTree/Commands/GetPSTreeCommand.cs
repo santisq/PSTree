@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
+using Microsoft.PowerShell.Commands;
 using PSTree.Extensions;
 
 namespace PSTree.Commands;
@@ -54,7 +55,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     protected override void BeginProcessing()
     {
-        if (Recurse && !MyInvocation.BoundParameters.ContainsKey("Depth"))
+        if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
         {
             Depth = int.MaxValue;
         }
@@ -78,8 +79,14 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     protected override void ProcessRecord()
     {
-        foreach (string path in EnumerateResolvedPaths())
+        foreach ((ProviderInfo provider, string path) in EnumerateResolvedPaths())
         {
+            if (provider.ImplementingType != typeof(FileSystemProvider))
+            {
+                WriteError(provider.ToInvalidProviderError(path));
+                continue;
+            }
+
             if (File.Exists(path))
             {
                 FileInfo file = new(path);
@@ -88,6 +95,12 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                     WriteObject(PSTreeFile.Create(file, path));
                 }
 
+                continue;
+            }
+
+            if (!System.IO.Directory.Exists(path))
+            {
+                WriteError(path.ToInvalidPathError());
                 continue;
             }
 
@@ -114,7 +127,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                 bool keepProcessing = level <= Depth;
                 foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
                 {
-                    if (!Force && item.IsHidden() || ShouldExclude(item))
+                    if (!Force && IsHidden(item) || ShouldExclude(item))
                     {
                         continue;
                     }
@@ -195,6 +208,9 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
         return _cache.GetTree(_withInclude && !Directory);
     }
+
+    private static bool IsHidden(FileSystemInfo item) =>
+        item.Attributes.HasFlag(FileAttributes.Hidden);
 
     private static bool MatchAny(string name, WildcardPattern[] patterns)
     {

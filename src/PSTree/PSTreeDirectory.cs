@@ -8,7 +8,7 @@ namespace PSTree;
 
 public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 {
-    public DirectoryInfo Parent => Instance.Parent;
+    public DirectoryInfo? Parent => Instance.Parent;
 
     public int ItemCount { get; internal set; }
 

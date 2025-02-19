@@ -1,15 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>PSTree</AssemblyName>
     <LangVersion>latest</LangVersion>
+    <NoWarn>CA1416</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="all" />
+    <!--
+    S.M.A brings in these deps but we don't rely on it directly. It's up to
+    the user to run with a newer PowerShell version that isn't affected.
+    -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-447r-wph3-92pm" />
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-555c-2p6r-68mm" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
@@ -19,6 +25,14 @@
 
   <ItemGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net472' ">
+    <PackageReference Include="System.Management.Automation" Version="7.4.0" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
