@@ -17,18 +17,6 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 
     private readonly Stack<(PSTreeRegistryKey, RegistryKey)> _stack = [];
 
-    private readonly Dictionary<string, RegistryKey> _map = new()
-    {
-        ["HKEY_CURRENT_USER"] = Registry.CurrentUser,
-        ["HKEY_LOCAL_MACHINE"] = Registry.LocalMachine,
-        ["HKEY_CLASSES_ROOT"] = Registry.ClassesRoot,
-        ["HKEY_USERS"] = Registry.Users,
-        ["HKEY_CURRENT_CONFIG"] = Registry.CurrentConfig
-    };
-
-    private static readonly RegistryView _view = Environment.Is64BitOperatingSystem
-        ? RegistryView.Registry64 : RegistryView.Registry32;
-
     [Parameter]
     [ValidateRange(0, int.MaxValue)]
     public int Depth { get; set; } = 3;
@@ -69,7 +57,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
         (string @base, string subkey) = path.Split(['\\'], 2);
         key = default;
 
-        if (!_map.TryGetValue(@base, out RegistryKey? value))
+        if (!RegistryMappings.TryGetKey(@base, out RegistryKey? value))
         {
             return false;
         }

@@ -21,9 +21,6 @@ public sealed class PSTreeRegistryValue : PSTreeRegistryBase
     private static string Combine(RegistryKey key, string value) =>
         System.IO.Path.Combine(key.Name, value);
 
-    public object? GetValue()
-    {
-        string path = Path.Substring(0, Path.Length - Name.Length);
-        return Registry.GetValue(path, Name, null);
-    }
+    public object? GetValue() =>
+        Registry.GetValue(Path.Substring(0, Path.Length - Name.Length), Name, null);
 }
