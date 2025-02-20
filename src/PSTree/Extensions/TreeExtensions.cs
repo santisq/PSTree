@@ -107,11 +107,13 @@ internal static class TreeExtensions
         return new string(chars);
     }
 
-    internal static (PSTreeRegistryKey, RegistryKey) CreateTreeKey(this RegistryKey key, string name) =>
-        (new PSTreeRegistryKey(key, name), key);
+    internal static (PSTreeRegistryKey, RegistryKey) CreateTreeKey(
+        this RegistryKey key, string name) =>
+        (new PSTreeRegistryKey(key, name, key.Name), key);
 
-    internal static (PSTreeRegistryKey, RegistryKey) CreateTreeKey(this RegistryKey key, string name, int depth) =>
-        (new PSTreeRegistryKey(key, name, depth), key);
+    internal static (PSTreeRegistryKey, RegistryKey) CreateTreeKey(
+        this RegistryKey key, string name, string source, int depth) =>
+        (new PSTreeRegistryKey(key, name, source, depth), key);
 
     internal static void Deconstruct(this string[] strings, out string @base, out string subKey) =>
         (@base, subKey) = (strings[0], strings[1]);

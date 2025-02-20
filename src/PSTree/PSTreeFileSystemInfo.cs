@@ -1,13 +1,11 @@
 namespace PSTree;
 
 public abstract class PSTreeFileSystemInfo(string hierarchy, string source)
-    : PSTreeBase(hierarchy)
+    : PSTreeBase(hierarchy, source)
 {
     internal PSTreeDirectory? ParentNode { get; set; }
 
     internal bool ShouldInclude { get; set; }
-
-    internal string Source { get; set; } = source;
 
     public long Length { get; internal set; }
 

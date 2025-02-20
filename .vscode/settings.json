@@ -27,6 +27,7 @@
     // We use Pester v5 so we don't need the legacy code lens
     "powershell.pester.useLegacyCodeLens": false,
     "cSpell.words": [
-        "pstree"
+        "pstree",
+        "treeviewfs"
     ],
 }

@@ -20,8 +20,14 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
     private readonly Dictionary<string, RegistryKey> _map = new()
     {
         ["HKEY_CURRENT_USER"] = Registry.CurrentUser,
-        ["HKEY_LOCAL_MACHINE"] = Registry.LocalMachine
+        ["HKEY_LOCAL_MACHINE"] = Registry.LocalMachine,
+        ["HKEY_CLASSES_ROOT"] = Registry.ClassesRoot,
+        ["HKEY_USERS"] = Registry.Users,
+        ["HKEY_CURRENT_CONFIG"] = Registry.CurrentConfig
     };
+
+    private static readonly RegistryView _view = Environment.Is64BitOperatingSystem
+        ? RegistryView.Registry64 : RegistryView.Registry32;
 
     [Parameter]
     [ValidateRange(0, int.MaxValue)]
@@ -95,6 +101,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
     {
         _cache.Clear();
         _stack.Push(key.CreateTreeKey(System.IO.Path.GetFileName(key.Name)));
+        string source = key.Name;
 
         while (_stack.Count > 0)
         {
@@ -112,10 +119,10 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
                             continue;
                         }
 
-                        _cache.Add(new PSTreeRegistryValue(key, value, depth));
+                        _cache.Add(new PSTreeRegistryValue(key, value, source, depth));
                     }
 
-                    PushSubKeys(key, depth);
+                    PushSubKeys(key, source, depth);
                 }
             }
 
@@ -126,7 +133,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
         return _cache.Items.ToArray().Format();
     }
 
-    private void PushSubKeys(RegistryKey key, int depth)
+    private void PushSubKeys(RegistryKey key, string source, int depth)
     {
         foreach (string keyname in key.GetSubKeyNames())
         {
@@ -139,7 +146,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
                     continue;
                 }
 
-                _stack.Push(subkey.CreateTreeKey(keyname, depth));
+                _stack.Push(subkey.CreateTreeKey(keyname, source, depth));
             }
             catch (Exception exception)
             {

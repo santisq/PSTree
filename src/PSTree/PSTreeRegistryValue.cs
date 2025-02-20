@@ -7,10 +7,23 @@ public sealed class PSTreeRegistryValue : PSTreeRegistryBase
 {
     public RegistryValueKind Kind { get; }
 
-    internal PSTreeRegistryValue(RegistryKey key, string value, int depth) :
-        base(value.Indent(depth), Combine(key, value))
+    public string Name { get; }
+
+    internal PSTreeRegistryValue(
+        RegistryKey key, string value, string source, int depth) :
+        base(value.Indent(depth), source, Combine(key, value))
     {
         Kind = key.GetValueKind(value);
         Depth = depth;
+        Name = value;
+    }
+
+    private static string Combine(RegistryKey key, string value) =>
+        System.IO.Path.Combine(key.Name, value);
+
+    public object? GetValue()
+    {
+        string path = Path.Substring(0, Path.Length - Name.Length);
+        return Registry.GetValue(path, Name, null);
     }
 }
