@@ -1,11 +1,13 @@
+#if !WINDOWS
+using System.Diagnostics.CodeAnalysis;
+    [ExcludeFromCodeCoverage]
+#endif
+
 using Microsoft.Win32;
 using PSTree.Extensions;
 
 namespace PSTree;
 
-#if !WINDOWS
-    [ExcludeFromCodeCoverage]
-#endif
 public sealed class TreeRegistryValue : TreeRegistryBase
 {
     private readonly string _parentPath;
