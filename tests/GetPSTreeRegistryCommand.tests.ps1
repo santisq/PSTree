@@ -53,42 +53,35 @@ Describe 'Get-PSTreeRegistry' {
         }
     }
 
-    # Context 'Output Properties' {
-    #     It 'PSTreeRegistryKey has expected properties' {
-    #         $key = Get-PSTreeRegistry -Path 'HKLM:\Software' |
-    #             Where-Object { $_ -is [PSTree.PSTreeRegistryKey] } | Select-Object -First 1
-    #         $key.PSObject.Properties.Name | Should -Contain 'Name'
-    #         $key.PSObject.Properties.Name | Should -Contain 'Path'
-    #         $key.PSObject.Properties.Name | Should -Contain 'SubKeyCount'
-    #         $key.PSObject.Properties.Name | Should -Contain 'ValueCount'
-    #         $key.PSObject.Properties.Name | Should -Contain 'Depth'
-    #         $key.PSObject.Properties.Name | Should -Contain 'LastWriteTime'
-    #     }
+    Context 'Output Properties' {
+        It 'PSTreeRegistryKey has expected properties' {
+            $key = Get-PSTreeRegistry -Path 'HKLM:\Software' -EA 0 |
+                Where-Object { $_ -is [PSTree.TreeRegistryKey] } |
+                Select-Object -First 1
 
-    #     It 'PSTreeRegistryValue has expected properties' {
-    #         $value = Get-PSTreeRegistry -Path 'HKLM:\Software' -Depth 0 |
-    #             Where-Object { $_ -is [PSTree.PSTreeRegistryValue] } | Select-Object -First 1
-    #         $value.PSObject.Properties.Name | Should -Contain 'Name'
-    #         $value.PSObject.Properties.Name | Should -Contain 'Path'
-    #         $value.PSObject.Properties.Name | Should -Contain 'Value'
-    #         $value.PSObject.Properties.Name | Should -Contain 'Kind'
-    #         $value.PSObject.Properties.Name | Should -Contain 'Depth'
-    #     }
-    # }
+            $key.Kind | Should -BeExactly RegistryKey
+            $key.SubKeyCount | Should -Not -BeNullOrEmpty
+            $key.ValueCount | Should -Not -BeNullOrEmpty
+            $key.View | Should -BeOfType ([Microsoft.Win32.RegistryView])
+            $key.Path | Should -Not -BeNullOrEmpty
+            $key.PSPath | Should -Not -BeNullOrEmpty
+            $key.PSParentPath | Should -BeOfType ([string])
+            $key.Hierarchy | Should -Not -BeNullOrEmpty
+            $key.Depth | Should -BeGreaterOrEqual 0
+        }
 
-    # Context 'Force Parameter' {
-    #     It 'Runs without error when Force is specified' {
-    #         $result = Get-PSTreeRegistry -Path 'HKLM:\Software' -Force
-    #         $result | Should -Not -BeNullOrEmpty
-    #         # Add more if Force has a specific effect later
-    #     }
-    # }
+        It 'PSTreeRegistryValue has expected properties' {
+            $value = Get-PSTreeRegistry -Path 'HKLM:\Software' -EA 0 |
+                Where-Object { $_ -is [PSTree.TreeRegistryValue] } |
+                Select-Object -First 1
 
-    # Context 'Error Handling' {
-    #     It 'Silently skips inaccessible keys' {
-    #         # HKLM:\SECURITY often requires elevated perms
-    #         $result = Get-PSTreeRegistry -Path 'HKLM:\SECURITY' -ErrorAction SilentlyContinue
-    #         $result | Should -BeNullOrEmpty # Adjust if it returns partial results
-    #     }
-    # }
+            $value.Kind | Should -BeOfType ([Microsoft.Win32.RegistryValueKind])
+            $value.Name | Should -Not -BeNullOrEmpty
+            $value.Path | Should -BeNullOrEmpty
+            $value.PSPath | Should -BeNullOrEmpty
+            $value.PSParentPath | Should -Not -BeNullOrEmpty
+            $value.Hierarchy | Should -Not -BeNullOrEmpty
+            $value.Depth | Should -BeGreaterOrEqual 0
+        }
+    }
 }
