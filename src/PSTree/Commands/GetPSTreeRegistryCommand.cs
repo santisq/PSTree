@@ -139,9 +139,10 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 
                 _stack.Push(subkey.CreateTreeKey(keyname, source, depth));
             }
-            catch (Exception exception)
+            catch (SecurityException exception)
             {
-                WriteError(exception.ToNotSpecifiedError(keyname));
+                string path = System.IO.Path.Combine(key.Name, keyname);
+                WriteError(exception.ToSecurityError(path));
             }
         }
     }

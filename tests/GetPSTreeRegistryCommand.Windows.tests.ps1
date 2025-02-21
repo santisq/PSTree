@@ -30,6 +30,11 @@ Describe 'Get-PSTreeRegistry.Windows' {
             $maxDepth = ($deep | Measure-Object -Property Depth -Maximum).Maximum
             $maxDepth | Should -BeExactly 2
         }
+
+        It 'Can throw if non-elevated' {
+            { Get-PSTreeRegistry -Path HKLM:\ } |
+                Should -Throw -ExceptionType ([System.Security.SecurityException])
+        }
     }
 
     Context 'Parameter Validation' {
@@ -41,9 +46,18 @@ Describe 'Get-PSTreeRegistry.Windows' {
                 Should -Throw -ExceptionType ([System.Management.Automation.ItemNotFoundException])
         }
 
+        It 'Throws on invalid provider path' {
+            { Get-PSTreeRegistry -Path Function:\Clear-Host } |
+                Should -Throw -ExceptionType ([System.ArgumentException])
+
+            { Get-PSTreeRegistry -LiteralPath Function:\Clear-Host } |
+                Should -Throw -ExceptionType ([System.ArgumentException])
+        }
+
         It 'Accepts pipeline input' {
             'HKCU:\*' | Get-PSTreeRegistry | Should -Not -BeNullOrEmpty
             Get-Item 'HKCU:\' | Get-PSTreeRegistry | Should -Not -BeNullOrEmpty
+            Get-PSTreeRegistry HKCU: -Depth 0 | Get-PSTreeRegistry | Should -Not -BeNullOrEmpty
         }
 
         It 'Handles multiple paths' {
@@ -58,7 +72,7 @@ Describe 'Get-PSTreeRegistry.Windows' {
         }
     }
 
-    Context 'Output Properties and Methods' {
+    Context 'Output Types' {
         It 'PSTreeRegistryKey has expected properties' {
             $key = Get-PSTreeRegistry -Path 'HKLM:\Software' -EA 0 |
                 Where-Object { $_ -is [PSTree.TreeRegistryKey] } |

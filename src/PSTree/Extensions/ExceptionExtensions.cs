@@ -38,9 +38,6 @@ internal static class ExceptionExtensions
         throw new ArgumentException(
             $"When adding or removing extensions, the extension must start with a period: '{extension}'.");
 
-    internal static ErrorRecord ToNotSpecifiedError(this Exception exception, object? context = null) =>
-        new(exception, exception.GetType().Name, ErrorCategory.NotSpecified, context);
-
     internal static ErrorRecord ToSecurityError(this SecurityException exception, string path) =>
         new(exception, "SecurityException", ErrorCategory.OpenError, path);
 
