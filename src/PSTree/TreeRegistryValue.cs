@@ -3,6 +3,9 @@ using PSTree.Extensions;
 
 namespace PSTree;
 
+#if !WINDOWS
+    [ExcludeFromCodeCoverage]
+#endif
 public sealed class TreeRegistryValue : TreeRegistryBase
 {
     private readonly string _parentPath;

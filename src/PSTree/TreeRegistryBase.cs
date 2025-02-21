@@ -1,5 +1,8 @@
 namespace PSTree;
 
+#if !WINDOWS
+    [ExcludeFromCodeCoverage]
+#endif
 public abstract class TreeRegistryBase(
     string hierarchy,
     string source,

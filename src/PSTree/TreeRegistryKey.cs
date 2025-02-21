@@ -3,6 +3,9 @@ using PSTree.Extensions;
 
 namespace PSTree;
 
+#if !WINDOWS
+    [ExcludeFromCodeCoverage]
+#endif
 public sealed class TreeRegistryKey : TreeRegistryBase
 {
     public string Kind { get; } = "RegistryKey";

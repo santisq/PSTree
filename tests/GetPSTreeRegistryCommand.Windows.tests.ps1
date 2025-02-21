@@ -58,7 +58,7 @@ Describe 'Get-PSTreeRegistry.Windows' {
         }
     }
 
-    Context 'Output Properties' {
+    Context 'Output Properties and Methods' {
         It 'PSTreeRegistryKey has expected properties' {
             $key = Get-PSTreeRegistry -Path 'HKLM:\Software' -EA 0 |
                 Where-Object { $_ -is [PSTree.TreeRegistryKey] } |
@@ -87,6 +87,12 @@ Describe 'Get-PSTreeRegistry.Windows' {
             $value.PSParentPath | Should -Not -BeNullOrEmpty
             $value.Hierarchy | Should -Not -BeNullOrEmpty
             $value.Depth | Should -BeGreaterOrEqual 0
+        }
+
+        It 'PSTreeRegistryValue has GetValue()' {
+            Get-PSTreeRegistry -Path 'HKLM:\Software' -EA 0 |
+                Where-Object { $_ -is [PSTree.TreeRegistryValue] } |
+                ForEach-Object GetValue | Should -BeOfType ([object])
         }
     }
 }

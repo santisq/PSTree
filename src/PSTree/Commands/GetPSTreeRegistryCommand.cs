@@ -8,6 +8,9 @@ using PSTree.Extensions;
 
 namespace PSTree.Commands;
 
+#if !WINDOWS
+    [ExcludeFromCodeCoverage]
+#endif
 [Cmdlet(VerbsCommon.Get, "PSTreeRegistry", DefaultParameterSetName = PathSet)]
 [OutputType(typeof(TreeRegistryKey), typeof(TreeRegistryValue))]
 [Alias("pstreereg")]
