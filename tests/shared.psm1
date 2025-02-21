@@ -29,6 +29,8 @@
 }
 
 $testPath = Split-Path $PSScriptRoot
-$testPath | Out-Null
+$isWin = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+    [System.Runtime.InteropServices.OSPlatform]::Windows)
 
-Export-ModuleMember -Function Test-NormalizePath -Variable testPath
+$testPath, $isWin | Out-Null
+Export-ModuleMember -Function Test-NormalizePath -Variable testPath, isWin

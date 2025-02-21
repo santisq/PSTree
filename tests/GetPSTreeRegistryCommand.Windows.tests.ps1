@@ -4,8 +4,13 @@ $moduleName = (Get-Item ([IO.Path]::Combine($PSScriptRoot, '..', 'module', '*.ps
 $manifestPath = [IO.Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
 
 Import-Module $manifestPath
+Import-Module ([System.IO.Path]::Combine($PSScriptRoot, 'shared.psm1'))
 
-Describe 'Get-PSTreeRegistry' {
+if (!$isWin) {
+    return
+}
+
+Describe 'Get-PSTreeRegistry.Windows' {
     Context 'Basic Functionality' {
         It 'Returns registry keys and registry values from a valid path' {
             Get-PSTreeRegistry HKCU:\ |
