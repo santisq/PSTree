@@ -21,16 +21,16 @@ internal static class TreeExtensions
             .ToString();
     }
 
-    internal static PSTreeFileSystemInfo[] Format(
-        this PSTreeFileSystemInfo[] tree,
+    internal static TreeFileSystemInfo[] Format(
+        this TreeFileSystemInfo[] tree,
         Dictionary<string, int> itemCounts)
     {
         int index;
         for (int i = 0; i < tree.Length; i++)
         {
-            PSTreeFileSystemInfo current = tree[i];
+            TreeFileSystemInfo current = tree[i];
 
-            if (current is PSTreeDirectory directory &&
+            if (current is TreeDirectory directory &&
                 itemCounts.TryGetValue(directory.FullName, out int count))
             {
                 directory.IndexCount(count);
@@ -64,13 +64,13 @@ internal static class TreeExtensions
         return tree;
     }
 
-    internal static PSTreeRegistryBase[] Format(
-        this PSTreeRegistryBase[] tree)
+    internal static TreeRegistryBase[] Format(
+        this TreeRegistryBase[] tree)
     {
         int index;
         for (int i = 0; i < tree.Length; i++)
         {
-            PSTreeRegistryBase current = tree[i];
+            TreeRegistryBase current = tree[i];
 
             if ((index = current.Hierarchy.IndexOf('└')) == -1)
             {
@@ -107,14 +107,19 @@ internal static class TreeExtensions
         return new string(chars);
     }
 
-    internal static (PSTreeRegistryKey, RegistryKey) CreateTreeKey(
+    internal static (TreeRegistryKey, RegistryKey) CreateTreeKey(
         this RegistryKey key, string name) =>
-        (new PSTreeRegistryKey(key, name, key.Name), key);
+        (new TreeRegistryKey(key, name, key.Name), key);
 
-    internal static (PSTreeRegistryKey, RegistryKey) CreateTreeKey(
+    internal static (TreeRegistryKey, RegistryKey) CreateTreeKey(
         this RegistryKey key, string name, string source, int depth) =>
-        (new PSTreeRegistryKey(key, name, source, depth), key);
+        (new TreeRegistryKey(key, name, source, depth), key);
 
-    internal static void Deconstruct(this string[] strings, out string @base, out string subKey) =>
-        (@base, subKey) = (strings[0], strings[1]);
+    internal static void Deconstruct(
+        this string[] strings,
+        out string @base,
+        out string? subKey)
+    {
+        (@base, subKey) = (strings[0], strings.Length == 1 ? null : strings[1]);
+    }
 }

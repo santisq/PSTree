@@ -1,6 +1,6 @@
 namespace PSTree;
 
-public abstract class PSTreeBase(string hierarchy, string source)
+public abstract class TreeBase(string hierarchy, string source)
 {
     public string Hierarchy { get; internal set; } = hierarchy;
 

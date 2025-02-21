@@ -9,13 +9,13 @@ using PSTree.Extensions;
 namespace PSTree.Commands;
 
 [Cmdlet(VerbsCommon.Get, "PSTreeRegistry", DefaultParameterSetName = PathSet)]
-[OutputType(typeof(PSTreeRegistryKey), typeof(PSTreeRegistryValue))]
+[OutputType(typeof(TreeRegistryKey), typeof(TreeRegistryValue))]
 [Alias("pstreereg")]
 public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 {
-    private readonly Cache<PSTreeRegistryBase, PSTreeRegistryValue> _cache = new();
+    private readonly Cache<TreeRegistryBase, TreeRegistryValue> _cache = new();
 
-    private readonly Stack<(PSTreeRegistryKey, RegistryKey)> _stack = [];
+    private readonly Stack<(TreeRegistryKey, RegistryKey)> _stack = [];
 
     [Parameter]
     [ValidateRange(0, int.MaxValue)]
@@ -54,7 +54,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 
     private bool TryGetKey(string path, [NotNullWhen(true)] out RegistryKey? key)
     {
-        (string @base, string subkey) = path.Split(['\\'], 2);
+        (string @base, string? subkey) = path.Split(['\\'], 2);
         key = default;
 
         if (!RegistryMappings.TryGetKey(@base, out RegistryKey? value))
@@ -85,7 +85,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
         return true;
     }
 
-    private PSTreeBase[] Traverse(RegistryKey key)
+    private TreeBase[] Traverse(RegistryKey key)
     {
         _cache.Clear();
         _stack.Push(key.CreateTreeKey(System.IO.Path.GetFileName(key.Name)));
@@ -93,7 +93,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 
         while (_stack.Count > 0)
         {
-            (PSTreeRegistryKey tree, key) = _stack.Pop();
+            (TreeRegistryKey tree, key) = _stack.Pop();
             int depth = tree.Depth + 1;
 
             using (key)
@@ -107,7 +107,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
                             continue;
                         }
 
-                        _cache.Add(new PSTreeRegistryValue(key, value, source, depth));
+                        _cache.Add(new TreeRegistryValue(key, value, source, depth));
                     }
 
                     PushSubKeys(key, source, depth);

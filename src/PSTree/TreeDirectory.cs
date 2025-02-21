@@ -6,7 +6,7 @@ using PSTree.Style;
 
 namespace PSTree;
 
-public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
+public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
 {
     public DirectoryInfo? Parent => Instance.Parent;
 
@@ -14,12 +14,12 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 
     public int TotalItemCount { get; internal set; }
 
-    private PSTreeDirectory(
+    private TreeDirectory(
         DirectoryInfo dir, string hierarchy, string source, int depth)
         : base(dir, hierarchy, source, depth)
     { }
 
-    private PSTreeDirectory(
+    private TreeDirectory(
         DirectoryInfo dir, string hierarchy, string source)
         : base(dir, hierarchy, source)
     {
@@ -41,22 +41,22 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
             .OrderBy(static e => e is DirectoryInfo)
             .ThenBy(static e => e, comparer);
 
-    internal static PSTreeDirectory Create(string path) =>
+    internal static TreeDirectory Create(string path) =>
         Create(new DirectoryInfo(path), path);
 
-    internal static PSTreeDirectory Create(DirectoryInfo dir, string source)
+    internal static TreeDirectory Create(DirectoryInfo dir, string source)
     {
         string styled = TreeStyle.Instance.GetColoredName(dir);
-        return new PSTreeDirectory(dir, styled, source);
+        return new TreeDirectory(dir, styled, source);
     }
 
-    internal static PSTreeDirectory Create(DirectoryInfo dir, string source, int depth)
+    internal static TreeDirectory Create(DirectoryInfo dir, string source, int depth)
     {
         string styled = TreeStyle.Instance.GetColoredName(dir).Indent(depth);
-        return new PSTreeDirectory(dir, styled, source, depth);
+        return new TreeDirectory(dir, styled, source, depth);
     }
 
-    internal PSTreeDirectory AddParent(PSTreeDirectory parent)
+    internal TreeDirectory AddParent(TreeDirectory parent)
     {
         ParentNode = parent;
         return this;
@@ -67,7 +67,7 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
         ItemCount = count;
         TotalItemCount = count;
 
-        for (PSTreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
+        for (TreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
         {
             i.TotalItemCount += count;
         }
@@ -75,7 +75,7 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
 
     internal void IndexLength(long length)
     {
-        for (PSTreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
+        for (TreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
         {
             i.Length += length;
         }
@@ -85,7 +85,7 @@ public sealed class PSTreeDirectory : PSTreeFileSystemInfo<DirectoryInfo>
     {
         ShouldInclude = true;
 
-        for (PSTreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
+        for (TreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
         {
             if (i.ShouldInclude)
             {

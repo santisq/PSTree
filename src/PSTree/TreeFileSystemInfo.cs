@@ -1,9 +1,9 @@
 namespace PSTree;
 
-public abstract class PSTreeFileSystemInfo(string hierarchy, string source)
-    : PSTreeBase(hierarchy, source)
+public abstract class TreeFileSystemInfo(string hierarchy, string source)
+    : TreeBase(hierarchy, source)
 {
-    internal PSTreeDirectory? ParentNode { get; set; }
+    internal TreeDirectory? ParentNode { get; set; }
 
     internal bool ShouldInclude { get; set; }
 

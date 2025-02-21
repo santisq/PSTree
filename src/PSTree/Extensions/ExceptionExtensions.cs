@@ -11,7 +11,7 @@ internal static class ExceptionExtensions
 
     internal static ErrorRecord ToInvalidPathError(this string path) =>
         new(
-            new Exception(
+            new ItemNotFoundException(
                 $"Cannot find path '{path}' because it does not exist."),
             "InvalidPath", ErrorCategory.InvalidArgument, path);
 
@@ -27,7 +27,7 @@ internal static class ExceptionExtensions
     internal static ErrorRecord ToResolvePathError(this Exception exception, string path) =>
         new(exception, "ResolvePath", ErrorCategory.NotSpecified, path);
 
-    internal static ErrorRecord ToEnumerationError(this Exception exception, PSTreeFileSystemInfo item) =>
+    internal static ErrorRecord ToEnumerationError(this Exception exception, TreeFileSystemInfo item) =>
         new(exception, "EnumerationFailure", ErrorCategory.NotSpecified, item);
 
     internal static void ThrowInvalidSequence(this string vt) =>

@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>PSTree</AssemblyName>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
     <NoWarn>CA1416</NoWarn>
   </PropertyGroup>
 

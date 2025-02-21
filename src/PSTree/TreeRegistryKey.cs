@@ -1,10 +1,9 @@
-using System.ComponentModel.Design;
 using Microsoft.Win32;
 using PSTree.Extensions;
 
 namespace PSTree;
 
-public sealed class PSTreeRegistryKey : PSTreeRegistryBase
+public sealed class TreeRegistryKey : TreeRegistryBase
 {
     public string Kind { get; } = "RegistryKey";
 
@@ -14,7 +13,7 @@ public sealed class PSTreeRegistryKey : PSTreeRegistryBase
 
     public RegistryView View { get; }
 
-    internal PSTreeRegistryKey(
+    internal TreeRegistryKey(
         RegistryKey key, string name, string source, int depth) :
         base(name.Indent(depth), source, key.Name)
     {
@@ -24,7 +23,7 @@ public sealed class PSTreeRegistryKey : PSTreeRegistryBase
         View = key.View;
     }
 
-    internal PSTreeRegistryKey(
+    internal TreeRegistryKey(
         RegistryKey key, string name, string source) :
         base(name, source, key.Name)
     {

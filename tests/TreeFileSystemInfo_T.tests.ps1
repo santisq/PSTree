@@ -6,7 +6,7 @@ $manifestPath = [IO.Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
 Import-Module $manifestPath
 Import-Module ([System.IO.Path]::Combine($PSScriptRoot, 'shared.psm1'))
 
-Describe 'PSTreeFileSystemInfo<T>' {
+Describe 'TreeFileSystemInfo<T>' {
     BeforeAll {
         $standardProperties = @(
             'Name'
@@ -27,17 +27,17 @@ Describe 'PSTreeFileSystemInfo<T>' {
     It 'Can determine if an instance is a Directory or File with its .HasFlag() method' {
         $testPath | Get-PSTree | ForEach-Object {
             if ($_.HasFlag([System.IO.FileAttributes]::Directory)) {
-                $_ | Should -BeOfType ([PSTree.PSTreeDirectory])
+                $_ | Should -BeOfType ([PSTree.TreeDirectory])
                 return
             }
 
-            $_ | Should -BeOfType ([PSTree.PSTreeFile])
+            $_ | Should -BeOfType ([PSTree.TreeFile])
         }
     }
 
     It 'Shares same properties as FileSystemInfo' {
         $instance = $testPath | Get-PSTree |
-            Where-Object { $_ -is [PSTree.PSTreeFile] } |
+            Where-Object { $_ -is [PSTree.TreeFile] } |
             Select-Object -First 1
 
         $instance | Should -HaveCount 1
