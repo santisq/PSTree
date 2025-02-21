@@ -85,15 +85,15 @@ Describe 'Get-PSTree' {
             Get-PSTree | Should -Not -BeNullOrEmpty
     }
 
-    It 'Outputs PSTreeFile and PSTreeDirectory Instances' {
+    It 'Outputs TreeFile and TreeDirectory Instances' {
         Get-PSTree -LiteralPath $testPath |
             ForEach-Object GetType |
-            Should -BeIn ([PSTree.PSTreeFile], [PSTree.PSTreeDirectory])
+            Should -BeIn ([PSTree.TreeFile], [PSTree.TreeDirectory])
     }
 
-    It 'Excludes PSTreeFile instances with -Directory' {
+    It 'Excludes TreeFile instances with -Directory' {
         Get-PSTree -LiteralPath $testPath -Directory |
-            Should -BeOfType ([PSTree.PSTreeDirectory])
+            Should -BeOfType ([PSTree.TreeDirectory])
     }
 
     It 'Controls recursion with -Depth parameter' {
@@ -125,7 +125,7 @@ Describe 'Get-PSTree' {
             [System.Linq.Enumerable]::Any(
                 [string[]] $include,
                 [System.Func[string, bool]] {
-                    $_.FullName -like $args[0] -or $_ -is [PSTree.PSTreeDirectory]
+                    $_.FullName -like $args[0] -or $_ -is [PSTree.TreeDirectory]
                 }
             )
         } | Should -BeTrue

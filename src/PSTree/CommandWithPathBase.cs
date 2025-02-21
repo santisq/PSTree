@@ -18,7 +18,7 @@ public abstract class CommandWithPathBase : PSCmdlet
 
     protected bool IsLiteral
     {
-        get => MyInvocation.BoundParameters.ContainsKey("LiteralPath");
+        get => MyInvocation.BoundParameters.ContainsKey(nameof(LiteralPath));
     }
 
     [Parameter(
@@ -44,7 +44,7 @@ public abstract class CommandWithPathBase : PSCmdlet
         set => _paths = value;
     }
 
-    protected IEnumerable<string> EnumerateResolvedPaths()
+    protected IEnumerable<(ProviderInfo, string)> EnumerateResolvedPaths()
     {
         Collection<string> resolvedPaths;
         ProviderInfo provider;
@@ -58,19 +58,7 @@ public abstract class CommandWithPathBase : PSCmdlet
                     provider: out provider,
                     drive: out _);
 
-                if (!provider.IsFileSystem())
-                {
-                    WriteError(provider.ToInvalidProviderError(resolved));
-                    continue;
-                }
-
-                if (!resolved.Exists())
-                {
-                    WriteError(resolved.ToInvalidPathError());
-                    continue;
-                }
-
-                yield return resolved;
+                yield return (provider, resolved);
                 continue;
             }
 
@@ -86,13 +74,7 @@ public abstract class CommandWithPathBase : PSCmdlet
 
             foreach (string resolved in resolvedPaths)
             {
-                if (!provider.IsFileSystem())
-                {
-                    WriteError(provider.ToInvalidProviderError(resolved));
-                    continue;
-                }
-
-                yield return resolved;
+                yield return (provider, resolved);
             }
         }
     }

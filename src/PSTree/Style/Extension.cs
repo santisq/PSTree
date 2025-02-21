@@ -71,7 +71,7 @@ public sealed class Extension
         return builder.ToString();
     }
 
-    private string ValidateExtension(string extension)
+    private static string ValidateExtension(string extension)
     {
         if (!extension.StartsWith("."))
         {
@@ -81,7 +81,7 @@ public sealed class Extension
         return extension;
     }
 
-    public bool TryGetValue(string extension, out string vt) => _extension.TryGetValue(extension, out vt);
+    public bool TryGetValue(string extension, out string? vt) => _extension.TryGetValue(extension, out vt);
 
     public bool ContainsKey(string extension) => _extension.ContainsKey(extension);
 

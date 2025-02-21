@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Management.Automation;
+using Microsoft.PowerShell.Commands;
 using PSTree.Extensions;
 
 namespace PSTree.Commands;
 
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = PathSet)]
-[OutputType(typeof(PSTreeDirectory), typeof(PSTreeFile))]
+[OutputType(typeof(TreeDirectory), typeof(TreeFile))]
 [Alias("pstree")]
 public sealed class GetPSTreeCommand : CommandWithPathBase
 {
@@ -20,9 +21,9 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     private WildcardPattern[]? _includePatterns;
 
-    private readonly Stack<PSTreeDirectory> _stack = new();
+    private readonly Stack<TreeDirectory> _stack = new();
 
-    private readonly Cache _cache = new();
+    private readonly Cache<TreeFileSystemInfo, TreeFile> _cache = new();
 
     private readonly TreeComparer _comparer = new();
 
@@ -54,7 +55,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     protected override void BeginProcessing()
     {
-        if (Recurse && !MyInvocation.BoundParameters.ContainsKey("Depth"))
+        if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
         {
             Depth = int.MaxValue;
         }
@@ -78,26 +79,38 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     protected override void ProcessRecord()
     {
-        foreach (string path in EnumerateResolvedPaths())
+        foreach ((ProviderInfo provider, string path) in EnumerateResolvedPaths())
         {
+            if (provider.ImplementingType != typeof(FileSystemProvider))
+            {
+                WriteError(provider.ToInvalidProviderError(path));
+                continue;
+            }
+
             if (File.Exists(path))
             {
                 FileInfo file = new(path);
                 if (!ShouldExclude(file) && ShouldInclude(file))
                 {
-                    WriteObject(PSTreeFile.Create(file, path));
+                    WriteObject(TreeFile.Create(file, path));
                 }
 
                 continue;
             }
 
+            if (!System.IO.Directory.Exists(path))
+            {
+                WriteError(path.ToInvalidPathError());
+                continue;
+            }
+
             WriteObject(
-                Traverse(PSTreeDirectory.Create(path)),
+                Traverse(TreeDirectory.Create(path)),
                 enumerateCollection: true);
         }
     }
 
-    private PSTreeFileSystemInfo[] Traverse(PSTreeDirectory directory)
+    private TreeFileSystemInfo[] Traverse(TreeDirectory directory)
     {
         _cache.Clear();
         _stack.Push(directory);
@@ -105,7 +118,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
         while (_stack.Count > 0)
         {
-            PSTreeDirectory next = _stack.Pop();
+            TreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
             long totalLength = 0;
 
@@ -114,7 +127,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                 bool keepProcessing = level <= Depth;
                 foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
                 {
-                    if (!Force && item.IsHidden() || ShouldExclude(item))
+                    if (!Force && IsHidden(item) || ShouldExclude(item))
                     {
                         continue;
                     }
@@ -141,7 +154,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
                         if (keepProcessing)
                         {
-                            PSTreeFile file = PSTreeFile
+                            TreeFile file = TreeFile
                                 .Create(fileInfo, source, level)
                                 .AddParent(next)
                                 .SetIncludeFlagIf(_withInclude);
@@ -157,7 +170,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                         continue;
                     }
 
-                    PSTreeDirectory dir = PSTreeDirectory
+                    TreeDirectory dir = TreeDirectory
                         .Create((DirectoryInfo)item, source, level)
                         .AddParent(next);
 
@@ -193,8 +206,11 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
             }
         }
 
-        return _cache.GetTree(_withInclude && !Directory);
+        return GetTree(_withInclude && !Directory);
     }
+
+    private static bool IsHidden(FileSystemInfo item) =>
+        item.Attributes.HasFlag(FileAttributes.Hidden);
 
     private static bool MatchAny(string name, WildcardPattern[] patterns)
     {
@@ -214,4 +230,35 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     private bool ShouldExclude(FileSystemInfo item) =>
         _withExclude && MatchAny(item.Name, _excludePatterns!);
+
+    private TreeFileSystemInfo[] GetTree(bool condition)
+    {
+        TreeFileSystemInfo[] result = condition
+            ? [.. _cache.Items.Where(static e => e.ShouldInclude)]
+            : [.. _cache.Items];
+
+        return result.Format(GetItemCount(result));
+    }
+
+    private static Dictionary<string, int> GetItemCount(TreeFileSystemInfo[] items)
+    {
+        Dictionary<string, int> counts = [];
+        foreach (TreeFileSystemInfo item in items)
+        {
+            string? path = item.ParentNode?.FullName;
+            if (path is null)
+            {
+                continue;
+            }
+
+            if (!counts.ContainsKey(path))
+            {
+                counts[path] = 0;
+            }
+
+            counts[path]++;
+        }
+
+        return counts;
+    }
 }

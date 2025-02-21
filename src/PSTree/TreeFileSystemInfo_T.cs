@@ -5,7 +5,7 @@ using Microsoft.PowerShell.Commands;
 
 namespace PSTree;
 
-public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
+public abstract class TreeFileSystemInfo<T> : TreeFileSystemInfo
     where T : FileSystemInfo
 {
     private PSObject? _pso;
@@ -36,7 +36,7 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
 
     public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
 
-    private protected PSTreeFileSystemInfo(
+    private protected TreeFileSystemInfo(
         T fileSystemInfo, string hierarchy, string source, int depth)
         : base(hierarchy, source)
     {
@@ -44,7 +44,7 @@ public abstract class PSTreeFileSystemInfo<T> : PSTreeFileSystemInfo
         Depth = depth;
     }
 
-    private protected PSTreeFileSystemInfo(
+    private protected TreeFileSystemInfo(
         T fileSystemInfo, string hierarchy, string source)
         : base(hierarchy, source)
     {

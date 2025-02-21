@@ -3,6 +3,8 @@ using System.IO;
 
 namespace PSTree;
 
+#pragma warning disable CS8767
+
 internal sealed class TreeComparer : IComparer<FileSystemInfo>
 {
     public int Compare(FileSystemInfo x, FileSystemInfo y) =>

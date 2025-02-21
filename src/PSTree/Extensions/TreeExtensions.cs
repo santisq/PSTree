@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Win32;
 
 namespace PSTree.Extensions;
 
@@ -20,20 +21,56 @@ internal static class TreeExtensions
             .ToString();
     }
 
-    internal static PSTreeFileSystemInfo[] Format(
-        this PSTreeFileSystemInfo[] tree,
+    internal static TreeFileSystemInfo[] Format(
+        this TreeFileSystemInfo[] tree,
         Dictionary<string, int> itemCounts)
     {
         int index;
         for (int i = 0; i < tree.Length; i++)
         {
-            PSTreeFileSystemInfo current = tree[i];
+            TreeFileSystemInfo current = tree[i];
 
-            if (current is PSTreeDirectory directory &&
+            if (current is TreeDirectory directory &&
                 itemCounts.TryGetValue(directory.FullName, out int count))
             {
                 directory.IndexCount(count);
             }
+
+            if ((index = current.Hierarchy.IndexOf('└')) == -1)
+            {
+                continue;
+            }
+
+            for (int z = i - 1; z >= 0; z--)
+            {
+                current = tree[z];
+                string hierarchy = current.Hierarchy;
+
+                if (char.IsWhiteSpace(hierarchy[index]))
+                {
+                    current.Hierarchy = hierarchy.ReplaceAt(index, '│');
+                    continue;
+                }
+
+                if (hierarchy[index] == '└')
+                {
+                    current.Hierarchy = hierarchy.ReplaceAt(index, '├');
+                }
+
+                break;
+            }
+        }
+
+        return tree;
+    }
+
+    internal static TreeRegistryBase[] Format(
+        this TreeRegistryBase[] tree)
+    {
+        int index;
+        for (int i = 0; i < tree.Length; i++)
+        {
+            TreeRegistryBase current = tree[i];
 
             if ((index = current.Hierarchy.IndexOf('└')) == -1)
             {
@@ -68,5 +105,21 @@ internal static class TreeExtensions
         char[] chars = input.ToCharArray();
         chars[index] = newChar;
         return new string(chars);
+    }
+
+    internal static (TreeRegistryKey, RegistryKey) CreateTreeKey(
+        this RegistryKey key, string name) =>
+        (new TreeRegistryKey(key, name, key.Name), key);
+
+    internal static (TreeRegistryKey, RegistryKey) CreateTreeKey(
+        this RegistryKey key, string name, string source, int depth) =>
+        (new TreeRegistryKey(key, name, source, depth), key);
+
+    internal static void Deconstruct(
+        this string[] strings,
+        out string @base,
+        out string? subKey)
+    {
+        (@base, subKey) = (strings[0], strings.Length == 1 ? null : strings[1]);
     }
 }

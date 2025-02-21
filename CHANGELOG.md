@@ -1,5 +1,9 @@
 # CHANGELOG
 
+- TBD
+  - Base types have been renamed removing the leading `PS` in their name, i.e.: `PSTreeFile` has been renamed to `TreeFile`.
+  - Added command `Get-PSTreeRegistry` to traverse the Registry. This cmdlet is Windows Only.
+
 - __01/19/2025__
   - Big code refactoring, this update improves readability and simplicity.
   - Updates to `-Include` and `-Exclude` parameters, with this update the patterns are evaluated using the

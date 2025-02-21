@@ -22,6 +22,8 @@ public sealed class ProjectInfo
 
     public Pester Pester { get; }
 
+    public Version PowerShellVersion { get; }
+
     public string? AnalyzerPath
     {
         get
@@ -41,8 +43,9 @@ public sealed class ProjectInfo
 
     private string? _analyzerPath;
 
-    private ProjectInfo(string path)
+    private ProjectInfo(string path, Version psVersion)
     {
+        PowerShellVersion = psVersion;
         Root = AssertDirectory(path);
 
         Module = new Module(
@@ -60,12 +63,14 @@ public sealed class ProjectInfo
 
     public static ProjectInfo Create(
         string path,
-        Configuration configuration)
+        Configuration configuration,
+        Version psVersion)
     {
-        ProjectInfo builder = new(path)
+        ProjectInfo builder = new(path, psVersion)
         {
             Configuration = configuration
         };
+
         builder.Module.Manifest = GetManifest(builder);
         builder.Module.Version = GetManifestVersion(builder);
         builder.Project.Release = GetReleasePath(
@@ -167,14 +172,18 @@ public sealed class ProjectInfo
     private static Version? GetManifestVersion(ProjectInfo builder)
     {
         using PowerShell powershell = PowerShell.Create(RunspaceMode.CurrentRunspace);
-        Hashtable? moduleInfo = powershell
-            .AddCommand("Import-PowerShellDataFile")
-            .AddArgument(builder.Module.Manifest?.FullName)
-            .Invoke<Hashtable>()
+        PSModuleInfo? moduleInfo = powershell
+            .AddCommand("Test-ModuleManifest")
+            .AddParameters(new Dictionary<string, object?>()
+            {
+                ["Path"] = builder.Module.Manifest?.FullName,
+                ["ErrorAction"] = "Ignore"
+            })
+            .Invoke<PSModuleInfo>()
             .FirstOrDefault();
 
-        return powershell.HadErrors
+        return powershell.Streams.Error is { Count: > 0 }
             ? throw powershell.Streams.Error.First().Exception
-            : LanguagePrimitives.ConvertTo<Version>(moduleInfo?["ModuleVersion"]);
+            : moduleInfo.Version;
     }
 }

@@ -66,7 +66,7 @@ public sealed class Pester
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            arguments.AddRange([ "-ExecutionPolicy", "Bypass" ]);
+            arguments.AddRange(["-ExecutionPolicy", "Bypass"]);
         }
 
         arguments.AddRange([
@@ -99,12 +99,12 @@ public sealed class Pester
 
         if (File.Exists(unitCoveragePath))
         {
-            arguments.AddRange([ "--merge-with", unitCoveragePath ]);
+            arguments.AddRange(["--merge-with", unitCoveragePath]);
         }
 
-        if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") is "true")
+        if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") == "true")
         {
-            arguments.AddRange([ "--source-mapping-file", sourceMappingFile ]);
+            arguments.AddRange(["--source-mapping-file", sourceMappingFile]);
             File.WriteAllText(
                 sourceMappingFile,
                 $"|{_info.Root.FullName}{Path.DirectorySeparatorChar}=/_/");

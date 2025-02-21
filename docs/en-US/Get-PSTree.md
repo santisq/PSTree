@@ -292,6 +292,6 @@ You can pipe a string that contains a path to this cmdlet. Output from `Get-Item
 
 ## OUTPUTS
 
-### PSTreeDirectory
+### TreeDirectory
 
-### PSTreeFile
+### TreeFile

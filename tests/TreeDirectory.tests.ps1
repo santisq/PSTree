@@ -6,7 +6,7 @@ $manifestPath = [IO.Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
 Import-Module $manifestPath
 Import-Module ([System.IO.Path]::Combine($PSScriptRoot, 'shared.psm1'))
 
-Describe 'PSTreeDirectory' {
+Describe 'TreeDirectory' {
     It 'Can enumerate Files with .EnumerateFiles()' {
         ($testPath | Get-PSTree -Depth 0).EnumerateFiles() |
             Should -BeOfType ([System.IO.FileInfo])
@@ -23,7 +23,7 @@ Describe 'PSTreeDirectory' {
             Should -BeIn ([System.IO.FileInfo], [System.IO.DirectoryInfo])
     }
 
-    It '.Parent property gets the PSTreeDirectory Parent DirectoryInfo instance' {
+    It '.Parent property gets the TreeDirectory Parent DirectoryInfo instance' {
         (Get-PSTree $testPath -Depth 0).Parent | Should -BeOfType ([System.IO.DirectoryInfo])
     }
 

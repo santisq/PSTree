@@ -38,7 +38,7 @@ if (-not ('ProjectBuilder.ProjectInfo' -as [type])) {
     }
 }
 
-$projectInfo = [ProjectBuilder.ProjectInfo]::Create($PSScriptRoot, $Configuration)
+$projectInfo = [ProjectBuilder.ProjectInfo]::Create($PSScriptRoot, $Configuration, $PSVersionTable.PSVersion)
 $projectInfo.GetRequirements() | Import-Module -DisableNameChecking -Force
 
 $ErrorActionPreference = $prev
