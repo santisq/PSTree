@@ -45,6 +45,9 @@ Describe 'Get-PSTreeRegistry.Windows' {
         It 'Can throw if non-elevated' {
             { Get-PSTreeRegistry -Path HKLM:\ } |
                 Should -Throw -ExceptionType ([System.Security.SecurityException])
+
+            { Get-PSTreeRegistry HKLM:\SECURITY } |
+                Should -Throw -ExceptionType ([System.Security.SecurityException])
         }
     }
 
@@ -58,11 +61,13 @@ Describe 'Get-PSTreeRegistry.Windows' {
         }
 
         It 'Throws on invalid provider path' {
-            { Get-PSTreeRegistry -Path Function:\Clear-Host } |
+            { Get-PSTreeRegistry -Path Function:\* } |
                 Should -Throw -ExceptionType ([System.ArgumentException])
 
             { Get-PSTreeRegistry -LiteralPath Function:\Clear-Host } |
                 Should -Throw -ExceptionType ([System.ArgumentException])
+
+            Get-PSTreeRegistry -Path Function:\* -EA 0 | Should -BeNullOrEmpty
         }
 
         It 'Accepts pipeline input' {
