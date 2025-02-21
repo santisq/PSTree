@@ -6,9 +6,9 @@ namespace PSTree;
 
 public sealed class TreeFile : TreeFileSystemInfo<FileInfo>
 {
-    public DirectoryInfo? Directory => Instance?.Directory;
+    public DirectoryInfo? Directory => Instance.Directory;
 
-    public string? DirectoryName => Instance?.DirectoryName;
+    public string? DirectoryName => Instance.DirectoryName;
 
     private TreeFile(
         FileInfo file, string hierarchy, string source)

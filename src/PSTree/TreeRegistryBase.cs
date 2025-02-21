@@ -28,14 +28,7 @@ public abstract class TreeRegistryBase(
     private static string? GetPSPath(string? path) =>
         string.IsNullOrEmpty(path) ? null : $"{_providerPath}{path}";
 
-    private static string? GetPSParentPath(string? path)
-    {
-        if (string.IsNullOrEmpty(path))
-        {
-            return null;
-        }
-
-        path = System.IO.Path.GetDirectoryName(path);
-        return string.IsNullOrEmpty(path) ? null : $"{_providerPath}{path}";
-    }
+    private static string? GetPSParentPath(string? path) =>
+        string.IsNullOrEmpty(path = System.IO.Path.GetDirectoryName(path))
+            ? null : $"{_providerPath}{path}";
 }

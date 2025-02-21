@@ -7,6 +7,12 @@ Import-Module $manifestPath
 Import-Module ([System.IO.Path]::Combine($PSScriptRoot, 'shared.psm1'))
 
 if (!$isWin) {
+    Describe 'Get-PSTreeRegistry.NonWindows' {
+        It 'Should throw a PlatformNotSupportedException on Non-Windows Platforms' {
+            { Get-PSTreeRegistry HKCU:\ } | Should -Throw -ExceptionType ([System.PlatformNotSupportedException])
+        }
+    }
+
     return
 }
 
@@ -20,6 +26,11 @@ Describe 'Get-PSTreeRegistry.Windows' {
 
         It 'Returns a single Key when Depth is 0' {
             Get-PSTreeRegistry -Path HKCU:\ -Depth 0 |
+                Should -HaveCount 1
+        }
+
+        It 'Ignores -Recurse if -Depth is used' {
+            Get-PSTreeRegistry -Path HKCU:\ -Depth 0 -Recurse |
                 Should -HaveCount 1
         }
 

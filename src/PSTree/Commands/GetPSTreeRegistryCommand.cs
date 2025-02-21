@@ -30,7 +30,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
     protected override void BeginProcessing()
     {
         this.ThrowIfNotSupportedPlatform();
-        if (Recurse.IsPresent && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
+        if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
         {
             Depth = int.MaxValue;
         }
