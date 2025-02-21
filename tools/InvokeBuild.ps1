@@ -19,6 +19,10 @@ task BuildManaged {
 
     try {
         foreach ($framework in $ProjectInfo.Project.TargetFrameworks) {
+            if ($framework -match '^net4' -and -not $IsWindows) {
+                continue
+            }
+
             Write-Host "Compiling for $framework"
             dotnet @arguments --framework $framework
 
