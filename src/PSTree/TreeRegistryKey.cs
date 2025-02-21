@@ -1,13 +1,14 @@
-#if !WINDOWS
-using System.Diagnostics.CodeAnalysis;
-    [ExcludeFromCodeCoverage]
-#endif
-
 using Microsoft.Win32;
 using PSTree.Extensions;
+#if !WINDOWS
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace PSTree;
 
+#if !WINDOWS
+    [ExcludeFromCodeCoverage]
+#endif
 public sealed class TreeRegistryKey : TreeRegistryBase
 {
     public string Kind { get; } = "RegistryKey";

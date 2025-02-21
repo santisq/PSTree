@@ -1,10 +1,12 @@
 #if !WINDOWS
 using System.Diagnostics.CodeAnalysis;
-    [ExcludeFromCodeCoverage]
 #endif
 
 namespace PSTree;
 
+#if !WINDOWS
+[ExcludeFromCodeCoverage]
+#endif
 public abstract class TreeRegistryBase(
     string hierarchy,
     string source,
