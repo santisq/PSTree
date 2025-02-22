@@ -100,7 +100,7 @@ This example uses the registry provider path to explore all keys under `HKEY_USE
 
 ### -Depth
 
-Specifies the maximum depth of the registry traversal. Default value is 3.
+Specifies the maximum depth of the registry traversal. Default value is 3. Use this parameter to control the depth for performance or readability when exploring large registry hives.
 
 ```yaml
 Type: Int32
@@ -132,7 +132,7 @@ Accept wildcard characters: False
 
 ### -LiteralPath
 
-Specifies the literal registry paths to traverse, without wildcard expansion. This parameter is mandatory and accepts input from the pipeline by property name (using the `PSPath` alias). Use this for exact path matching, bypassing wildcard interpretation.  
+Specifies the literal registry paths to traverse, without wildcard expansion. This parameter accepts input from the pipeline by property name (using the `PSPath` alias). Use this for exact path matching, bypassing wildcard interpretation.  
 
 > [!TIP]
 > For registry base keys not mapped as PowerShell drives (e.g., `HKCU:\` and `HKLM:\`), you can use the provider path format by prefixing the path with `Registry::`. For example, to traverse all keys under `HKEY_USERS` exactly as specified, use: `Get-PSTreeRegistry -LiteralPath Registry::HKEY_USERS`.
@@ -151,7 +151,7 @@ Accept wildcard characters: False
 
 ### -Path
 
-Specifies the registry paths to traverse. Accepts one or more registry paths (e.g., `HKLM:\Software`, `HKCU:\Software`), which can include wildcards. This parameter is mandatory and can accept input from the pipeline. Paths are resolved using PowerShell's registry provider.  
+Specifies the registry paths to traverse. Accepts one or more registry paths (e.g., `HKLM:\Software`, `HKCU:\Software`), which can include [wildcard characters](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_wildcards?view=powershell-7.5). This parameter can accept input from the pipeline. Paths are resolved using [PowerShell's registry provider](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_registry_provider?view=powershell-7.5).  
 
 > [!TIP]
 > For registry base keys not mapped as PowerShell drives (e.g., `HKCU:\` and `HKLM:\`), you can use the provider path format by prefixing the path with `Registry::`. For example, to traverse each key under `HKEY_USERS`, use: `Get-PSTreeRegistry -Path Registry::HKEY_USERS\*`.
@@ -163,7 +163,7 @@ Aliases:
 
 Required: False
 Position: 0
-Default value: None
+Default value: $PWD
 Accept pipeline input: True (ByValue)
 Accept wildcard characters: True
 ```
@@ -193,7 +193,7 @@ This cmdlet supports the common parameters. For more information, see [about_Com
 ### System.String
 
 You can pipe strings containing registry paths to this cmdlet.  
-Output from `Get-Item` and `Get-ChildItem` can be piped to this cmdlet.
+Output from cmdlets that return `Microsoft.Win32.RegistryKey` objects (e.g., `Get-Item`, `Get-ChildItem`) can be piped to this cmdlet, with pipeline input bound to `-LiteralPath` if the objects have a `PSPath` property.
 
 ## OUTPUTS
 
@@ -207,7 +207,7 @@ Returns objects of type `TreeRegistryValue` representing registry values associa
 
 ## NOTES
 
-This cmdlet is Windows-only and requires PowerShell 5.1 or later. It may require elevated permissions for certain registry hives.
+This cmdlet is Windows-only and requires PowerShell 5.1 or later. It may require elevated permissions for certain registry hives. For file system navigation, see the [`Get-PSTree`](./Get-PSTree.md) cmdlet.
 
 ## RELATED LINKS
 
@@ -215,7 +215,6 @@ This cmdlet is Windows-only and requires PowerShell 5.1 or later. It may require
 
 [**about_Registry_Provider**](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_registry_provider?view=powershell-7.5)
 
-[**`Get-PSTreeRegistry` Source Code**](../../src/PSTree/Commands/GetPSTreeRegistryCommand.cs)
-
+[**`Get-PSTreeRegistry` Source**](../../src/PSTree/Commands/GetPSTreeRegistryCommand.cs)
 
 [**`Get-PSTreeRegistry` Tests**](../../tests/GetPSTreeRegistryCommand.tests.ps1)
