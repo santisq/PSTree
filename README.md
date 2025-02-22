@@ -222,7 +222,9 @@ RegistryKey      └── Control
 #### Get the value of a `TreeValueKey` item
 
 ```powershell
-PS ..\PSTree> $values = Get-PSTreeRegistry HKCU:\Environment\ -Depth 2 | Where-Object { $_ -is [PSTree.TreeRegistryValue] }
+PS ..\PSTree> $values = Get-PSTreeRegistry HKCU:\Environment\ -Depth 2 |
+    Where-Object { $_ -is [PSTree.TreeRegistryValue] }
+
 PS ..\PSTree> $values
 
    Hive: HKEY_CURRENT_USER\Environment
