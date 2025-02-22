@@ -1,8 +1,10 @@
 # CHANGELOG
 
-- TBD
-  - Base types have been renamed removing the leading `PS` in their name, i.e.: `PSTreeFile` has been renamed to `TreeFile`.
-  - Added command `Get-PSTreeRegistry` to traverse the Registry. This cmdlet is Windows Only.
+# CHANGELOG
+
+- __02/22/2025__
+  - Renamed base types by removing the leading `PS` prefix (e.g., `PSTreeFile` → `TreeFile`, `PSTreeRegistryKey` → `TreeRegistryKey`) to streamline naming and improve consistency.
+  - Added the `Get-PSTreeRegistry` cmdlet, enabling tree-style traversal of the Windows Registry. This Windows-only cmdlet supports parameters like `-Path`, `-LiteralPath`, `-Depth`, `-Force`, and `-KeysOnly` for filtering and controlling output depth. Includes comprehensive Pester tests and documentation updates.
 
 - __01/19/2025__
   - Big code refactoring, this update improves readability and simplicity.

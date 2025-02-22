@@ -9,7 +9,7 @@ schema: 2.0.0
 
 ## SYNOPSIS
 
-{{ Fill in the Synopsis }}
+Retrieves registry keys and values from the Windows Registry in a hierarchical, tree-like format, allowing exploration of registry structures.
 
 ## SYNTAX
 
@@ -37,7 +37,7 @@ Get-PSTreeRegistry
 
 ## DESCRIPTION
 
-{{ Fill in the Description }}
+The `Get-PSTreeRegistry` cmdlet provides a tree-style view of the Windows Registry, displaying registry keys and their associated values in a hierarchical format similar to the `tree` command for file systems. This Windows-only cmdlet is designed for navigating and analyzing registry configurations, making it easier to inspect, troubleshoot, or document registry structures.
 
 ## EXAMPLES
 
@@ -53,7 +53,7 @@ PS C:\> {{ Add example code here }}
 
 ### -Depth
 
-{{ Fill Depth Description }}
+Specifies the maximum depth of the registry traversal.
 
 ```yaml
 Type: Int32
@@ -69,7 +69,7 @@ Accept wildcard characters: False
 
 ### -KeysOnly
 
-{{ Fill KeysOnly Description }}
+Limits output to `TreeRegistryKey` objects only, excluding `TreeRegistryValue` objects. When specified, the cmdlet displays only registry keys and their subkeys, omitting any values associated with those keys.
 
 ```yaml
 Type: SwitchParameter
@@ -85,7 +85,10 @@ Accept wildcard characters: False
 
 ### -LiteralPath
 
-{{ Fill LiteralPath Description }}
+Specifies the literal registry paths to traverse, without wildcard expansion. This parameter is mandatory and accepts input from the pipeline by property name (using the `PSPath` alias). Use this for exact path matching, bypassing wildcard interpretation.  
+
+> [!TIP]
+> For registry base keys not mapped as PowerShell drives (e.g., `HKCU:\` and `HKLM:\`), you can use the provider path format by prefixing the path with `Registry::`. For example, to traverse all keys under `HKEY_USERS` exactly as specified, use: `Get-PSTreeRegistry -LiteralPath Registry::HKEY_USERS`.
 
 ```yaml
 Type: String[]
@@ -101,7 +104,10 @@ Accept wildcard characters: False
 
 ### -Path
 
-{{ Fill Path Description }}
+Specifies the registry paths to traverse. Accepts one or more registry paths (e.g., `HKLM:\Software`, `HKCU:\Software`), which can include wildcards. This parameter is mandatory and can accept input from the pipeline. Paths are resolved using PowerShell's registry provider.  
+
+> [!TIP]
+> For registry base keys not mapped as PowerShell drives (e.g., `HKCU:\` and `HKLM:\`), you can use the provider path format by prefixing the path with `Registry::`. For example, to traverse each key under `HKEY_USERS`, use: `Get-PSTreeRegistry -Path Registry::HKEY_USERS\*`.
 
 ```yaml
 Type: String[]
@@ -131,35 +137,19 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -ProgressAction
-
-{{ Fill ProgressAction Description }}
-
-```yaml
-Type: ActionPreference
-Parameter Sets: (All)
-Aliases: proga
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### CommonParameters
 
 This cmdlet supports the common parameters. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## INPUTS
 
-### System.String[]
+### String
 
 ## OUTPUTS
 
-### PSTree.TreeRegistryKey
+### TreeRegistryKey
 
-### PSTree.TreeRegistryValue
+### TreeRegistryValue
 
 ## NOTES
 
