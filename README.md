@@ -88,7 +88,7 @@ Set-Location ./PSTree
    -a---         67.35 KB │   └── TreeStyle.png
    ```
 
-  #### Excludes items starting with `.[gva]*` and `assetsts`
+  #### Excludes items starting with `.[gva]*` and `assets`
 
    ```powershell
    Get-PSTree -Exclude .[gva]*, assets | Select-Object -First 20
