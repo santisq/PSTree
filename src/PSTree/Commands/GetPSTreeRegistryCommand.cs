@@ -27,6 +27,9 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
     [Parameter]
     public SwitchParameter Recurse { get; set; }
 
+    [Parameter]
+    public SwitchParameter KeysOnly { get; set; }
+
     protected override void BeginProcessing()
     {
         this.ThrowIfNotSupportedPlatform();
@@ -103,6 +106,11 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
             {
                 if (depth <= Depth)
                 {
+                    if (KeysOnly)
+                    {
+                        goto PushKeys;
+                    }
+
                     foreach (string value in key.GetValueNames())
                     {
                         if (string.IsNullOrEmpty(value))
@@ -113,6 +121,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
                         _cache.Add(new TreeRegistryValue(key, value, source, depth));
                     }
 
+                    PushKeys:
                     PushSubKeys(key, source, depth);
                 }
             }

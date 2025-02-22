@@ -34,7 +34,7 @@
     Copyright = '(c) Santiago Squarzon. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description = 'tree like cmdlet for PowerShell'
+    Description = 'tree like cmdlets for PowerShell'
 
     # Minimum version of the PowerShell engine required by this module
     PowerShellVersion = '5.1'
@@ -112,6 +112,8 @@
                 'csharp'
                 'recursion'
                 'tree-structure'
+                'filesystem'
+                'registry'
             )
 
             # A URL to the license for this module.
