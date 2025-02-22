@@ -55,187 +55,187 @@ Set-Location ./PSTree
 
 ## Usage
 
-- ### `Get-PSTree`
+### `Get-PSTree`
 
-  #### Get the current directory tree with default parameters values
+#### Get the current directory tree with default parameters values
 
-   ```powershell
-   PS ..\PSTree> Get-PSTree | Select-Object -First 20
+```powershell
+PS ..\PSTree> Get-PSTree | Select-Object -First 20
 
-      Source: C:\User\Documents\PSTree
+   Source: C:\User\Documents\PSTree
 
-   Mode            Length Hierarchy
-   ----            ------ ---------
-   d----         33.79 KB PSTree
-   -a---          4.75 KB ├── .gitignore
-   -a---        137.00  B ├── .markdownlint.json
-   -a---          1.37 KB ├── build.ps1
-   -a---         18.31 KB ├── CHANGELOG.md
-   -a---          1.07 KB ├── LICENSE
-   -a---          8.16 KB ├── README.md
-   d----          0.00  B ├── .github
-   d----          4.10 KB │   └── workflows
-   -a---          4.10 KB │       └── ci.yml
-   d----          4.18 KB ├── .vscode
-   -a---        275.00  B │   ├── extensions.json
-   -a---          1.39 KB │   ├── launch.json
-   -a---          1.09 KB │   ├── settings.json
-   -a---          1.43 KB │   └── tasks.json
-   d----        229.32 KB ├── assets
-   -a---         10.00 KB │   ├── EscapeSequence.png
-   -a---         78.08 KB │   ├── Example.After.png
-   -a---         73.89 KB │   ├── Example.Before.png
-   -a---         67.35 KB │   └── TreeStyle.png
-   ```
+Mode            Length Hierarchy
+----            ------ ---------
+d----         33.79 KB PSTree
+-a---          4.75 KB ├── .gitignore
+-a---        137.00  B ├── .markdownlint.json
+-a---          1.37 KB ├── build.ps1
+-a---         18.31 KB ├── CHANGELOG.md
+-a---          1.07 KB ├── LICENSE
+-a---          8.16 KB ├── README.md
+d----          0.00  B ├── .github
+d----          4.10 KB │   └── workflows
+-a---          4.10 KB │       └── ci.yml
+d----          4.18 KB ├── .vscode
+-a---        275.00  B │   ├── extensions.json
+-a---          1.39 KB │   ├── launch.json
+-a---          1.09 KB │   ├── settings.json
+-a---          1.43 KB │   └── tasks.json
+d----        229.32 KB ├── assets
+-a---         10.00 KB │   ├── EscapeSequence.png
+-a---         78.08 KB │   ├── Example.After.png
+-a---         73.89 KB │   ├── Example.Before.png
+-a---         67.35 KB │   └── TreeStyle.png
+```
 
-  #### Excludes items starting with `.[gva]*` and `assets`
+#### Excludes items starting with `.[gva]*` and `assets`
 
-   ```powershell
-   Get-PSTree -Exclude .[gva]*, assets | Select-Object -First 20
+```powershell
+Get-PSTree -Exclude .[gva]*, assets | Select-Object -First 20
 
-      Source: C:\User\Documents\PSTree
+   Source: C:\User\Documents\PSTree
 
-   Mode            Length Hierarchy
-   ----            ------ ---------
-   d----         29.04 KB PSTree
-   -a---        137.00  B ├── .markdownlint.json
-   -a---          1.37 KB ├── build.ps1
-   -a---         18.31 KB ├── CHANGELOG.md
-   -a---          1.07 KB ├── LICENSE
-   -a---          8.16 KB ├── README.md
-   d----          0.00  B ├── docs
-   d----         12.57 KB │   └── en-US
-   -a---          4.36 KB │       ├── about_TreeStyle.md
-   -a---          7.39 KB │       ├── Get-PSTree.md
-   -a---        848.00  B │       └── Get-PSTreeStyle.md
-   d----         19.75 KB ├── module
-   -a---         14.74 KB │   ├── PSTree.Format.ps1xml
-   -a---          5.01 KB │   └── PSTree.psd1
-   d----        341.36 KB ├── output
-   -a---         22.70 KB │   ├── PSTree.2.1.11.nupkg
-   -a---         24.21 KB │   ├── PSTree.2.1.12.nupkg
-   -a---         24.22 KB │   ├── PSTree.2.1.13.nupkg
-   -a---         24.42 KB │   ├── PSTree.2.1.14.nupkg
-   -a---         25.07 KB │   ├── PSTree.2.1.15.nupkg
-   ```
+Mode            Length Hierarchy
+----            ------ ---------
+d----         29.04 KB PSTree
+-a---        137.00  B ├── .markdownlint.json
+-a---          1.37 KB ├── build.ps1
+-a---         18.31 KB ├── CHANGELOG.md
+-a---          1.07 KB ├── LICENSE
+-a---          8.16 KB ├── README.md
+d----          0.00  B ├── docs
+d----         12.57 KB │   └── en-US
+-a---          4.36 KB │       ├── about_TreeStyle.md
+-a---          7.39 KB │       ├── Get-PSTree.md
+-a---        848.00  B │       └── Get-PSTreeStyle.md
+d----         19.75 KB ├── module
+-a---         14.74 KB │   ├── PSTree.Format.ps1xml
+-a---          5.01 KB │   └── PSTree.psd1
+d----        341.36 KB ├── output
+-a---         22.70 KB │   ├── PSTree.2.1.11.nupkg
+-a---         24.21 KB │   ├── PSTree.2.1.12.nupkg
+-a---         24.22 KB │   ├── PSTree.2.1.13.nupkg
+-a---         24.42 KB │   ├── PSTree.2.1.14.nupkg
+-a---         25.07 KB │   ├── PSTree.2.1.15.nupkg
+```
 
-  #### Includes `.ps1` and `.cs` files and excludes `tools` folder
+#### Includes `.ps1` and `.cs` files and excludes `tools` folder
 
-   ```powershell
-   PS ..\PSTree> Get-PStree -Include *.ps1, *.cs -Exclude tools
+```powershell
+PS ..\PSTree> Get-PStree -Include *.ps1, *.cs -Exclude tools
 
-      Source: C:\User\Documents\PSTree
+   Source: C:\User\Documents\PSTree
 
-   Mode            Length Hierarchy
-   ----            ------ ---------
-   d----          1.37 KB PSTree
-   -a---          1.37 KB ├── build.ps1
-   d----          0.00  B ├── src
-   d----         12.94 KB │   └── PSTree
-   -a---        621.00  B │       ├── Cache.cs
-   -a---          2.14 KB │       ├── CommandWithPathBase.cs
-   -a---        664.00  B │       ├── RegistryMappings.cs
-   -a---        254.00  B │       ├── TreeBase.cs
-   -a---        438.00  B │       ├── TreeComparer.cs
-   -a---          2.69 KB │       ├── TreeDirectory.cs
-   -a---          1.40 KB │       ├── TreeFile.cs
-   -a---          1.68 KB │       ├── TreeFileSystemInfo_T.cs
-   -a---        401.00  B │       ├── TreeFileSystemInfo.cs
-   -a---        971.00  B │       ├── TreeRegistryBase.cs
-   -a---        957.00  B │       ├── TreeRegistryKey.cs
-   -a---        846.00  B │       └── TreeRegistryValue.cs
-   d----         22.36 KB └── tests
-   -a---        765.00  B     ├── FormattingInternals.tests.ps1
-   -a---          6.14 KB     ├── GetPSTreeCommand.tests.ps1
-   -a---          5.29 KB     ├── GetPSTreeRegistryCommand.tests.ps1
-   -a---          1.77 KB     ├── TreeDirectory.tests.ps1
-   -a---        914.00  B     ├── TreeFile.tests.ps1
-   -a---          2.62 KB     ├── TreeFileSystemInfo_T.tests.ps1
-   -a---          4.90 KB     └── TreeStyle.tests.ps1
-   ```
+Mode            Length Hierarchy
+----            ------ ---------
+d----          1.37 KB PSTree
+-a---          1.37 KB ├── build.ps1
+d----          0.00  B ├── src
+d----         12.94 KB │   └── PSTree
+-a---        621.00  B │       ├── Cache.cs
+-a---          2.14 KB │       ├── CommandWithPathBase.cs
+-a---        664.00  B │       ├── RegistryMappings.cs
+-a---        254.00  B │       ├── TreeBase.cs
+-a---        438.00  B │       ├── TreeComparer.cs
+-a---          2.69 KB │       ├── TreeDirectory.cs
+-a---          1.40 KB │       ├── TreeFile.cs
+-a---          1.68 KB │       ├── TreeFileSystemInfo_T.cs
+-a---        401.00  B │       ├── TreeFileSystemInfo.cs
+-a---        971.00  B │       ├── TreeRegistryBase.cs
+-a---        957.00  B │       ├── TreeRegistryKey.cs
+-a---        846.00  B │       └── TreeRegistryValue.cs
+d----         22.36 KB └── tests
+-a---        765.00  B     ├── FormattingInternals.tests.ps1
+-a---          6.14 KB     ├── GetPSTreeCommand.tests.ps1
+-a---          5.29 KB     ├── GetPSTreeRegistryCommand.tests.ps1
+-a---          1.77 KB     ├── TreeDirectory.tests.ps1
+-a---        914.00  B     ├── TreeFile.tests.ps1
+-a---          2.62 KB     ├── TreeFileSystemInfo_T.tests.ps1
+-a---          4.90 KB     └── TreeStyle.tests.ps1
+```
 
-  #### Get the recursive size of the folders
+#### Get the recursive size of the folders
 
-   ```powershell
-   PS ..\PSTree> Get-PSTree .\src\ -Depth 2 -Directory -RecursiveSize
+```powershell
+PS ..\PSTree> Get-PSTree .\src\ -Depth 2 -Directory -RecursiveSize
 
-      Source: C:\User\Documents\PSTree\src
+   Source: C:\User\Documents\PSTree\src
 
-   Mode            Length Hierarchy
-   ----            ------ ---------
-   d----       1023.80 KB src
-   d----       1023.80 KB └── PSTree
-   d----        648.08 KB     ├── bin
-   d----          7.53 KB     ├── CodeAnalysis
-   d----         12.05 KB     ├── Commands
-   d----          5.77 KB     ├── Extensions
-   d----          1.13 KB     ├── Internal
-   d----        325.42 KB     ├── obj
-   d----          9.31 KB     └── Style
-   ```
+Mode            Length Hierarchy
+----            ------ ---------
+d----       1023.80 KB src
+d----       1023.80 KB └── PSTree
+d----        648.08 KB     ├── bin
+d----          7.53 KB     ├── CodeAnalysis
+d----         12.05 KB     ├── Commands
+d----          5.77 KB     ├── Extensions
+d----          1.13 KB     ├── Internal
+d----        325.42 KB     ├── obj
+d----          9.31 KB     └── Style
+```
 
-- ### `Get-PSTreeRegistry`
+### `Get-PSTreeRegistry`
 
-  #### Get the tree-view of `HKCU:\System`
-  
-   ```powershell
-   PS ..\PSTree> Get-PSTreeRegistry HKCU:\System -Depth 2
+#### Get the tree-view of `HKCU:\System`
 
-      Hive: HKEY_CURRENT_USER\System
+```powershell
+PS ..\PSTree> Get-PSTreeRegistry HKCU:\System -Depth 2
 
-   Kind         Hierarchy
-   ----         ---------
-   RegistryKey  System
-   RegistryKey  ├── GameConfigStore
-   DWord        │   ├── GameDVR_Enabled
-   DWord        │   ├── GameDVR_FSEBehaviorMode
-   Binary       │   ├── Win32_AutoGameModeDefaultProfile
-   Binary       │   ├── Win32_GameModeRelatedProcesses
-   DWord        │   ├── GameDVR_HonorUserFSEBehaviorMode
-   DWord        │   ├── GameDVR_DXGIHonorFSEWindowsCompatible
-   DWord        │   ├── GameDVR_EFSEFeatureFlags
-   RegistryKey  │   ├── Parents
-   RegistryKey  │   └── Children
-   RegistryKey  └── CurrentControlSet
-   RegistryKey      ├── Policies
-   RegistryKey      └── Control
-   ```
+   Hive: HKEY_CURRENT_USER\System
 
-  #### Show only Keys
+Kind         Hierarchy
+----         ---------
+RegistryKey  System
+RegistryKey  ├── GameConfigStore
+DWord        │   ├── GameDVR_Enabled
+DWord        │   ├── GameDVR_FSEBehaviorMode
+Binary       │   ├── Win32_AutoGameModeDefaultProfile
+Binary       │   ├── Win32_GameModeRelatedProcesses
+DWord        │   ├── GameDVR_HonorUserFSEBehaviorMode
+DWord        │   ├── GameDVR_DXGIHonorFSEWindowsCompatible
+DWord        │   ├── GameDVR_EFSEFeatureFlags
+RegistryKey  │   ├── Parents
+RegistryKey  │   └── Children
+RegistryKey  └── CurrentControlSet
+RegistryKey      ├── Policies
+RegistryKey      └── Control
+```
 
-   ```powershell
-   PS ..\PSTree> Get-PSTreeRegistry HKCU:\System -Depth 2 -KeysOnly
+#### Show only Keys
 
-      Hive: HKEY_CURRENT_USER\System
+```powershell
+PS ..\PSTree> Get-PSTreeRegistry HKCU:\System -Depth 2 -KeysOnly
 
-   Kind         Hierarchy
-   ----         ---------
-   RegistryKey  System
-   RegistryKey  ├── GameConfigStore
-   RegistryKey  │   ├── Parents
-   RegistryKey  │   └── Children
-   RegistryKey  └── CurrentControlSet
-   RegistryKey      ├── Policies
-   RegistryKey      └── Control
-   ```
+   Hive: HKEY_CURRENT_USER\System
 
-  #### Get the value of a `TreeValueKey` item
+Kind         Hierarchy
+----         ---------
+RegistryKey  System
+RegistryKey  ├── GameConfigStore
+RegistryKey  │   ├── Parents
+RegistryKey  │   └── Children
+RegistryKey  └── CurrentControlSet
+RegistryKey      ├── Policies
+RegistryKey      └── Control
+```
 
-   ```powershell
-   PS ..\PSTree> $values = Get-PSTreeRegistry HKCU:\Environment\ -Depth 2 | Where-Object { $_ -is [PSTree.TreeRegistryValue] }
-   PS ..\PSTree> $values
+#### Get the value of a `TreeValueKey` item
 
-      Hive: HKEY_CURRENT_USER\Environment
+```powershell
+PS ..\PSTree> $values = Get-PSTreeRegistry HKCU:\Environment\ -Depth 2 | Where-Object { $_ -is [PSTree.TreeRegistryValue] }
+PS ..\PSTree> $values
 
-   Kind         Hierarchy
-   ----         ---------
-   ExpandString ├── Path
-   ExpandString ├── TEMP
-   ExpandString └── TMP
+   Hive: HKEY_CURRENT_USER\Environment
 
-   PS ..\PSTree> $values[1].GetValue()
-   C:\Users\User\AppData\Local\Temp
-   ```
+Kind         Hierarchy
+----         ---------
+ExpandString ├── Path
+ExpandString ├── TEMP
+ExpandString └── TMP
+
+PS ..\PSTree> $values[1].GetValue()
+C:\Users\User\AppData\Local\Temp
+```
 
 ## Changelog
 
