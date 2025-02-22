@@ -35,11 +35,16 @@ Describe 'Get-PSTreeRegistry.Windows' {
         }
 
         It 'Limits recursion with Depth parameter' {
-            $shallow = Get-PSTreeRegistry -Path HKCU:\ -Depth 1
-            $deep = Get-PSTreeRegistry -Path HKCU:\ -Depth 2
-            $deep.Count | Should -BeGreaterThan $shallow.Count
-            $maxDepth = ($deep | Measure-Object -Property Depth -Maximum).Maximum
+            $withDepth = Get-PSTreeRegistry -Path HKCU:\ -Depth 2
+            $deep = Get-PSTreeRegistry -Path HKCU:\ -Recurse
+            $deep.Count | Should -BeGreaterThan $withDepth.Count
+            $maxDepth = ($withDepth | Measure-Object -Property Depth -Maximum).Maximum
             $maxDepth | Should -BeExactly 2
+        }
+
+        It 'Displays only TreeRegistryKey with -KeysOnly' {
+            Get-PSTreeRegistry -Path HKCU:\ -KeysOnly |
+                Should -BeOfType ([PSTree.TreeRegistryKey])
         }
 
         It 'Can throw if non-elevated' {
