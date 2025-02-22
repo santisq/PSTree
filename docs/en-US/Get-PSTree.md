@@ -113,7 +113,7 @@ PS ..\PSTree> Get-ChildItem -Directory | Get-PSTree -Include *.ps1
 
 ### -Depth
 
-Determines the number of subdirectory levels that are included in the recursion.
+Determines the number of subdirectory levels that are included in the recursion. Default value is 3.
 
 ```yaml
 Type: Int32

@@ -41,19 +41,66 @@ The `Get-PSTreeRegistry` cmdlet provides a tree-style view of the Windows Regist
 
 ## EXAMPLES
 
-### Example 1
+### Example 1: Display the `Software` registry hive with full recursion
 
 ```powershell
-PS C:\> {{ Add example code here }}
+PS ..\PSTree> Get-PSTreeRegistry HKLM:\Software -Recurse
 ```
 
-{{ Add example description here }}
+This example retrieves all keys under `HKLM:\Software`, showing the complete hierarchy recursively.
+
+### Example 2: List only registry keys under `HKLM:\Software`, up to 2 levels deep, excluding values
+
+```powershell
+PS ..\PSTree> Get-PSTreeRegistry HKLM:\Software -Depth 2 -KeysOnly
+```
+
+This example restricts output to keys only (no values) and limits the depth to 2 levels for better readability.
+
+### Example 3: Retrieve and Display a Value from a `TreeRegistryValue` Object
+
+```powershell
+PS ..\PSTree> $items = Get-PSTreeRegistry HKCU:\Environment\ -Depth 2
+PS ..\PSTree> $values = $items | Where-Object { $_ -is [PSTree.TreeRegistryValue] }
+PS ..\PSTree> $values
+
+   Hive: HKEY_CURRENT_USER\Environment
+
+Kind         Hierarchy
+----         ---------
+ExpandString ├── Path
+ExpandString ├── TEMP
+ExpandString └── TMP
+
+PS ..\PSTree> $values[1].GetValue()
+C:\Users\User\AppData\Local\Temp
+```
+
+This example demonstrates how to use `Get-PSTreeRegistry` to retrieve registry values, filter for `TreeRegistryValue` objects, and access a specific value using the `.GetValue()` method. It targets the `HKCU:\Environment` hive, limiting depth to 2 levels, and shows how to extract a value like `TEMP`.  
+
+### Example 4: Traverse `HKEY_USERS` Using the Provider Path
+
+```powershell
+PS ..\PSTree> Get-PSTreeRegistry -Path Registry::HKEY_USERS -Depth 1 -EA 0
+
+   Hive: HKEY_USERS
+
+Kind         Hierarchy
+----         ---------
+RegistryKey  HKEY_USERS
+RegistryKey  ├── S-1-5-18
+RegistryKey  ├── S-1-5-21-3616279808-3400134814-4233402850-1002_Classes
+RegistryKey  ├── S-1-5-21-3616279808-3400134814-4233402850-1002
+RegistryKey  └── .DEFAULT
+```
+
+This example uses the registry provider path to explore all keys under `HKEY_USERS`, limited to 1 level deep.  
 
 ## PARAMETERS
 
 ### -Depth
 
-Specifies the maximum depth of the registry traversal.
+Specifies the maximum depth of the registry traversal. Default value is 3.
 
 ```yaml
 Type: Int32
@@ -62,7 +109,7 @@ Aliases:
 
 Required: False
 Position: Named
-Default value: None
+Default value: 3
 Accept pipeline input: False
 Accept wildcard characters: False
 ```
@@ -123,7 +170,7 @@ Accept wildcard characters: True
 
 ### -Recurse
 
-{{ Fill Recurse Description }}
+Enables recursive traversal of all subkeys under the specified registry path. Use this switch to ensure complete hierarchy exploration without depth restrictions.
 
 ```yaml
 Type: SwitchParameter
@@ -143,14 +190,32 @@ This cmdlet supports the common parameters. For more information, see [about_Com
 
 ## INPUTS
 
-### String
+### System.String
+
+You can pipe strings containing registry paths to this cmdlet.  
+Output from `Get-Item` and `Get-ChildItem` can be piped to this cmdlet.
 
 ## OUTPUTS
 
-### TreeRegistryKey
+### PSTree.TreeRegistryKey
 
-### TreeRegistryValue
+Returns objects of type `TreeRegistryKey` representing registry keys in a hierarchical structure. If `-KeysOnly` is specified, only `TreeRegistryKey` objects are returned; otherwise, `TreeRegistryValue` objects may also be included, but the primary output type remains `TreeRegistryKey` for consistency with the tree-like organization.
+
+### PSTree.TreeRegistryValue
+
+Returns objects of type `TreeRegistryValue` representing registry values associated with keys, included in the output unless the `-KeysOnly` parameter is specified. Each object includes properties such as `Name`, `Kind`, and `Depth`, allowing access to value data (e.g., via the `.GetValue()` method). These objects are nested under `TreeRegistryKey` objects in the hierarchical output, providing detailed value information for registry exploration.
 
 ## NOTES
 
+This cmdlet is Windows-only and requires PowerShell 5.1 or later. It may require elevated permissions for certain registry hives.
+
 ## RELATED LINKS
+
+[**Microsoft.Win32 Namespace**](https://learn.microsoft.com/en-us/dotnet/api/microsoft.win32?view=net-9.0)
+
+[**about_Registry_Provider**](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_registry_provider?view=powershell-7.5)
+
+[**`Get-PSTreeRegistry` Source Code**](../../src/PSTree/Commands/GetPSTreeRegistryCommand.cs)
+
+
+[**`Get-PSTreeRegistry` Tests**](../../tests/GetPSTreeRegistryCommand.tests.ps1)
