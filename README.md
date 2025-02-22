@@ -3,7 +3,7 @@
 <div align="center">
    <sub>
 
-   `tree` like cmdlet for PowerShell!
+   `tree` like cmdlets for PowerShell!
    </sub>
 <br/><br/>
 
