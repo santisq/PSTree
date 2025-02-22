@@ -174,6 +174,69 @@ Set-Location ./PSTree
    d----          9.31 KB     └── Style
    ```
 
+- ### `Get-PSTreeRegistry`
+
+  #### Get the tree-view of `HKCU:\System`
+  
+   ```powershell
+   PS ..\PSTree> Get-PSTreeRegistry HKCU:\System -Depth 2
+
+      Hive: HKEY_CURRENT_USER\System
+
+   Kind         Hierarchy
+   ----         ---------
+   RegistryKey  System
+   RegistryKey  ├── GameConfigStore
+   DWord        │   ├── GameDVR_Enabled
+   DWord        │   ├── GameDVR_FSEBehaviorMode
+   Binary       │   ├── Win32_AutoGameModeDefaultProfile
+   Binary       │   ├── Win32_GameModeRelatedProcesses
+   DWord        │   ├── GameDVR_HonorUserFSEBehaviorMode
+   DWord        │   ├── GameDVR_DXGIHonorFSEWindowsCompatible
+   DWord        │   ├── GameDVR_EFSEFeatureFlags
+   RegistryKey  │   ├── Parents
+   RegistryKey  │   └── Children
+   RegistryKey  └── CurrentControlSet
+   RegistryKey      ├── Policies
+   RegistryKey      └── Control
+   ```
+
+  #### Show only Keys
+
+   ```powershell
+   PS ..\PSTree> Get-PSTreeRegistry HKCU:\System -Depth 2 -KeysOnly
+
+      Hive: HKEY_CURRENT_USER\System
+
+   Kind         Hierarchy
+   ----         ---------
+   RegistryKey  System
+   RegistryKey  ├── GameConfigStore
+   RegistryKey  │   ├── Parents
+   RegistryKey  │   └── Children
+   RegistryKey  └── CurrentControlSet
+   RegistryKey      ├── Policies
+   RegistryKey      └── Control
+   ```
+
+  #### Get the value of a `TreeValueKey` item
+
+   ```powershell
+   PS ..\PSTree> $values = Get-PSTreeRegistry HKCU:\Environment\ -Depth 2 | Where-Object { $_ -is [PSTree.TreeRegistryValue] }
+   PS ..\PSTree> $values
+
+      Hive: HKEY_CURRENT_USER\Environment
+
+   Kind         Hierarchy
+   ----         ---------
+   ExpandString ├── Path
+   ExpandString ├── TEMP
+   ExpandString └── TMP
+
+   PS ..\PSTree> $values[1].GetValue()
+   C:\Users\User\AppData\Local\Temp
+   ```
+
 ## Changelog
 
 - [CHANGELOG.md](CHANGELOG.md)
