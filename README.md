@@ -219,12 +219,11 @@ RegistryKey      ├── Policies
 RegistryKey      └── Control
 ```
 
-#### Get the value of a `TreeValueKey` item
+#### Get the value of a `TreeRegistryValue` item
 
 ```powershell
-PS ..\PSTree> $values = Get-PSTreeRegistry HKCU:\Environment\ -Depth 2 |
-    Where-Object { $_ -is [PSTree.TreeRegistryValue] }
-
+PS ..\PSTree> $items = Get-PSTreeRegistry HKCU:\Environment\ -Depth 2
+PS ..\PSTree> $values = $items | Where-Object { $_ -is [PSTree.TreeRegistryValue] }
 PS ..\PSTree> $values
 
    Hive: HKEY_CURRENT_USER\Environment
