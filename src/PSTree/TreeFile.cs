@@ -28,13 +28,13 @@ public sealed class TreeFile : TreeFileSystemInfo<FileInfo>
 
     internal static TreeFile Create(FileInfo file, string source)
     {
-        string styled = TreeStyle.Instance.GetColoredName(file);
+        string styled = TreeStyle.Instance.FileSystem.GetColoredName(file);
         return new TreeFile(file, styled, source);
     }
 
     internal static TreeFile Create(FileInfo file, string source, int depth)
     {
-        string styled = TreeStyle.Instance.GetColoredName(file).Indent(depth);
+        string styled = TreeStyle.Instance.FileSystem.GetColoredName(file).Indent(depth);
         return new TreeFile(file, styled, source, depth);
     }
 

@@ -34,9 +34,23 @@ internal static class ExceptionExtensions
         throw new ArgumentException(
             $"The specified string contains printable content when it should only contain ANSI escape sequences: '{vt}'.");
 
-    internal static void ThrowInvalidExtension(this string extension) =>
+    internal static string ThrowIfInvalidExtension(this string extension)
+    {
+        #if NET6_0_OR_GREATER
+        if (extension.StartsWith('.'))
+        {
+            return extension;
+        }
+        #else
+        if (extension.StartsWith("."))
+        {
+            return extension;
+        }
+        #endif
+
         throw new ArgumentException(
             $"When adding or removing extensions, the extension must start with a period: '{extension}'.");
+    }
 
     internal static ErrorRecord ToSecurityError(this SecurityException exception, string path) =>
         new(exception, "SecurityException", ErrorCategory.OpenError, path);
