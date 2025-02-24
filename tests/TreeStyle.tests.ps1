@@ -13,39 +13,7 @@ Describe 'GetPSTreeStyle Command' {
 Describe 'TreeStyle Type' {
     BeforeAll {
         $style = [PSTree.Style.TreeStyle]::Instance
-        $style, $escape | Out-Null
-
-        $path = Join-Path $TestDrive 'teststyle'
-        '.exe', '.ps1' | New-Item -Path { Join-Path $path "file$_" } -Force | Out-Null
-    }
-
-    It 'Directory property can be set' {
-        $style.Directory | Should -Not -BeNullOrEmpty
-        { $style.Directory = 'Invalid' } | Should -Throw
-        { $style.Directory = $style.Palette.Background.BrightGreen } | Should -Not -Throw
-    }
-
-    It 'Executable property can be set' {
-        $style.Executable | Should -Not -BeNullOrEmpty
-        { $style.Executable = 'Invalid' } | Should -Throw
-        { $style.Executable = $style.Palette.Background.BrightGreen } | Should -Not -Throw
-    }
-
-    It 'OutputRendering defines if output is colored' {
-        $style.OutputRendering = [PSTree.Style.OutputRendering]::Host
-
-        Get-PSTree $TestDrive -Recurse -Include *.ps1, *.exe | ForEach-Object {
-            if ($_.Extension -eq '.exe' -and $IsLinux) {
-                return
-            }
-
-            $_.Hierarchy | Should -Match '\b\x1B\[(?:[0-9]+;?){1,}m'
-        }
-
-        $style.OutputRendering = [PSTree.Style.OutputRendering]::PlainText
-
-        Get-PSTree $TestDrive -Recurse -Include *.ps1, *.exe | ForEach-Object Hierarchy |
-            Should -Not -Match '\b\x1B\[(?:[0-9]+;?){1,}m'
+        $style | Out-Null
     }
 
     It 'CombineSequence() can combine 2 VT Sequences' {
@@ -65,6 +33,45 @@ Describe 'TreeStyle Type' {
 
     It 'ToItalic() adds italic accent' {
         $style.ToItalic($style.Palette.Background.White) | Should -Match ';3m$'
+    }
+}
+
+Describe 'FileSystem Type' {
+    BeforeAll {
+        $style = [PSTree.Style.TreeStyle]::Instance
+        $style | Out-Null
+
+        $path = Join-Path $TestDrive 'teststyle'
+        '.exe', '.ps1' | New-Item -Path { Join-Path $path "file$_" } -Force | Out-Null
+    }
+
+    It 'Directory property can be set' {
+        $style.FileSystem.Directory | Should -Not -BeNullOrEmpty
+        { $style.FileSystem.Directory = 'Invalid' } | Should -Throw
+        { $style.FileSystem.Directory = $style.Palette.Background.BrightGreen } | Should -Not -Throw
+    }
+
+    It 'Executable property can be set' {
+        $style.FileSystem.Executable | Should -Not -BeNullOrEmpty
+        { $style.FileSystem.Executable = 'Invalid' } | Should -Throw
+        { $style.FileSystem.Executable = $style.Palette.Background.BrightGreen } | Should -Not -Throw
+    }
+
+    It 'OutputRendering defines if output is colored' {
+        $style.OutputRendering = [PSTree.Style.OutputRendering]::Host
+
+        Get-PSTree $TestDrive -Recurse -Include *.ps1, *.exe | ForEach-Object {
+            if ($_.Extension -eq '.exe' -and $IsLinux) {
+                return
+            }
+
+            $_.Hierarchy | Should -Match '\b\x1B\[(?:[0-9]+;?){1,}m'
+        }
+
+        $style.OutputRendering = [PSTree.Style.OutputRendering]::PlainText
+
+        Get-PSTree $TestDrive -Recurse -Include *.ps1, *.exe | ForEach-Object Hierarchy |
+            Should -Not -Match '\b\x1B\[(?:[0-9]+;?){1,}m'
     }
 }
 
@@ -93,7 +100,7 @@ Describe 'Palette Type' {
 
 Describe 'Extension Type' {
     BeforeAll {
-        $extension = [PSTree.Style.TreeStyle]::Instance.Extension
+        $extension = [PSTree.Style.TreeStyle]::Instance.FileSystem.Extension
         $escape = "$([char] 27)"
         $extension, $escape | Out-Null
     }
@@ -146,4 +153,3 @@ Describe 'Extension Type' {
         $extension.Count | Should -BeExactly 0
     }
 }
-

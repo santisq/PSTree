@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,50 +13,15 @@ public sealed class TreeStyle
 
     private static TreeStyle s_instance = new();
 
-    private string _directory = "\x1B[44;1m";
-
-    private string _executable = "\x1B[32;1m";
-
-    private readonly HashSet<string> _exec = new(Comparer)
-    {
-        ".com",
-        ".exe",
-        ".bat",
-        ".cmd",
-        ".vbs",
-        ".vbe",
-        ".js",
-        ".jse",
-        ".wsf",
-        ".wsh",
-        ".msc",
-        ".cpl"
-    };
-
-    private readonly bool _isWin = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
     private static readonly Regex s_validate = new(
         @"^\x1B\[(?:[0-9]+;?){1,}m$",
         RegexOptions.Compiled);
 
-    internal static StringComparer Comparer { get; } =
-        StringComparer.InvariantCultureIgnoreCase;
+    internal static StringComparer Comparer { get; } = StringComparer.InvariantCultureIgnoreCase;
+
+    internal bool IsWindows { get => RuntimeInformation.IsOSPlatform(OSPlatform.Windows); }
 
     public OutputRendering OutputRendering { get; set; } = OutputRendering.Host;
-
-    public string Directory
-    {
-        get => _directory;
-        set => _directory = ThrowIfInvalidSequence(value);
-    }
-
-    public string Executable
-    {
-        get => _executable;
-        set => _executable = ThrowIfInvalidSequence(value);
-    }
-
-    public Extension Extension { get; } = new();
 
     public Palette Palette { get; } = new();
 
@@ -66,35 +29,7 @@ public sealed class TreeStyle
 
     public static TreeStyle Instance { get => s_instance; }
 
-    internal string GetColoredName(FileInfo file)
-    {
-        if (OutputRendering is not OutputRendering.Host)
-        {
-            return file.Name;
-        }
-
-        if (Extension.TryGetValue(file.Extension, out string? vt))
-        {
-            return $"{vt}{file.Name}{Reset}";
-        }
-
-        if (_isWin && _exec.Contains(file.Extension))
-        {
-            return $"{Executable}{file.Name}{Reset}";
-        }
-
-        return file.Name;
-    }
-
-    internal string GetColoredName(DirectoryInfo directory)
-    {
-        if (OutputRendering is OutputRendering.PlainText)
-        {
-            return directory.Name;
-        }
-
-        return $"{Directory}{directory.Name}{Reset}";
-    }
+    public FileSystem FileSystem { get; } = new();
 
     internal static string ThrowIfInvalidSequence(string vt)
     {

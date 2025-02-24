@@ -46,13 +46,13 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
 
     internal static TreeDirectory Create(DirectoryInfo dir, string source)
     {
-        string styled = TreeStyle.Instance.GetColoredName(dir);
+        string styled = TreeStyle.Instance.FileSystem.GetColoredName(dir);
         return new TreeDirectory(dir, styled, source);
     }
 
     internal static TreeDirectory Create(DirectoryInfo dir, string source, int depth)
     {
-        string styled = TreeStyle.Instance.GetColoredName(dir).Indent(depth);
+        string styled = TreeStyle.Instance.FileSystem.GetColoredName(dir).Indent(depth);
         return new TreeDirectory(dir, styled, source, depth);
     }
 

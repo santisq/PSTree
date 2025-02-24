@@ -45,6 +45,41 @@
       </TableControl>
     </View>
     <View>
+      <Name>treeviewreg</Name>
+      <ViewSelectedBy>
+        <TypeName>PSTree.TreeRegistryBase</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <ScriptBlock>[PSTree.Internal._FormattingInternals]::GetSource($_)</ScriptBlock>
+        <Label>Hive</Label>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Kind</Label>
+            <Width>12</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Hierarchy</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Kind</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Hierarchy</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
       <Name>PSTree.Style.Palette</Name>
       <ViewSelectedBy>
         <TypeName>PSTree.Style.Palette</TypeName>
@@ -191,6 +226,34 @@
                 <PropertyName>OutputRendering</PropertyName>
               </ListItem>
               <ListItem>
+                <Label>Reset</Label>
+                <ScriptBlock>
+                  [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Reset)
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>FileSystem</Label>
+                <PropertyName>FileSystem</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Palette</Label>
+                <PropertyName>Palette</PropertyName>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
+      <Name>PSTree.Style.FileSystem</Name>
+      <ViewSelectedBy>
+        <TypeName>PSTree.Style.FileSystem</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
                 <Label>Directory</Label>
                 <ScriptBlock>
                   [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Directory)
@@ -201,16 +264,6 @@
                 <ScriptBlock>
                   [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Executable)
                 </ScriptBlock>
-              </ListItem>
-              <ListItem>
-                <Label>Reset</Label>
-                <ScriptBlock>
-                  [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Reset)
-                </ScriptBlock>
-              </ListItem>
-              <ListItem>
-                <Label>Palette</Label>
-                <PropertyName>Palette</PropertyName>
               </ListItem>
               <ListItem>
                 <Label>Extension</Label>
@@ -245,41 +298,6 @@
               </TableColumnItem>
               <TableColumnItem>
                 <ScriptBlock>[PSTree.Style.Extension]::GetEscapedValues($_)</ScriptBlock>
-              </TableColumnItem>
-            </TableColumnItems>
-          </TableRowEntry>
-        </TableRowEntries>
-      </TableControl>
-    </View>
-    <View>
-      <Name>treeviewreg</Name>
-      <ViewSelectedBy>
-        <TypeName>PSTree.TreeRegistryBase</TypeName>
-      </ViewSelectedBy>
-      <GroupBy>
-        <ScriptBlock>[PSTree.Internal._FormattingInternals]::GetSource($_)</ScriptBlock>
-        <Label>Hive</Label>
-      </GroupBy>
-      <TableControl>
-        <TableHeaders>
-          <TableColumnHeader>
-            <Label>Kind</Label>
-            <Width>12</Width>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-          <TableColumnHeader>
-            <Label>Hierarchy</Label>
-            <Alignment>Left</Alignment>
-          </TableColumnHeader>
-        </TableHeaders>
-        <TableRowEntries>
-          <TableRowEntry>
-            <TableColumnItems>
-              <TableColumnItem>
-                <PropertyName>Kind</PropertyName>
-              </TableColumnItem>
-              <TableColumnItem>
-                <PropertyName>Hierarchy</PropertyName>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>
