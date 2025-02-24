@@ -297,7 +297,7 @@
                 <ScriptBlock>$_.Keys -join [Environment]::NewLine</ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
-                <ScriptBlock>[PSTree.Style.Extension]::GetEscapedValues($_)</ScriptBlock>
+                <ScriptBlock>$_.GetEscapedValues()</ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>

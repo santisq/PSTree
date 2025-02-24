@@ -128,7 +128,7 @@ Describe 'Extension Type' {
     }
 
     It 'GetEscapedValues() should not be empty' {
-        $extension::GetEscapedValues($extension) | Should -Not -BeNullOrEmpty
+        $extension.GetEscapedValues() | Should -Not -BeNullOrEmpty
     }
 
     It 'ContainsKey() checks if a extension exists' {
