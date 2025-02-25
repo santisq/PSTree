@@ -35,8 +35,6 @@ public sealed class TreeRegistryKey : TreeRegistryBase
     }
 
     private static string GetColoredName(string name) =>
-        TreeStyle.Instance.Registry is null
-            ? name
-            : TreeStyle.Instance.Registry.GetColoredKey(name);
+        TreeStyle.Instance.Registry.GetColoredKey(name);
 }
 #endif

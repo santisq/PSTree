@@ -28,9 +28,7 @@ public sealed class TreeRegistryValue : TreeRegistryBase
     }
 
     private static string GetColoredName(string name, RegistryValueKind kind) =>
-        TreeStyle.Instance.Registry is null
-            ? name
-            : TreeStyle.Instance.Registry.GetColoredValue(name, kind);
+        TreeStyle.Instance.Registry.GetColoredValue(name, kind);
 
     public object? GetValue() => Registry.GetValue(_parentPath, Name, null);
 }
