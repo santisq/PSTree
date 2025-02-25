@@ -10,9 +10,6 @@ namespace PSTree.Commands;
 
 #if WINDOWS
 [OutputType(typeof(TreeRegistryKey), typeof(TreeRegistryValue))]
-#else
-[ExcludeFromCodeCoverage]
-#endif
 [Cmdlet(VerbsCommon.Get, "PSTreeRegistry", DefaultParameterSetName = PathSet)]
 [Alias("pstreereg")]
 public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
@@ -33,7 +30,6 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 
     protected override void BeginProcessing()
     {
-        this.ThrowIfNotSupportedPlatform();
         if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
         {
             Depth = int.MaxValue;
@@ -122,7 +118,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
                         _cache.Add(new TreeRegistryValue(key, value, source, depth));
                     }
 
-                    PushKeys:
+                PushKeys:
                     PushSubKeys(key, source, depth);
                 }
             }
@@ -157,3 +153,14 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
         }
     }
 }
+#else
+[Cmdlet(VerbsCommon.Get, "PSTreeRegistry")]
+[Alias("pstreereg")]
+public sealed class GetPSTreeRegistryCommandNonWindows : PSCmdlet
+{
+    [Parameter(Position = 0, ValueFromRemainingArguments = true)]
+    public object? Arguments { get; set; }
+
+    protected override void BeginProcessing() => this.ThrowNotSupportedPlatform();
+}
+#endif

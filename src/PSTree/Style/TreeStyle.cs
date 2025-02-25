@@ -14,8 +14,6 @@ public sealed class TreeStyle
 {
     private const string s_esc = "\x1B";
 
-    private RegistryStyle? _registry;
-
     private static TreeStyle? s_instance;
 
     private static readonly Regex s_validate = new(
@@ -36,10 +34,9 @@ public sealed class TreeStyle
 
     public FileSystemStyle FileSystem { get; } = new();
 
-#if !WINDOWS
-    [ExcludeFromCodeCoverage]
+#if WINDOWS
+    public RegistryStyle Registry { get; } = new();
 #endif
-    public RegistryStyle? Registry { get => _registry ??= IsWindows == true ? new() : null; }
 
     internal TreeStyle()
     { }
