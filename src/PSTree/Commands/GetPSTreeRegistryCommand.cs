@@ -10,13 +10,16 @@ namespace PSTree.Commands;
 
 #if WINDOWS
 [OutputType(typeof(TreeRegistryKey), typeof(TreeRegistryValue))]
+#endif
 [Cmdlet(VerbsCommon.Get, "PSTreeRegistry", DefaultParameterSetName = PathSet)]
 [Alias("pstreereg")]
 public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 {
+#if WINDOWS
     private readonly Cache<TreeRegistryBase, TreeRegistryValue> _cache = new();
 
     private readonly Stack<(TreeRegistryKey, RegistryKey)> _stack = [];
+#endif
 
     [Parameter]
     [ValidateRange(0, int.MaxValue)]
@@ -30,12 +33,14 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 
     protected override void BeginProcessing()
     {
+        this.ThrowIfNotSupportedPlatform();
         if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
         {
             Depth = int.MaxValue;
         }
     }
 
+#if WINDOWS
     protected override void ProcessRecord()
     {
         foreach ((ProviderInfo provider, string path) in EnumerateResolvedPaths())
@@ -152,15 +157,5 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
             }
         }
     }
-}
-#else
-[Cmdlet(VerbsCommon.Get, "PSTreeRegistry")]
-[Alias("pstreereg")]
-public sealed class GetPSTreeRegistryCommandNonWindows : PSCmdlet
-{
-    [Parameter(Position = 0, ValueFromRemainingArguments = true)]
-    public object? Arguments { get; set; }
-
-    protected override void BeginProcessing() => this.ThrowNotSupportedPlatform();
-}
 #endif
+}

@@ -1,14 +1,14 @@
 using System;
 using System.Management.Automation;
+using System.Runtime.InteropServices;
 using System.Security;
-#if !WINDOWS
-using System.Security;
-#endif
 
 namespace PSTree.Extensions;
 
 internal static class ExceptionExtensions
 {
+    private static readonly bool _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+
     internal static ErrorRecord ToInvalidPathError(this string path) =>
         new(
             new ItemNotFoundException(
@@ -52,17 +52,20 @@ internal static class ExceptionExtensions
             $"When adding or removing extensions, the extension must start with a period: '{extension}'.");
     }
 
-#if WINDOWS
     internal static ErrorRecord ToSecurityError(this SecurityException exception, string path) =>
         new(exception, "SecurityException", ErrorCategory.OpenError, path);
-#else
-    internal static void ThrowNotSupportedPlatform(this PSCmdlet cmdlet)
+
+    internal static void ThrowIfNotSupportedPlatform(this PSCmdlet cmdlet)
     {
+        if (_isWindows)
+        {
+            return;
+        }
+
         PlatformNotSupportedException exception = new(
             "The 'Get-PSTreeRegistry' cmdlet is only supported on Windows.");
 
         cmdlet.ThrowTerminatingError(new ErrorRecord(
             exception, "NotSupportedPlatform", ErrorCategory.InvalidOperation, null));
     }
-#endif
 }
