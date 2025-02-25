@@ -236,6 +236,10 @@
                 <PropertyName>FileSystem</PropertyName>
               </ListItem>
               <ListItem>
+                <Label>Registry</Label>
+                <PropertyName>Registry</PropertyName>
+              </ListItem>
+              <ListItem>
                 <Label>Palette</Label>
                 <PropertyName>Palette</PropertyName>
               </ListItem>
@@ -245,9 +249,9 @@
       </ListControl>
     </View>
     <View>
-      <Name>PSTree.Style.FileSystem</Name>
+      <Name>PSTree.Style.FileSystemStyle</Name>
       <ViewSelectedBy>
-        <TypeName>PSTree.Style.FileSystem</TypeName>
+        <TypeName>PSTree.Style.FileSystemStyle</TypeName>
       </ViewSelectedBy>
       <ListControl>
         <ListEntries>
@@ -275,6 +279,30 @@
       </ListControl>
     </View>
     <View>
+      <Name>PSTree.Style.RegistryStyle</Name>
+      <ViewSelectedBy>
+        <TypeName>PSTree.Style.RegistryStyle</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>RegistryKey</Label>
+                <ScriptBlock>
+                  [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.RegistryKey)
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>RegistryValueKind</Label>
+                <PropertyName>RegistryValueKind</PropertyName>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
       <Name>PSTree.Style.Extension</Name>
       <ViewSelectedBy>
         <TypeName>PSTree.Style.Extension</TypeName>
@@ -283,6 +311,36 @@
         <TableHeaders>
           <TableColumnHeader>
             <Label>Extension</Label>
+            <Width>12</Width>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Style</Label>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <Wrap>true</Wrap>
+            <TableColumnItems>
+              <TableColumnItem>
+                <ScriptBlock>$_.Keys -join [Environment]::NewLine</ScriptBlock>
+              </TableColumnItem>
+              <TableColumnItem>
+                <ScriptBlock>$_.GetEscapedValues()</ScriptBlock>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
+      <Name>PSTree.Style.ValueKind</Name>
+      <ViewSelectedBy>
+        <TypeName>PSTree.Style.ValueKind</TypeName>
+      </ViewSelectedBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Kind</Label>
             <Width>12</Width>
           </TableColumnHeader>
           <TableColumnHeader>

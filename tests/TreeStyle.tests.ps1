@@ -36,7 +36,7 @@ Describe 'TreeStyle Type' {
     }
 }
 
-Describe 'FileSystem Type' {
+Describe 'FileSystemStyle Type' {
     BeforeAll {
         $style = [PSTree.Style.TreeStyle]::Instance
         $style | Out-Null

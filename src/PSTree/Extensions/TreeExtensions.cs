@@ -107,6 +107,7 @@ internal static class TreeExtensions
         return new string(chars);
     }
 
+#if WINDOWS
     internal static (TreeRegistryKey, RegistryKey) CreateTreeKey(
         this RegistryKey key, string name) =>
         (new TreeRegistryKey(key, name, key.Name), key);
@@ -122,4 +123,5 @@ internal static class TreeExtensions
     {
         (@base, subKey) = (strings[0], strings.Length == 1 ? null : strings[1]);
     }
+#endif
 }

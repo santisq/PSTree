@@ -3,7 +3,7 @@ using System.IO;
 
 namespace PSTree.Style;
 
-public sealed class FileSystem
+public sealed class FileSystemStyle
 {
     private string _directory = "\x1B[44;1m";
 
@@ -51,7 +51,7 @@ public sealed class FileSystem
             return $"{vt}{file.Name}{TreeStyle.Instance.Reset}";
         }
 
-        if (TreeStyle.Instance.IsWindows && _exec.Contains(file.Extension))
+        if (TreeStyle.IsWindows && _exec.Contains(file.Extension))
         {
             return $"{Executable}{file.Name}{TreeStyle.Instance.Reset}";
         }

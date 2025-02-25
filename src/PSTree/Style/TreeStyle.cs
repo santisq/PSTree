@@ -4,6 +4,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using PSTree.Extensions;
+#if !WINDOWS
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace PSTree.Style;
 
@@ -11,7 +14,9 @@ public sealed class TreeStyle
 {
     private const string s_esc = "\x1B";
 
-    private static TreeStyle s_instance = new();
+    private RegistryStyle? _registry;
+
+    private static TreeStyle? s_instance;
 
     private static readonly Regex s_validate = new(
         @"^\x1B\[(?:[0-9]+;?){1,}m$",
@@ -19,7 +24,7 @@ public sealed class TreeStyle
 
     internal static StringComparer Comparer { get; } = StringComparer.InvariantCultureIgnoreCase;
 
-    internal bool IsWindows { get => RuntimeInformation.IsOSPlatform(OSPlatform.Windows); }
+    internal static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
     public OutputRendering OutputRendering { get; set; } = OutputRendering.Host;
 
@@ -27,9 +32,17 @@ public sealed class TreeStyle
 
     public string Reset { get; } = "\x1B[0m";
 
-    public static TreeStyle Instance { get => s_instance; }
+    public static TreeStyle Instance { get => s_instance ??= new(); }
 
-    public FileSystem FileSystem { get; } = new();
+    public FileSystemStyle FileSystem { get; } = new();
+
+#if !WINDOWS
+    [ExcludeFromCodeCoverage]
+#endif
+    public RegistryStyle? Registry { get => _registry ??= IsWindows == true ? new() : null; }
+
+    internal TreeStyle()
+    { }
 
     internal static string ThrowIfInvalidSequence(string vt)
     {

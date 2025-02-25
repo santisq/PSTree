@@ -7,21 +7,16 @@ using System.Text;
 
 namespace PSTree.Style;
 
-public abstract class StyleDictionaryBase<TKey>
+public abstract class StyleDictionaryBase<TKey>(Dictionary<TKey, string> internalDictionary)
     where TKey : notnull
 {
-    private readonly Dictionary<TKey, string> _internalDictionary;
+    private readonly Dictionary<TKey, string> _internalDictionary = internalDictionary;
 
     public ICollection<TKey> Keys { get => _internalDictionary.Keys; }
 
     public ICollection<string> Values { get => _internalDictionary.Values; }
 
     public int Count { get => _internalDictionary.Count; }
-
-    internal StyleDictionaryBase(Dictionary<TKey, string> internalDictionary)
-    {
-        _internalDictionary = internalDictionary;
-    }
 
     protected abstract TKey Validate(TKey key);
 
@@ -55,8 +50,13 @@ public abstract class StyleDictionaryBase<TKey>
         return builder.ToString();
     }
 
-    public override string ToString()
+    public override string? ToString()
     {
+        if (_internalDictionary.Count == 0)
+        {
+            return null;
+        }
+
         StringBuilder builder = new(_internalDictionary.Count);
         string[] keys = [.. Keys.Select(static e => e is string str ? str : e.ToString()!)];
         int max = keys.Max(e => e.Length);

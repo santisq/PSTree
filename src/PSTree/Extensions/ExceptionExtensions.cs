@@ -52,8 +52,10 @@ internal static class ExceptionExtensions
             $"When adding or removing extensions, the extension must start with a period: '{extension}'.");
     }
 
+#if WINDOWS
     internal static ErrorRecord ToSecurityError(this SecurityException exception, string path) =>
         new(exception, "SecurityException", ErrorCategory.OpenError, path);
+#endif
 
     internal static void ThrowIfNotSupportedPlatform(this PSCmdlet cmdlet)
     {

@@ -1,12 +1,7 @@
-#if !WINDOWS
-using System.Diagnostics.CodeAnalysis;
-#endif
+#if WINDOWS
 
 namespace PSTree;
 
-#if !WINDOWS
-[ExcludeFromCodeCoverage]
-#endif
 public abstract class TreeRegistryBase(
     string hierarchy,
     string source,
@@ -32,3 +27,4 @@ public abstract class TreeRegistryBase(
         string.IsNullOrEmpty(path = System.IO.Path.GetDirectoryName(path))
             ? null : $"{_providerPath}{path}";
 }
+#endif
