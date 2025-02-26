@@ -5,9 +5,9 @@ using PSTree.Style;
 
 namespace PSTree;
 
-public sealed class TreeRegistryKey : TreeRegistryBase<string>
+public sealed class TreeRegistryKey : TreeRegistryBase
 {
-    public override string Kind { get; } = "RegistryKey";
+    public string Kind { get; } = "RegistryKey";
 
     public int SubKeyCount { get; }
 

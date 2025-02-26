@@ -2,7 +2,7 @@
 
 namespace PSTree;
 
-public abstract class TreeRegistryBase<TKind>(
+public abstract class TreeRegistryBase(
     string hierarchy,
     string source,
     string? path = null)
@@ -13,8 +13,6 @@ public abstract class TreeRegistryBase<TKind>(
     private string? _psparentpath;
 
     protected const string _providerPath = @"Microsoft.PowerShell.Core\Registry::";
-
-    public abstract TKind Kind { get; }
 
     public string? Path { get; } = path;
 
