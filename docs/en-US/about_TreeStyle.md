@@ -1,21 +1,26 @@
 # about_TreeStyle
 
+## TOPIC
+
+Customizing PSTree Output with TreeStyle.
+
 ## SHORT DESCRIPTION
 
-Describes the available support for ANSI escape sequences in PSTree Module.
+The `TreeStyle` class enables customization of the hierarchical output for `Get-PSTree` and `Get-PSTreeRegistry` cmdlets in the PSTree module.
 
 ## LONG DESCRIPTION
 
-PSTree v2.2.0 and above added support for coloring the hierarchy output from `Get-PSTree` and `Get-PStreeRegistry` cmdlets via the `TreeStyle` type. The type offers a subset of capabilities that the built-in [`PSStyle`][1] has.
-
-The instance of this type can be accessed via the [`Get-PSTreeStyle`][2] cmdlet or the `[PSTree.Style.TreeStyle]::Instance` property:
+PSTree version 2.2.0 and later introduces support for coloring the hierarchical output of the `Get-PSTree` and `Get-PSTreeRegistry` cmdlets using the `TreeStyle` class. This class provides a subset of features similar to those in PowerShell’s built-in [PSStyle][1].
+You can access the singleton instance of `TreeStyle` through either the [Get-PSTreeStyle][2] cmdlet or the `[PSTree.Style.TreeStyle]::Instance` property:
 
 <div>
   &nbsp;&nbsp;&nbsp;
   <img src="../../assets/TreeStyle.png" alt="TreeStyle" width="35%" height="35%">
 </div>
 
-It has some useful methods to combine escape sequences as well as add accents, see next section for more details.
+The `TreeStyle` class offers methods for combining escape sequences and applying text accents, such as bold or italic. See the next section for additional details.
+
+Here are its members:
 
 ```powershell
    TypeName: PSTree.Style.TreeStyle
@@ -38,7 +43,7 @@ Registry        Property   PSTree.Style.RegistryStyle Registry {get;}
 Reset           Property   string Reset {get;}
 ```
 
-The `.EscapeSequence(string vt)` method can be used to see the escape sequence used to produce the color and accent, for example:
+The `.EscapeSequence()` method reveals the escape sequence applied to generate specific colors or accents. For example:
 
 <div>
   &nbsp;&nbsp;&nbsp;
@@ -49,41 +54,43 @@ The `.EscapeSequence(string vt)` method can be used to see the escape sequence u
 
 ### Get-PSTree
 
-Similar to `PSStyle` you can update the properties of `TreeStyle` as well as add and remove coloring for different extensions.
+You can customize the output of `Get-PSTree` by modifying the properties of the `TreeStyle` class, much like you would with PowerShell’s `PSStyle`. This allows you to update colors for directories, files, and specific file extensions, as well as add or remove color schemes for different file types.
 
 > [!NOTE]
 >
-> - For now, customizing the output of files that are a __SymbolicLink__ is not supported.
-> - The __Executable__ accent is only available for Windows Operating System.
+> - Customizing the output for files that are __Symbolic Links__ is not currently supported.
+> - The __Executable__ accent is only available on Windows operating systems.
 
-For example, take the standard output:
+Consider the standard output of `Get-PSTree`:
 
 <div>
   &nbsp;&nbsp;&nbsp;
   <img src="../../assets/Get-PSTree.Before.png" alt="Get-PSTree.Before" width="45%" height="45%">
 </div>
 
-We can make a few changes to the `PSTree.Style.FileSystemStyle` object:
+You can adjust the appearance by modifying the `PSTree.Style.FileSystemStyle` object. Here’s an example of how to apply customizations:
 
 ```powershell
 $style = Get-PSTreeStyle
 $palette = $style.Palette
-# update the .ps1 extension
+
+# Update the .ps1 extension to white text on a red background
 $style.FileSystem.Extension['.ps1'] = $style.CombineSequence($palette.Foreground.White, $palette.Background.Red)
-# add the .cs extension
-$style.FileSystem.Extension['.cs'] = $style.ToItalic($style.ToBold($palette.ForeGround.BrightCyan))
-# update the Directory style
+
+# Add the .cs extension with bold and italic bright cyan text
+$style.FileSystem.Extension['.cs'] = $style.ToItalic($style.ToBold, $palette.Foreground.BrightCyan)
+
+# Update the Directory style to use a magenta background
 $style.FileSystem.Directory = "`e[45m"
 ```
 
 > [!TIP]
 >
-> - The `` `e `` escape character was added in PowerShell 6. __Windows PowerShell 5.1__ users can use `[char] 27` instead, for example from previous example, instead of ``"`e[45m"`` you can use `"$([char] 27)[45m"`.
- See [__about_Special_Characters__][3] for more details.
-> - The `TreeStyle` type has 3 public methods that you can use to add accents or combine VT sequences, `ToItalic()`, `ToBold()` and `CombineSequence()`.
-> - You can also reset the style instance to its initial state using `.ResetSettings()` however if you had the instance stored in a variable you will need to re-assign its value, i.e.: `$style.ResetSettings()` then `$style = treestyle`.
+> - PowerShell 6 and later support the `` `e `` escape character for VT sequences. For __Windows PowerShell 5.1__, use `[char] 27` instead. For example, replace ``"`e[45m"`` with `"$([char] 27)[45m"`. See [about_Special_Characters)[3] for more details.
+> - The `TreeStyle` class provides methods like `.ToItalic()`, `.ToBold()`, and `.CombineSequence()` to apply text accents or combine VT sequences.
+> - To reset the `TreeStyle` instance to its default state, use `.ResetSettings()`. If stored in a variable, reassign it afterward, e.g., `$style.ResetSettings()` followed by `$style = Get-PSTreeStyle`.
 
-Then, if we re-run the same command we can see those changes in the `Get-PSTree` output:
+After applying these changes, re-running the same `Get-PSTree` command will display the updated styles:
 
 <div>
   &nbsp;&nbsp;&nbsp;
@@ -92,32 +99,35 @@ Then, if we re-run the same command we can see those changes in the `Get-PSTree`
 
 ### Get-PSTreeRegistry
 
-PSTree v2.2.3 adds coloring support for this cmdlet, the `PSTree.Style.RegistryStyle` object allows you to customize the color for `TreeRegistryKey` and `TreeRegistryValue` instances.
+Starting with PSTree version 2.2.3, the `Get-PSTreeRegistry` cmdlet supports customizable coloring via the `PSTree.Style.RegistryStyle` object. This allows you to define colors for both `TreeRegistryKey` and `TreeRegistryValue` instances.
 
-The coloring for `TreeRegistryKey` instances is determined by the `.RegistryKey` property whereas the coloring for `TreeRegistryValue` instances is determined by the `RegistryValueKind` property, an object to which you can add key value pairs to determine the coloring based on `.Kind` property.
+- __TreeRegistryKey__: The color is set using the `.RegistryKey` property.
+- __TreeRegistryValue__: The color is controlled by the `.RegistryValueKind` property, a dictionary that maps [RegistryValueKind][4] types to color settings based on the `.Kind` property of each registry value.
 
 > [!NOTE]
-> The keys must be of type [`RegistryValueKind`][4] or should be convertable to it, e.g.: ``.RegistryValueKind[2] = "`e[45m"`` or ``.RegistryValueKind['ExpandString'] = "`e[45m"`` is valid.
+> Keys in `.RegistryValueKind` must be of type [RegistryValueKind][4] or convertible to it. For example, both ``.RegistryValueKind[2] = "`e[45m"`` (where `2` corresponds to `ExpandString` enum value) and ``.RegistryValueKind['ExpandString'] = "`e[45m"`` are valid. Similarly, ``.RegistryValueKind[1] = "`e[45m"`` or ``.RegistryValueKind['String'] = "`e[45m"`` can be used for `String`. String keys must match the enum names exactly, such as `'String'`, `'ExpandString'`, `'Binary'`, etc.
 
-Take the standard output as an example:
+Here’s the standard output of `Get-PSTreeRegistry` before customization:
 
 <div>
   &nbsp;&nbsp;&nbsp;
   <img src="../../assets/Get-PSTreeRegistry.Before.png" alt="Get-PSTreeRegistry.Before" width="45%" height="45%">
 </div>
 
-We can add coloring for instances of Kind `String` and update the coloring for Registry Keys:
+You can customize the colors with the following code:
 
 ```powershell
 $style = Get-PSTreeStyle
 $palette = $style.Palette
-# update the TreeRegistryKey style
+
+# Set TreeRegistryKey instances to a red background
 $style.Registry.RegistryKey = $palette.Background.Red
-# add style for `String` kind TreeRegistryValue
+
+# Set TreeRegistryValue instances of 'String' kind to bright green foreground
 $style.Registry.RegistryValueKind['String'] = $palette.Foreground.BrightGreen
 ```
 
-Then, if we re-run the same command we can see those changes in the `Get-PSTreeRegistry` output:
+After applying these changes, re-running `Get-PSTreeRegistry` reflects the updated styles:
 
 <div>
   &nbsp;&nbsp;&nbsp;
@@ -126,11 +136,13 @@ Then, if we re-run the same command we can see those changes in the `Get-PSTreeR
 
 ## DISABLING ANSI OUTPUT
 
-Similarly to `PSStyle`, you can disable the ANSI rendering by updating the `OutputRendering` property:
+Just like PowerShell’s `PSStyle`, you can disable ANSI rendering in PSTree’s output by modifying the `.OutputRendering` property of the `TreeStyle` instance. Simply set it to `'PlainText'` using the following command:
 
 ```powershell
 (Get-PSTreeStyle).OutputRendering = 'PlainText'
 ```
+
+This disables all ANSI-based coloring and formatting, resulting in plain text output for commands like `Get-PSTree` and `Get-PSTreeRegistry`. It’s a straightforward way to simplify the display when you don’t need the extra visual styling.
 
 [1]: https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_ansi_terminals
 [2]: ./Get-PSTreeStyle.md
