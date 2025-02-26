@@ -5,11 +5,11 @@ using PSTree.Style;
 
 namespace PSTree;
 
-public sealed class TreeRegistryValue : TreeRegistryBase
+public sealed class TreeRegistryValue : TreeRegistryBase<RegistryValueKind>
 {
     private readonly string _parentPath;
 
-    public RegistryValueKind Kind { get; }
+    public override RegistryValueKind Kind { get; }
 
     public string Name { get; }
 
