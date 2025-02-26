@@ -13,7 +13,9 @@ public sealed class RegistryStyle
         set => _registryKey = TreeStyle.ThrowIfInvalidSequence(value);
     }
 
-    public ValueKind RegistryValueKind { get; } = new();
+    public ValueKind RegistryValueKind { get; }
+
+    internal RegistryStyle() => RegistryValueKind = new();
 
     internal string GetColoredKey(string key)
     {

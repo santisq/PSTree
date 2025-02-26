@@ -4,9 +4,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using PSTree.Extensions;
-#if !WINDOWS
-using System.Diagnostics.CodeAnalysis;
-#endif
 
 namespace PSTree.Style;
 

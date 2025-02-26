@@ -75,6 +75,101 @@ Describe 'FileSystemStyle Type' {
     }
 }
 
+if ($isWin) {
+    Describe 'RegistryStyle Type' {
+        BeforeAll {
+            $style = [PSTree.Style.TreeStyle]::Instance
+            $style | Out-Null
+        }
+
+        It 'RegistryKey property can be set' {
+            $style.Registry.RegistryKey | Should -Not -BeNullOrEmpty
+            { $style.Registry.RegistryKey = 'Invalid' } | Should -Throw
+            { $style.Registry.RegistryKey = $style.Palette.Background.BrightGreen } | Should -Not -Throw
+        }
+
+        It 'OutputRendering defines if output is colored' {
+            $style.OutputRendering = [PSTree.Style.OutputRendering]::Host
+            Get-PSTreeRegistry HKCU:\ -KeysOnly | ForEach-Object Hierarchy |
+                Should -Match '\s?\x1B\[(?:[0-9]+;?){1,}m'
+
+            $style.OutputRendering = [PSTree.Style.OutputRendering]::PlainText
+            Get-PSTreeRegistry HKCU:\ -KeysOnly | ForEach-Object Hierarchy |
+                Should -Not -Match '\s?\x1B\[(?:[0-9]+;?){1,}m'
+
+            $style.OutputRendering = [PSTree.Style.OutputRendering]::Host
+        }
+    }
+
+    Describe 'ValueKind Type' {
+        BeforeAll {
+            $style = [PSTree.Style.TreeStyle]::Instance
+            $kind = $style.Registry.RegistryValueKind
+            $escape = "$([char] 27)"
+            $kind, $escape | Out-Null
+        }
+
+        It 'Keys should be empty' {
+            $kind.Keys | Should -BeNullOrEmpty
+        }
+
+        It 'Values should be empty' {
+            $kind.Values | Should -BeNullOrEmpty
+        }
+
+        It 'Supports setting RegistryValueKind sequence by index' {
+            { $kind['String'] = "$escape[33;1m" } | Should -Not -Throw
+            { $kind['String'] = 'Invalid' } | Should -Throw
+            { $kind['Invalid'] = "$escape[33;1m" } | Should -Throw
+        }
+
+        It 'Supports getting extension sequence by index' {
+            $kind['String'] | Should -BeExactly "$escape[33;1m"
+        }
+
+
+        It 'ToString() should not be empty' {
+            $kind.ToString() | Should -Not -BeNullOrEmpty
+        }
+
+        It 'GetEscapedValues() should not be empty' {
+            $kind.GetEscapedValues() | Should -Not -BeNullOrEmpty
+        }
+
+        It 'ContainsKey() checks if a extension exists' {
+            $kind.ContainsKey('String') | Should -BeTrue
+            $kind.ContainsKey('ExpandString') | Should -BeFalse
+            { $kind.ContainsKey('NotExist') } | Should -Throw
+        }
+
+        It 'Add() adds a new extension' {
+            { $kind.Add('ExpandString', "$escape[33;1m") } | Should -Not -Throw
+            { $kind.Add('Invalid', "$escape[33;1m") } | Should -Throw
+            { $kind.Add('DWord', 'Invalid') } | Should -Throw
+            { $kind.Add('DWord', "$escape[33;1m") } | Should -Not -Throw
+        }
+
+        It 'Adds coloring to TreeRegistryValue instances' {
+            $style.OutputRendering = [PSTree.Style.OutputRendering]::Host
+
+            Get-PSTreeRegistry HKCU:\ -EA 0 |
+                Where-Object Kind -In DWord, ExpandString, String |
+                Select-Object -ExpandProperty Hierarchy -First 10 |
+                Should -Match '\s?\x1B\[(?:[0-9]+;?){1,}m'
+        }
+
+        It 'Remove() removes an existing extension' {
+            $kind.Remove('DWord') | Should -BeTrue
+            $kind.Remove('DWord') | Should -BeFalse
+        }
+
+        It 'Clear() clears the internal dictionary' {
+            $kind.Clear()
+            $kind.Count | Should -BeExactly 0
+        }
+    }
+}
+
 Describe 'Palette Type' {
     BeforeAll {
         $palette = [PSTree.Style.TreeStyle]::Instance.Palette

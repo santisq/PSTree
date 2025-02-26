@@ -37,7 +37,9 @@ public sealed class FileSystemStyle
         set => _executable = TreeStyle.ThrowIfInvalidSequence(value);
     }
 
-    public Extension Extension { get; } = new();
+    public Extension Extension { get; }
+
+    internal FileSystemStyle() => Extension = new();
 
     internal string GetColoredName(FileInfo file)
     {
