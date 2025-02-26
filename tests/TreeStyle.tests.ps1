@@ -94,7 +94,7 @@ if ($isWin) {
                 Should -Match '\s?\x1B\[(?:[0-9]+;?){1,}m'
 
             $style.OutputRendering = [PSTree.Style.OutputRendering]::PlainText
-            Get-PSTreeRegistry HKCU:\ -KeysOnly | ForEach-Object Hierarchy |
+            Get-PSTreeRegistry HKCU:\ | ForEach-Object Hierarchy |
                 Should -Not -Match '\s?\x1B\[(?:[0-9]+;?){1,}m'
 
             $style.OutputRendering = [PSTree.Style.OutputRendering]::Host
@@ -117,6 +117,10 @@ if ($isWin) {
             $kind.Values | Should -BeNullOrEmpty
         }
 
+        It 'ToString() should be empty when initialized' {
+            $kind.ToString() | Should -BeNullOrEmpty
+        }
+
         It 'Supports setting RegistryValueKind sequence by index' {
             { $kind['String'] = "$escape[33;1m" } | Should -Not -Throw
             { $kind['String'] = 'Invalid' } | Should -Throw
@@ -126,7 +130,6 @@ if ($isWin) {
         It 'Supports getting extension sequence by index' {
             $kind['String'] | Should -BeExactly "$escape[33;1m"
         }
-
 
         It 'ToString() should not be empty' {
             $kind.ToString() | Should -Not -BeNullOrEmpty
