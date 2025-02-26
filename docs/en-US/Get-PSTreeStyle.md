@@ -1,7 +1,7 @@
 ---
 external help file: PSTree.dll-Help.xml
 Module Name: PSTree
-online version:
+online version: https://github.com/santisq/PSTree/blob/main/docs/en-US/Get-PSTreeStyle.md
 schema: 2.0.0
 ---
 
@@ -9,7 +9,7 @@ schema: 2.0.0
 
 ## SYNOPSIS
 
-Gets the instance of `TreeStyle` used for output rendering.
+Retrieves the `TreeStyle` instance used for output rendering.
 
 ## SYNTAX
 
@@ -20,7 +20,9 @@ Get-PSTreeStyle
 
 ## DESCRIPTION
 
-The `Get-PSTreeStyle` cmdlet can be used to access the instance of `TreeStyle` used for rendering and customizing the `Get-PSTree` output. See [__about_TreeStyle__](./about_TreeStyle.md) for more information.
+The `Get-PSTreeStyle` cmdlet provides access to the `TreeStyle` instance that controls the rendering and customization of output for the `Get-PSTree` and `Get-PSTreeRegistry` cmdlets.
+
+For details, see [__about_TreeStyle__](./about_TreeStyle.md).
 
 ## EXAMPLES
 
@@ -29,6 +31,8 @@ The `Get-PSTreeStyle` cmdlet can be used to access the instance of `TreeStyle` u
 ```powershell
 PS ..\PSTree> $style = Get-PSTreeStyle
 ```
+
+Stores the `TreeStyle` instance in the `$style` variable.
 
 ## PARAMETERS
 

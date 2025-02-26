@@ -8,17 +8,20 @@ using PSTree.Extensions;
 
 namespace PSTree.Commands;
 
-#if !WINDOWS
-    [ExcludeFromCodeCoverage]
-#endif
 [Cmdlet(VerbsCommon.Get, "PSTreeRegistry", DefaultParameterSetName = PathSet)]
+#if WINDOWS
 [OutputType(typeof(TreeRegistryKey), typeof(TreeRegistryValue))]
+#else
+[ExcludeFromCodeCoverage]
+#endif
 [Alias("pstreereg")]
 public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 {
+#if WINDOWS
     private readonly Cache<TreeRegistryBase, TreeRegistryValue> _cache = new();
 
     private readonly Stack<(TreeRegistryKey, RegistryKey)> _stack = [];
+#endif
 
     [Parameter]
     [ValidateRange(0, int.MaxValue)]
@@ -39,6 +42,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
         }
     }
 
+#if WINDOWS
     protected override void ProcessRecord()
     {
         foreach ((ProviderInfo provider, string path) in EnumerateResolvedPaths())
@@ -121,7 +125,7 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
                         _cache.Add(new TreeRegistryValue(key, value, source, depth));
                     }
 
-                    PushKeys:
+                PushKeys:
                     PushSubKeys(key, source, depth);
                 }
             }
@@ -155,4 +159,5 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
             }
         }
     }
+#endif
 }

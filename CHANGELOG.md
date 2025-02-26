@@ -1,5 +1,10 @@
 # CHANGELOG
 
+- __02/26/2025__
+  - Introduced the `RegistryStyle` class and added a `Registry` property to the `TreeStyle` class.
+  - Moved file system style properties from `TreeStyle` to a new `FileSystemStyle` class, with a `FileSystem` property added to `TreeStyle`.
+  - Added coloring support for `Get-PSTreeRegistry`, allowing customization based on the `Kind` property of `TreeRegistryBase` instances.
+
 - __02/22/2025__
   - Renamed base types by removing the leading `PS` prefix (e.g., `PSTreeFile` → `TreeFile`, `PSTreeRegistryKey` → `TreeRegistryKey`) to streamline naming and improve consistency.
   - Added the `Get-PSTreeRegistry` cmdlet, enabling tree-style traversal of the Windows Registry. This Windows-only cmdlet supports parameters like `-Path`, `-LiteralPath`, `-Depth`, `-Force`, and `-KeysOnly` for filtering and controlling output depth. Includes comprehensive Pester tests and documentation updates.

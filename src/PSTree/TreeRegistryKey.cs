@@ -1,14 +1,10 @@
+#if WINDOWS
 using Microsoft.Win32;
 using PSTree.Extensions;
-#if !WINDOWS
-using System.Diagnostics.CodeAnalysis;
-#endif
+using PSTree.Style;
 
 namespace PSTree;
 
-#if !WINDOWS
-    [ExcludeFromCodeCoverage]
-#endif
 public sealed class TreeRegistryKey : TreeRegistryBase
 {
     public string Kind { get; } = "RegistryKey";
@@ -21,7 +17,7 @@ public sealed class TreeRegistryKey : TreeRegistryBase
 
     internal TreeRegistryKey(
         RegistryKey key, string name, string source, int depth) :
-        base(name.Indent(depth), source, key.Name)
+        base(GetColoredName(name).Indent(depth), source, key.Name)
     {
         Depth = depth;
         SubKeyCount = key.SubKeyCount;
@@ -31,10 +27,14 @@ public sealed class TreeRegistryKey : TreeRegistryBase
 
     internal TreeRegistryKey(
         RegistryKey key, string name, string source) :
-        base(name, source, key.Name)
+        base(GetColoredName(name), source, key.Name)
     {
         SubKeyCount = key.SubKeyCount;
         ValueCount = key.ValueCount;
         View = key.View;
     }
+
+    private static string GetColoredName(string name) =>
+        TreeStyle.Instance.Registry.GetColoredKey(name);
 }
+#endif

@@ -1,14 +1,10 @@
+#if WINDOWS
 using Microsoft.Win32;
 using PSTree.Extensions;
-#if !WINDOWS
-using System.Diagnostics.CodeAnalysis;
-#endif
+using PSTree.Style;
 
 namespace PSTree;
 
-#if !WINDOWS
-    [ExcludeFromCodeCoverage]
-#endif
 public sealed class TreeRegistryValue : TreeRegistryBase
 {
     private readonly string _parentPath;
@@ -21,14 +17,19 @@ public sealed class TreeRegistryValue : TreeRegistryBase
 
     internal TreeRegistryValue(
         RegistryKey key, string value, string source, int depth) :
-        base(value.Indent(depth), source)
+        base(string.Empty, source)
     {
         _parentPath = key.Name;
         Kind = key.GetValueKind(value);
+        Hierarchy = GetColoredName(value, Kind).Indent(depth);
         Depth = depth;
         Name = value;
         PSParentPath = $"{_providerPath}{_parentPath}";
     }
 
+    private static string GetColoredName(string name, RegistryValueKind kind) =>
+        TreeStyle.Instance.Registry.GetColoredValue(name, kind);
+
     public object? GetValue() => Registry.GetValue(_parentPath, Name, null);
 }
+#endif

@@ -45,6 +45,41 @@
       </TableControl>
     </View>
     <View>
+      <Name>treeviewreg</Name>
+      <ViewSelectedBy>
+        <TypeName>PSTree.TreeRegistryBase</TypeName>
+      </ViewSelectedBy>
+      <GroupBy>
+        <ScriptBlock>[PSTree.Internal._FormattingInternals]::GetSource($_)</ScriptBlock>
+        <Label>Hive</Label>
+      </GroupBy>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader>
+            <Label>Kind</Label>
+            <Width>12</Width>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+          <TableColumnHeader>
+            <Label>Hierarchy</Label>
+            <Alignment>Left</Alignment>
+          </TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries>
+          <TableRowEntry>
+            <TableColumnItems>
+              <TableColumnItem>
+                <PropertyName>Kind</PropertyName>
+              </TableColumnItem>
+              <TableColumnItem>
+                <PropertyName>Hierarchy</PropertyName>
+              </TableColumnItem>
+            </TableColumnItems>
+          </TableRowEntry>
+        </TableRowEntries>
+      </TableControl>
+    </View>
+    <View>
       <Name>PSTree.Style.Palette</Name>
       <ViewSelectedBy>
         <TypeName>PSTree.Style.Palette</TypeName>
@@ -191,6 +226,38 @@
                 <PropertyName>OutputRendering</PropertyName>
               </ListItem>
               <ListItem>
+                <Label>Reset</Label>
+                <ScriptBlock>
+                  [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Reset)
+                </ScriptBlock>
+              </ListItem>
+              <ListItem>
+                <Label>FileSystem</Label>
+                <PropertyName>FileSystem</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Registry</Label>
+                <PropertyName>Registry</PropertyName>
+              </ListItem>
+              <ListItem>
+                <Label>Palette</Label>
+                <PropertyName>Palette</PropertyName>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
+      <Name>PSTree.Style.FileSystemStyle</Name>
+      <ViewSelectedBy>
+        <TypeName>PSTree.Style.FileSystemStyle</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
                 <Label>Directory</Label>
                 <ScriptBlock>
                   [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Directory)
@@ -203,18 +270,32 @@
                 </ScriptBlock>
               </ListItem>
               <ListItem>
-                <Label>Reset</Label>
+                <Label>Extension</Label>
+                <PropertyName>Extension</PropertyName>
+              </ListItem>
+            </ListItems>
+          </ListEntry>
+        </ListEntries>
+      </ListControl>
+    </View>
+    <View>
+      <Name>PSTree.Style.RegistryStyle</Name>
+      <ViewSelectedBy>
+        <TypeName>PSTree.Style.RegistryStyle</TypeName>
+      </ViewSelectedBy>
+      <ListControl>
+        <ListEntries>
+          <ListEntry>
+            <ListItems>
+              <ListItem>
+                <Label>RegistryKey</Label>
                 <ScriptBlock>
-                  [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.Reset)
+                  [PSTree.Style.TreeStyle]::Instance.EscapeSequence($_.RegistryKey)
                 </ScriptBlock>
               </ListItem>
               <ListItem>
-                <Label>Palette</Label>
-                <PropertyName>Palette</PropertyName>
-              </ListItem>
-              <ListItem>
-                <Label>Extension</Label>
-                <PropertyName>Extension</PropertyName>
+                <Label>RegistryValueKind</Label>
+                <PropertyName>RegistryValueKind</PropertyName>
               </ListItem>
             </ListItems>
           </ListEntry>
@@ -244,7 +325,7 @@
                 <ScriptBlock>$_.Keys -join [Environment]::NewLine</ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
-                <ScriptBlock>[PSTree.Style.Extension]::GetEscapedValues($_)</ScriptBlock>
+                <ScriptBlock>$_.GetEscapedValues()</ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>
@@ -252,34 +333,29 @@
       </TableControl>
     </View>
     <View>
-      <Name>treeviewreg</Name>
+      <Name>PSTree.Style.ValueKind</Name>
       <ViewSelectedBy>
-        <TypeName>PSTree.TreeRegistryBase</TypeName>
+        <TypeName>PSTree.Style.ValueKind</TypeName>
       </ViewSelectedBy>
-      <GroupBy>
-        <ScriptBlock>[PSTree.Internal._FormattingInternals]::GetSource($_)</ScriptBlock>
-        <Label>Hive</Label>
-      </GroupBy>
       <TableControl>
         <TableHeaders>
           <TableColumnHeader>
             <Label>Kind</Label>
             <Width>12</Width>
-            <Alignment>Left</Alignment>
           </TableColumnHeader>
           <TableColumnHeader>
-            <Label>Hierarchy</Label>
-            <Alignment>Left</Alignment>
+            <Label>Style</Label>
           </TableColumnHeader>
         </TableHeaders>
         <TableRowEntries>
           <TableRowEntry>
+            <Wrap>true</Wrap>
             <TableColumnItems>
               <TableColumnItem>
-                <PropertyName>Kind</PropertyName>
+                <ScriptBlock>$_.Keys -join [Environment]::NewLine</ScriptBlock>
               </TableColumnItem>
               <TableColumnItem>
-                <PropertyName>Hierarchy</PropertyName>
+                <ScriptBlock>$_.GetEscapedValues()</ScriptBlock>
               </TableColumnItem>
             </TableColumnItems>
           </TableRowEntry>
