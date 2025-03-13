@@ -15,20 +15,13 @@ namespace PSTree.Commands;
 [ExcludeFromCodeCoverage]
 #endif
 [Alias("pstreereg")]
-public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
+public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 {
 #if WINDOWS
     private readonly Cache<TreeRegistryBase, TreeRegistryValue> _cache = new();
 
     private readonly Stack<(TreeRegistryKey, RegistryKey)> _stack = [];
 #endif
-
-    [Parameter]
-    [ValidateRange(0, int.MaxValue)]
-    public int Depth { get; set; } = 3;
-
-    [Parameter]
-    public SwitchParameter Recurse { get; set; }
 
     [Parameter]
     public SwitchParameter KeysOnly { get; set; }
