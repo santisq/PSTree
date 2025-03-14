@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Win32;
 
@@ -65,11 +66,39 @@ internal static class TreeExtensions
         return tree;
     }
 
-    private static string ReplaceAt(this string input, int index, char newChar)
+#if NETCOREAPP
+    [SkipLocalsInit]
+#endif
+    private static unsafe string ReplaceAt(this string input, int index, char newChar)
     {
-        char[] chars = input.ToCharArray();
-        chars[index] = newChar;
-        return new string(chars);
+#if NETCOREAPP
+        return string.Create(input.Length, (input, index, newChar),
+            static (buffer, state) =>
+            {
+                state.input.AsSpan().CopyTo(buffer);
+                buffer[state.index] = state.newChar;
+            });
+#else
+        if (input.Length > 0x200)
+        {
+            char[] chars = input.ToCharArray();
+            chars[index] = newChar;
+            return new string(chars);
+        }
+
+        char* pChars = stackalloc char[0x200];
+        fixed (char* source = input)
+        {
+            Buffer.MemoryCopy(
+                source,
+                pChars,
+                0x200 * sizeof(char),
+                input.Length * sizeof(char));
+        }
+
+        pChars[index] = newChar;
+        return new string(pChars, 0, input.Length);
+#endif
     }
 
 #if !NETCOREAPP
