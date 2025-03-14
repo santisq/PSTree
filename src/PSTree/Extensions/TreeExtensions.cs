@@ -8,19 +8,36 @@ namespace PSTree.Extensions;
 
 internal static class TreeExtensions
 {
+#if !NETCOREAPP
     [ThreadStatic]
     private static StringBuilder? s_sb;
+#endif
 
     internal static string Indent(this string inputString, int indentation)
     {
-        s_sb ??= new StringBuilder();
-        s_sb.Clear();
+        const string corner = "└── ";
+        int repeatCount = (4 * indentation) - 4;
+        int capacity = repeatCount + 4 + inputString.Length;
+
+#if NETCOREAPP
+        return string.Create(
+            capacity, (repeatCount, corner, inputString),
+            static (buffer, state) =>
+        {
+            buffer[..state.repeatCount].Fill(' ');
+            state.corner.AsSpan().CopyTo(buffer[state.repeatCount..]);
+            state.inputString.AsSpan().CopyTo(buffer[(state.repeatCount + 4)..]);
+        });
+#else
+        s_sb ??= new StringBuilder(64);
+        s_sb.Clear().EnsureCapacity(capacity);
 
         return s_sb
-            .Append(' ', (4 * indentation) - 4)
-            .Append("└── ")
+            .Append(' ', repeatCount)
+            .Append(corner)
             .Append(inputString)
             .ToString();
+#endif
     }
 
     internal static TreeFileSystemInfo[] Format(
@@ -72,12 +89,13 @@ internal static class TreeExtensions
     private static unsafe string ReplaceAt(this string input, int index, char newChar)
     {
 #if NETCOREAPP
-        return string.Create(input.Length, (input, index, newChar),
+        return string.Create(
+            input.Length, (input, index, newChar),
             static (buffer, state) =>
-            {
-                state.input.AsSpan().CopyTo(buffer);
-                buffer[state.index] = state.newChar;
-            });
+        {
+            state.input.AsSpan().CopyTo(buffer);
+            buffer[state.index] = state.newChar;
+        });
 #else
         if (input.Length > 0x200)
         {
@@ -164,10 +182,11 @@ internal static class TreeExtensions
 
     internal static void Deconstruct(
         this string[] strings,
-        out string @base,
+        out string baseKey,
         out string? subKey)
     {
-        (@base, subKey) = (strings[0], strings.Length == 1 ? null : strings[1]);
+        baseKey = strings[0];
+        subKey = strings.Length == 1 ? null : strings[1];
     }
 #endif
 }
