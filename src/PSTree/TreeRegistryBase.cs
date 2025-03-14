@@ -14,6 +14,8 @@ public abstract class TreeRegistryBase(
 
     protected const string _providerPath = @"Microsoft.PowerShell.Core\Registry::";
 
+    public abstract string Name { get; }
+
     public string? Path { get; } = path;
 
     public virtual string? PSPath { get => _pspath ??= GetPSPath(Path); }

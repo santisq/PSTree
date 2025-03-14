@@ -15,7 +15,8 @@ internal static class TreeExtensions
         s_sb ??= new StringBuilder();
         s_sb.Clear();
 
-        return s_sb.Append(' ', (4 * indentation) - 4)
+        return s_sb
+            .Append(' ', (4 * indentation) - 4)
             .Append("└── ")
             .Append(inputString)
             .ToString();

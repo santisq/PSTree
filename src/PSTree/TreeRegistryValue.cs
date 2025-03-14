@@ -11,7 +11,7 @@ public sealed class TreeRegistryValue : TreeRegistryBase
 
     public RegistryValueKind Kind { get; }
 
-    public string Name { get; }
+    public override string Name { get; }
 
     public override string? PSParentPath { get; }
 

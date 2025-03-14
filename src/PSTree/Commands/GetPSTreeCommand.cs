@@ -178,9 +178,8 @@ public sealed class GetPSTreeCommand : TreeCommandBase
         foreach (TreeFileSystemInfo item in items)
         {
             string? path = item.ParentNode?.FullName;
-            if (path is not null)
+            if (path is not null && !counts.TryAdd(path, 1))
             {
-                counts.TryAdd(path, 0);
                 counts[path]++;
             }
         }
