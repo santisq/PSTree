@@ -201,6 +201,41 @@ RegistryKey      ├── Policies
 RegistryKey      └── Control
 ```
 
+#### Filter Out Specific Items from the `HKCU:\System` Tree
+
+```powershell
+PS ..\PSTree> Get-PSTreeRegistry HKCU:\System -Depth 2 -Exclude CurrentControlSet, GameDV*
+
+   Hive: HKEY_CURRENT_USER\System
+
+Kind         Hierarchy
+----         ---------
+RegistryKey  System
+RegistryKey  └── GameConfigStore
+Binary           ├── Win32_AutoGameModeDefaultProfile
+Binary           ├── Win32_GameModeRelatedProcesses
+RegistryKey      ├── Parents
+RegistryKey      └── Children
+```
+
+### Select GameDVR-Related Values in the `HKCU:\System` Tree
+
+```powershell
+PS ..\PSTree> Get-PSTreeRegistry HKCU:\System -Depth 2 -Include GameDVR*
+
+   Hive: HKEY_CURRENT_USER\System
+
+Kind         Hierarchy
+----         ---------
+RegistryKey  System
+RegistryKey  └── GameConfigStore
+DWord            ├── GameDVR_Enabled
+DWord            ├── GameDVR_FSEBehaviorMode
+DWord            ├── GameDVR_HonorUserFSEBehaviorMode
+DWord            ├── GameDVR_DXGIHonorFSEWindowsCompatible
+DWord            └── GameDVR_EFSEFeatureFlags
+```
+
 #### Show only Keys
 
 ```powershell
