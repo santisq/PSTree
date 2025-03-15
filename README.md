@@ -218,7 +218,7 @@ RegistryKey      ├── Parents
 RegistryKey      └── Children
 ```
 
-### Select GameDVR-Related Values in the `HKCU:\System` Tree
+#### Select GameDVR-Related Values in the `HKCU:\System` Tree
 
 ```powershell
 PS ..\PSTree> Get-PSTreeRegistry HKCU:\System -Depth 2 -Include GameDVR*
