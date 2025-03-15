@@ -6,7 +6,7 @@ public abstract class TreeRegistryBase(
     string hierarchy,
     string source,
     string? path = null)
-    : TreeBase(hierarchy, source)
+    : TreeBase<TreeRegistryKey>(hierarchy, source)
 {
     private string? _pspath;
 

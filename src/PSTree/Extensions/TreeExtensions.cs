@@ -24,9 +24,10 @@ internal static class TreeExtensions
             capacity, (repeatCount, corner, inputString),
             static (buffer, state) =>
         {
-            buffer[..state.repeatCount].Fill(' ');
-            state.corner.AsSpan().CopyTo(buffer[state.repeatCount..]);
-            state.inputString.AsSpan().CopyTo(buffer[(state.repeatCount + 4)..]);
+            int count = state.repeatCount;
+            buffer[..count].Fill(' ');
+            state.corner.AsSpan().CopyTo(buffer[count..]);
+            state.inputString.AsSpan().CopyTo(buffer[(count + 4)..]);
         });
 #else
         s_sb ??= new StringBuilder(64);
@@ -122,8 +123,7 @@ internal static class TreeExtensions
 #if !NETCOREAPP
     internal static bool TryAdd<TKey, TValue>(
         this IDictionary<TKey, TValue> dictionary,
-        TKey key,
-        TValue value)
+        TKey key, TValue value)
     {
         if (!dictionary.ContainsKey(key))
         {
@@ -179,6 +179,14 @@ internal static class TreeExtensions
     internal static (TreeRegistryKey, RegistryKey) CreateTreeKey(
         this RegistryKey key, string name, string source, int depth) =>
         (new TreeRegistryKey(key, name, source, depth), key);
+
+    internal static (TreeRegistryKey, RegistryKey) AddParent(
+        this (TreeRegistryKey, RegistryKey) treeKey,
+        TreeRegistryKey parent)
+    {
+        treeKey.Item1.AddParent<TreeRegistryKey>(parent);
+        return treeKey;
+    }
 
     internal static void Deconstruct(
         this string[] strings,

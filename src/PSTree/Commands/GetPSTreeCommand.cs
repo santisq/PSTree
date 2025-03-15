@@ -107,7 +107,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                         {
                             TreeFile file = TreeFile
                                 .Create(fileInfo, source, level)
-                                .AddParent(next)
+                                .AddParent<TreeFile>(next)
                                 .SetIncludeFlagIf(WithInclude);
 
                             _cache.Add(file);
@@ -123,11 +123,11 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
                     TreeDirectory dir = TreeDirectory
                         .Create((DirectoryInfo)item, source, level)
-                        .AddParent(next);
+                        .AddParent<TreeDirectory>(next);
 
                     if (keepProcessing && Directory || !WithInclude)
                     {
-                        dir.ShouldInclude = true;
+                        dir.Include = true;
                     }
 
                     _stack.Push(dir);
@@ -163,12 +163,9 @@ public sealed class GetPSTreeCommand : TreeCommandBase
     private static bool IsHidden(FileSystemInfo item) =>
         item.Attributes.HasFlag(FileAttributes.Hidden);
 
-    private TreeFileSystemInfo[] GetTree(bool condition)
+    private TreeFileSystemInfo[] GetTree(bool includeCondition)
     {
-        TreeFileSystemInfo[] result = condition
-            ? [.. _cache.Items.Where(static e => e.ShouldInclude)]
-            : [.. _cache.Items];
-
+        TreeFileSystemInfo[] result = _cache.GetResult(includeCondition);
         return result.Format(GetItemCount(result));
     }
 
