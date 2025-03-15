@@ -30,8 +30,10 @@ public static class _FormattingInternals
     [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
     public static string GetSource(TreeFileSystemInfo item) => item.Source;
 
+#if WINDOWS
     [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
     public static string GetSource(TreeRegistryBase item) => item.Source;
+#endif
 
     [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
     public static string GetFormattedLength(long length)
