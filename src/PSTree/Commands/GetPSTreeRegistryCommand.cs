@@ -122,7 +122,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
             _cache.Flush();
         }
 
-        return _cache.GetResult(WithInclude).Format();
+        return _cache.GetResult(WithInclude && !KeysOnly).Format();
     }
 
     private bool ShouldSkipValue(string value) =>
