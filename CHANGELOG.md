@@ -1,5 +1,11 @@
 # CHANGELOG
 
+- __03/15/2025__
+  - Optimized code to reduce memory allocations, improving performance for large data sets.
+  - Added `-Include` and `-Exclude` parameters to the `Get-PSTreeRegistry` cmdlet:
+    - `-Exclude`: Filters out registry keys and values based on wildcard patterns.
+    - `-Include`: Limits output to registry values matching wildcard patterns.
+
 - __02/26/2025__
   - Introduced the `RegistryStyle` class and added a `Registry` property to the `TreeStyle` class.
   - Moved file system style properties from `TreeStyle` to a new `FileSystemStyle` class, with a `FileSystem` property added to `TreeStyle`.
