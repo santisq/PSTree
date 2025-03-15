@@ -96,6 +96,22 @@ RegistryKey  └── .DEFAULT
 
 This example uses the registry provider path to explore all keys under `HKEY_USERS`, limited to 1 level deep.  
 
+### Example 5: Filter Out Microsoft and Log-Related Items in `HKCU:\SOFTWARE` Tree
+
+```powershell
+PS ..\PSTree> Get-PSTreeRegistry HKCU:\SOFTWARE\ -Exclude Microsoft, *Log*
+```
+
+Excludes registry keys named "Microsoft" (e.g., `HKCU:\SOFTWARE\Microsoft`) and any keys or values with "Log" in their name (e.g., `HKCU:\SOFTWARE\UpdateLog` or a value named `ErrorLog`).
+
+### Example 6: Select Windows-Related Registry Values in `HKCU:\SOFTWARE` Tree
+
+```powershell
+PS ..\PSTree> Get-PSTreeRegistry HKCU:\SOFTWARE\ -Include Win*
+```
+
+Includes only registry values whose names start with "Win" (e.g., `WindowsVersion=10.0`) from the `HKCU:\SOFTWARE` tree, omitting all keys and non-matching values.
+
 ## PARAMETERS
 
 ### -Depth
@@ -184,6 +200,50 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
+### -Exclude
+
+Specifies an array of one or more string patterns to exclude registry keys or values from the output as the cmdlet traverses the registry. Matching items are omitted from the results. [Wildcard characters](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_wildcards?view=powershell-7.5) are accepted.  
+
+> [!NOTE]
+>
+> - For registry keys, patterns are evaluated against the leaf name of the registry path (e.g., `KeyName` in `HKLM:\Software\KeyName`).
+> - For registry values, patterns are evaluated against the value name (e.g., `ValueName` in a key’s `ValueName=Data` pair).
+> The `-Include` and `-Exclude` parameters can be used together, but exclusions are applied before inclusions.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: True
+```
+
+### -Include
+
+Specifies an array of one or more string patterns to include only matching registry values in the output as the cmdlet traverses the registry. Matching registry values are included, while others (including all keys) are omitted. [Wildcard characters](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_wildcards?view=powershell-7.5) are accepted.  
+
+> [!NOTE]
+>
+> - __This parameter works only on registry values, not keys.__
+> - Patterns are evaluated against the value name (e.g., `ValueName` in a key’s `ValueName=Data` pair).
+> - The `-Include` and `-Exclude` parameters can be used together, but exclusions are applied before inclusions.
+
+```yaml
+Type: String[]
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: True
+```
+
 ### CommonParameters
 
 This cmdlet supports the common parameters. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
@@ -211,10 +271,10 @@ This cmdlet is Windows-only and requires PowerShell 5.1 or later. It may require
 
 ## RELATED LINKS
 
-[**Microsoft.Win32 Namespace**](https://learn.microsoft.com/en-us/dotnet/api/microsoft.win32?view=net-9.0)
+[__Microsoft.Win32 Namespace__](https://learn.microsoft.com/en-us/dotnet/api/microsoft.win32?view=net-9.0)
 
-[**about_Registry_Provider**](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_registry_provider?view=powershell-7.5)
+[__about_Registry_Provider__](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_registry_provider?view=powershell-7.5)
 
-[**`Get-PSTreeRegistry` Source**](../../src/PSTree/Commands/GetPSTreeRegistryCommand.cs)
+[__`Get-PSTreeRegistry` Source__](../../src/PSTree/Commands/GetPSTreeRegistryCommand.cs)
 
-[**`Get-PSTreeRegistry` Tests**](../../tests/GetPSTreeRegistryCommand.tests.ps1)
+[__`Get-PSTreeRegistry` Tests__](../../tests/GetPSTreeRegistryCommand.tests.ps1)

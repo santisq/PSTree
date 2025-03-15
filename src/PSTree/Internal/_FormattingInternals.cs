@@ -28,7 +28,12 @@ public static class _FormattingInternals
         string.Format(CultureInfo.CurrentCulture, "{0,10:d} {0,8:t}", date);
 
     [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
-    public static string GetSource(TreeBase item) => item.Source;
+    public static string GetSource(TreeFileSystemInfo item) => item.Source;
+
+#if WINDOWS
+    [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
+    public static string GetSource(TreeRegistryBase item) => item.Source;
+#endif
 
     [Hidden, EditorBrowsable(EditorBrowsableState.Never)]
     public static string GetFormattedLength(long length)

@@ -6,9 +6,6 @@ namespace PSTree;
 
 internal static class RegistryMappings
 {
-    internal static bool TryGetKey(string key, [NotNullWhen(true)] out RegistryKey? value) =>
-        _map.TryGetValue(key, out value);
-
     private static readonly Dictionary<string, RegistryKey> _map = new()
     {
         ["HKEY_CURRENT_USER"] = Registry.CurrentUser,
@@ -17,4 +14,8 @@ internal static class RegistryMappings
         ["HKEY_USERS"] = Registry.Users,
         ["HKEY_CURRENT_CONFIG"] = Registry.CurrentConfig
     };
+
+    internal static bool TryGetKey(
+        string key, [NotNullWhen(true)] out RegistryKey? value)
+        => _map.TryGetValue(key, out value);
 }

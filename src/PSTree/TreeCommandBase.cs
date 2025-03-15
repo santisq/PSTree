@@ -2,19 +2,28 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Management.Automation;
 using PSTree.Extensions;
 
 namespace PSTree;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class CommandWithPathBase : PSCmdlet
+public abstract class TreeCommandBase : PSCmdlet
 {
+    private WildcardPattern[]? _excludePatterns;
+
+    private WildcardPattern[]? _includePatterns;
+
     protected const string PathSet = "Path";
 
     protected const string LiteralPathSet = "LiteralPath";
 
     protected string[]? _paths;
+
+    protected bool WithExclude { get; private set; }
+
+    protected bool WithInclude { get; private set; }
 
     protected bool IsLiteral
     {
@@ -42,6 +51,47 @@ public abstract class CommandWithPathBase : PSCmdlet
     {
         get => _paths;
         set => _paths = value;
+    }
+
+    [Parameter]
+    [ValidateRange(0, int.MaxValue)]
+    public virtual int Depth { get; set; } = 3;
+
+    [Parameter]
+    public SwitchParameter Recurse { get; set; }
+
+    [Parameter]
+    [SupportsWildcards]
+    [ValidateNotNullOrEmpty]
+    public string[]? Exclude { get; set; }
+
+    [Parameter]
+    [SupportsWildcards]
+    [ValidateNotNullOrEmpty]
+    public string[]? Include { get; set; }
+
+    protected override void BeginProcessing()
+    {
+        if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
+        {
+            Depth = int.MaxValue;
+        }
+
+        const WildcardOptions options = WildcardOptions.Compiled
+            | WildcardOptions.CultureInvariant
+            | WildcardOptions.IgnoreCase;
+
+        if (Exclude is not null)
+        {
+            _excludePatterns = [.. Exclude.Select(e => new WildcardPattern(e, options))];
+            WithExclude = true;
+        }
+
+        if (Include is not null)
+        {
+            _includePatterns = [.. Include.Select(e => new WildcardPattern(e, options))];
+            WithInclude = true;
+        }
     }
 
     protected IEnumerable<(ProviderInfo, string)> EnumerateResolvedPaths()
@@ -78,4 +128,25 @@ public abstract class CommandWithPathBase : PSCmdlet
             }
         }
     }
+
+    private static bool MatchAny(
+        string name,
+        WildcardPattern[] patterns)
+    {
+        foreach (WildcardPattern pattern in patterns)
+        {
+            if (pattern.IsMatch(name))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected bool ShouldInclude(string item) =>
+        !WithInclude || MatchAny(item, _includePatterns!);
+
+    protected bool ShouldExclude(string item) =>
+        WithExclude && MatchAny(item, _excludePatterns!);
 }

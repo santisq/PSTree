@@ -16,5 +16,11 @@ Describe 'Formatting internals' {
         $testPath | Get-PSTree | ForEach-Object {
             [PSTree.Internal._FormattingInternals]::GetSource($_) | Should -BeExactly $testPath
         }
+
+        if ($isWin) {
+            Get-PSTreeRegistry HKCU:\ | ForEach-Object {
+                [PSTree.Internal._FormattingInternals]::GetSource($_) | Should -BeExactly 'HKEY_CURRENT_USER'
+            }
+        }
     }
 }

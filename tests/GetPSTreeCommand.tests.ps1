@@ -111,7 +111,7 @@ Describe 'Get-PSTree' {
         Get-PSTree $testPath -Exclude $exclude -Recurse | ForEach-Object {
             [System.Linq.Enumerable]::Any(
                 [string[]] $exclude,
-                [System.Func[string, bool]] { $_.FullName -like $args[0] })
+                [System.Func[string, bool]] { $_.Name -like $args[0] })
         } | Should -Not -BeTrue
 
         Get-ChildItem $testPath -Filter *.ps1 -Recurse |
@@ -125,7 +125,7 @@ Describe 'Get-PSTree' {
             [System.Linq.Enumerable]::Any(
                 [string[]] $include,
                 [System.Func[string, bool]] {
-                    $_.FullName -like $args[0] -or $_ -is [PSTree.TreeDirectory]
+                    $_.Name -like $args[0] -or $_ -is [PSTree.TreeDirectory]
                 }
             )
         } | Should -BeTrue

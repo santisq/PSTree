@@ -6,13 +6,15 @@ public abstract class TreeRegistryBase(
     string hierarchy,
     string source,
     string? path = null)
-    : TreeBase(hierarchy, source)
+    : TreeBase<TreeRegistryKey>(hierarchy, source)
 {
     private string? _pspath;
 
     private string? _psparentpath;
 
     protected const string _providerPath = @"Microsoft.PowerShell.Core\Registry::";
+
+    public abstract string Name { get; }
 
     public string? Path { get; } = path;
 

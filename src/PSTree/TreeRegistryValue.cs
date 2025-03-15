@@ -9,9 +9,11 @@ public sealed class TreeRegistryValue : TreeRegistryBase
 {
     private readonly string _parentPath;
 
+    internal override bool Include { get; set; } = true;
+
     public RegistryValueKind Kind { get; }
 
-    public string Name { get; }
+    public override string Name { get; }
 
     public override string? PSParentPath { get; }
 
@@ -27,9 +29,19 @@ public sealed class TreeRegistryValue : TreeRegistryBase
         PSParentPath = $"{_providerPath}{_parentPath}";
     }
 
+    public object? GetValue() => Registry.GetValue(_parentPath, Name, null);
+
     private static string GetColoredName(string name, RegistryValueKind kind) =>
         TreeStyle.Instance.Registry.GetColoredValue(name, kind);
 
-    public object? GetValue() => Registry.GetValue(_parentPath, Name, null);
+    internal TreeRegistryValue SetIncludeFlagIf(bool condition)
+    {
+        if (condition)
+        {
+            ParentNode?.SetIncludeFlag();
+        }
+
+        return this;
+    }
 }
 #endif

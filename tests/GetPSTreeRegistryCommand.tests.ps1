@@ -54,6 +54,28 @@ Describe 'Get-PSTreeRegistry.Windows' {
             { Get-PSTreeRegistry HKLM:\SECURITY } |
                 Should -Throw -ExceptionType ([System.Security.SecurityException])
         }
+
+        It 'Excludes child items with -Exclude parameter' {
+            $exclude = '*a*', '*net*', '*sys*'
+            Get-PSTreeRegistry HKCU:\ -Exclude * | Should -HaveCount 1
+            Get-PSTreeRegistry HKCU:\ -Exclude $exclude -Recurse | ForEach-Object {
+                [System.Linq.Enumerable]::Any(
+                    [string[]] $exclude,
+                    [System.Func[string, bool]] { $_.Name -like $args[0] })
+            } | Should -Not -BeTrue
+        }
+
+        It 'Includes child items with -Include parameter' {
+            $include = '*sys*', '*user*'
+            Get-PSTreeRegistry HKCU:\ -Include $include | ForEach-Object {
+                [System.Linq.Enumerable]::Any(
+                    [string[]] $include,
+                    [System.Func[string, bool]] {
+                        $_.Name -like $args[0] -or $_ -is [PSTree.TreeRegistryKey]
+                    }
+                )
+            } | Should -BeTrue
+        }
     }
 
     Context 'Parameter Validation' {

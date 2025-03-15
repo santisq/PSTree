@@ -15,7 +15,7 @@ namespace PSTree.Commands;
 [ExcludeFromCodeCoverage]
 #endif
 [Alias("pstreereg")]
-public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
+public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 {
 #if WINDOWS
     private readonly Cache<TreeRegistryBase, TreeRegistryValue> _cache = new();
@@ -24,22 +24,12 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 #endif
 
     [Parameter]
-    [ValidateRange(0, int.MaxValue)]
-    public int Depth { get; set; } = 3;
-
-    [Parameter]
-    public SwitchParameter Recurse { get; set; }
-
-    [Parameter]
     public SwitchParameter KeysOnly { get; set; }
 
     protected override void BeginProcessing()
     {
         this.ThrowIfNotSupportedPlatform();
-        if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
-        {
-            Depth = int.MaxValue;
-        }
+        base.BeginProcessing();
     }
 
 #if WINDOWS
@@ -61,6 +51,82 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
             WriteObject(Traverse(key), enumerateCollection: true);
         }
     }
+
+    private TreeRegistryBase[] Traverse(RegistryKey key)
+    {
+        _cache.Clear();
+        _stack.Push(key.CreateTreeKey(System.IO.Path.GetFileName(key.Name)));
+        string source = key.Name;
+
+        while (_stack.Count > 0)
+        {
+            (TreeRegistryKey tree, key) = _stack.Pop();
+            int depth = tree.Depth + 1;
+
+            using (key)
+            {
+                if (depth <= Depth)
+                {
+                    if (KeysOnly)
+                    {
+                        goto PushKeys;
+                    }
+
+                    foreach (string value in key.GetValueNames())
+                    {
+                        if (ShouldSkipValue(value))
+                        {
+                            continue;
+                        }
+
+                        TreeRegistryValue treevalue = new(key, value, source, depth);
+
+                        _cache.Add(treevalue
+                            .AddParent<TreeRegistryValue>(tree)
+                            .SetIncludeFlagIf(WithInclude));
+                    }
+
+                PushKeys:
+                    foreach (string keyname in key.GetSubKeyNames())
+                    {
+                        if (ShouldExclude(keyname))
+                        {
+                            continue;
+                        }
+
+                        try
+                        {
+                            RegistryKey? subkey = key.OpenSubKey(keyname);
+
+                            if (subkey is null)
+                            {
+                                continue;
+                            }
+
+                            (TreeRegistryKey, RegistryKey) treekey = subkey
+                                .CreateTreeKey(keyname, source, depth)
+                                .AddParent(tree);
+
+                            _stack.Push(treekey);
+                        }
+                        catch (SecurityException exception)
+                        {
+                            string path = System.IO.Path.Combine(key.Name, keyname);
+                            WriteError(exception.ToSecurityError(path));
+                        }
+                    }
+                }
+            }
+
+            _cache.Add(tree);
+            _cache.Flush();
+        }
+
+        return _cache.GetResult(WithInclude && !KeysOnly).Format();
+    }
+
+    private bool ShouldSkipValue(string value) =>
+        string.IsNullOrEmpty(value) || ShouldExclude(value) || !ShouldInclude(value);
 
     private bool TryGetKey(string path, [NotNullWhen(true)] out RegistryKey? key)
     {
@@ -93,71 +159,6 @@ public sealed class GetPSTreeRegistryCommand : CommandWithPathBase
 
         key = value;
         return true;
-    }
-
-    private TreeBase[] Traverse(RegistryKey key)
-    {
-        _cache.Clear();
-        _stack.Push(key.CreateTreeKey(System.IO.Path.GetFileName(key.Name)));
-        string source = key.Name;
-
-        while (_stack.Count > 0)
-        {
-            (TreeRegistryKey tree, key) = _stack.Pop();
-            int depth = tree.Depth + 1;
-
-            using (key)
-            {
-                if (depth <= Depth)
-                {
-                    if (KeysOnly)
-                    {
-                        goto PushKeys;
-                    }
-
-                    foreach (string value in key.GetValueNames())
-                    {
-                        if (string.IsNullOrEmpty(value))
-                        {
-                            continue;
-                        }
-
-                        _cache.Add(new TreeRegistryValue(key, value, source, depth));
-                    }
-
-                PushKeys:
-                    PushSubKeys(key, source, depth);
-                }
-            }
-
-            _cache.Add(tree);
-            _cache.Flush();
-        }
-
-        return _cache.Items.ToArray().Format();
-    }
-
-    private void PushSubKeys(RegistryKey key, string source, int depth)
-    {
-        foreach (string keyname in key.GetSubKeyNames())
-        {
-            try
-            {
-                RegistryKey? subkey = key.OpenSubKey(keyname);
-
-                if (subkey is null)
-                {
-                    continue;
-                }
-
-                _stack.Push(subkey.CreateTreeKey(keyname, source, depth));
-            }
-            catch (SecurityException exception)
-            {
-                string path = System.IO.Path.Combine(key.Name, keyname);
-                WriteError(exception.ToSecurityError(path));
-            }
-        }
     }
 #endif
 }

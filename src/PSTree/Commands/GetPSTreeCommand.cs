@@ -11,28 +11,13 @@ namespace PSTree.Commands;
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = PathSet)]
 [OutputType(typeof(TreeDirectory), typeof(TreeFile))]
 [Alias("pstree")]
-public sealed class GetPSTreeCommand : CommandWithPathBase
+public sealed class GetPSTreeCommand : TreeCommandBase
 {
-    private bool _withExclude;
-
-    private bool _withInclude;
-
-    private WildcardPattern[]? _excludePatterns;
-
-    private WildcardPattern[]? _includePatterns;
-
     private readonly Stack<TreeDirectory> _stack = new();
 
     private readonly Cache<TreeFileSystemInfo, TreeFile> _cache = new();
 
     private readonly TreeComparer _comparer = new();
-
-    [Parameter]
-    [ValidateRange(0, int.MaxValue)]
-    public int Depth { get; set; } = 3;
-
-    [Parameter]
-    public SwitchParameter Recurse { get; set; }
 
     [Parameter]
     public SwitchParameter Force { get; set; }
@@ -42,40 +27,6 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
     [Parameter]
     public SwitchParameter RecursiveSize { get; set; }
-
-    [Parameter]
-    [SupportsWildcards]
-    [ValidateNotNullOrEmpty]
-    public string[]? Exclude { get; set; }
-
-    [Parameter]
-    [SupportsWildcards]
-    [ValidateNotNullOrEmpty]
-    public string[]? Include { get; set; }
-
-    protected override void BeginProcessing()
-    {
-        if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
-        {
-            Depth = int.MaxValue;
-        }
-
-        const WildcardOptions options = WildcardOptions.Compiled
-            | WildcardOptions.CultureInvariant
-            | WildcardOptions.IgnoreCase;
-
-        if (Exclude is not null)
-        {
-            _excludePatterns = [.. Exclude.Select(e => new WildcardPattern(e, options))];
-            _withExclude = true;
-        }
-
-        if (Include is not null)
-        {
-            _includePatterns = [.. Include.Select(e => new WildcardPattern(e, options))];
-            _withInclude = true;
-        }
-    }
 
     protected override void ProcessRecord()
     {
@@ -90,7 +41,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
             if (File.Exists(path))
             {
                 FileInfo file = new(path);
-                if (!ShouldExclude(file) && ShouldInclude(file))
+                if (!ShouldExclude(file.Name) && ShouldInclude(file.Name))
                 {
                     WriteObject(TreeFile.Create(file, path));
                 }
@@ -127,7 +78,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                 bool keepProcessing = level <= Depth;
                 foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
                 {
-                    if (!Force && IsHidden(item) || ShouldExclude(item))
+                    if (!Force && IsHidden(item) || ShouldExclude(item.Name))
                     {
                         continue;
                     }
@@ -140,7 +91,7 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                             continue;
                         }
 
-                        if (!ShouldInclude(fileInfo))
+                        if (!ShouldInclude(fileInfo.Name))
                         {
                             continue;
                         }
@@ -156,8 +107,8 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
                         {
                             TreeFile file = TreeFile
                                 .Create(fileInfo, source, level)
-                                .AddParent(next)
-                                .SetIncludeFlagIf(_withInclude);
+                                .AddParent<TreeFile>(next)
+                                .SetIncludeFlagIf(WithInclude);
 
                             _cache.Add(file);
                         }
@@ -172,11 +123,11 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
 
                     TreeDirectory dir = TreeDirectory
                         .Create((DirectoryInfo)item, source, level)
-                        .AddParent(next);
+                        .AddParent<TreeDirectory>(next);
 
-                    if (keepProcessing && Directory || !_withInclude)
+                    if (keepProcessing && Directory || !WithInclude)
                     {
-                        dir.ShouldInclude = true;
+                        dir.Include = true;
                     }
 
                     _stack.Push(dir);
@@ -206,37 +157,15 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
             }
         }
 
-        return GetTree(_withInclude && !Directory);
+        return GetTree(WithInclude && !Directory);
     }
 
     private static bool IsHidden(FileSystemInfo item) =>
         item.Attributes.HasFlag(FileAttributes.Hidden);
 
-    private static bool MatchAny(string name, WildcardPattern[] patterns)
+    private TreeFileSystemInfo[] GetTree(bool includeCondition)
     {
-        foreach (WildcardPattern pattern in patterns)
-        {
-            if (pattern.IsMatch(name))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private bool ShouldInclude(FileInfo item) =>
-        !_withInclude || MatchAny(item.Name, _includePatterns!);
-
-    private bool ShouldExclude(FileSystemInfo item) =>
-        _withExclude && MatchAny(item.Name, _excludePatterns!);
-
-    private TreeFileSystemInfo[] GetTree(bool condition)
-    {
-        TreeFileSystemInfo[] result = condition
-            ? [.. _cache.Items.Where(static e => e.ShouldInclude)]
-            : [.. _cache.Items];
-
+        TreeFileSystemInfo[] result = _cache.GetResult(includeCondition);
         return result.Format(GetItemCount(result));
     }
 
@@ -246,17 +175,10 @@ public sealed class GetPSTreeCommand : CommandWithPathBase
         foreach (TreeFileSystemInfo item in items)
         {
             string? path = item.ParentNode?.FullName;
-            if (path is null)
+            if (path is not null && !counts.TryAdd(path, 1))
             {
-                continue;
+                counts[path]++;
             }
-
-            if (!counts.ContainsKey(path))
-            {
-                counts[path] = 0;
-            }
-
-            counts[path]++;
         }
 
         return counts;

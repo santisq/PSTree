@@ -23,7 +23,7 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
         DirectoryInfo dir, string hierarchy, string source)
         : base(dir, hierarchy, source)
     {
-        ShouldInclude = true;
+        Include = true;
     }
 
     public IEnumerable<FileInfo> EnumerateFiles() =>
@@ -56,12 +56,6 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
         return new TreeDirectory(dir, styled, source, depth);
     }
 
-    internal TreeDirectory AddParent(TreeDirectory parent)
-    {
-        ParentNode = parent;
-        return this;
-    }
-
     internal void IndexCount(int count)
     {
         ItemCount = count;
@@ -78,21 +72,6 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
         for (TreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
         {
             i.Length += length;
-        }
-    }
-
-    internal void SetIncludeFlag()
-    {
-        ShouldInclude = true;
-
-        for (TreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
-        {
-            if (i.ShouldInclude)
-            {
-                return;
-            }
-
-            i.ShouldInclude = true;
         }
     }
 }
