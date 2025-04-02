@@ -66,13 +66,13 @@ PS ..\PSTree> Get-PSTree | Select-Object -First 20
 
 Mode            Length Hierarchy
 ----            ------ ---------
-d----         33.79 KB PSTree
--a---          4.75 KB ├── .gitignore
+d----         36.78 KB PSTree
+-a---          4.75 KB ├── .gitignore        
 -a---        137.00  B ├── .markdownlint.json
 -a---          1.37 KB ├── build.ps1
--a---         18.31 KB ├── CHANGELOG.md
+-a---         19.34 KB ├── CHANGELOG.md
 -a---          1.07 KB ├── LICENSE
--a---          8.16 KB ├── README.md
+-a---         10.12 KB ├── README.md
 d----          0.00  B ├── .github
 d----          4.10 KB │   └── workflows
 -a---          4.10 KB │       └── ci.yml
@@ -81,37 +81,37 @@ d----          4.18 KB ├── .vscode
 -a---          1.39 KB │   ├── launch.json
 -a---          1.09 KB │   ├── settings.json
 -a---          1.43 KB │   └── tasks.json
-d----        229.32 KB ├── assets
+d----        266.71 KB ├── assets
 -a---         10.00 KB │   ├── EscapeSequence.png
--a---         78.08 KB │   ├── Example.After.png
--a---         73.89 KB │   ├── Example.Before.png
--a---         67.35 KB │   └── TreeStyle.png
+-a---         78.08 KB │   ├── Get-PSTree.After.png
+-a---         73.89 KB │   ├── Get-PSTree.Before.png
+-a---         34.54 KB │   ├── Get-PSTreeRegistry.After.png
 ```
 
-#### Excludes items starting with `.[gva]*` and `assets`
+#### Excludes items starting with `.g`, `.v`, `.m` and `assets`
 
 ```powershell
-Get-PSTree -Exclude .[gva]*, assets | Select-Object -First 20
+Get-PSTree -Exclude .[gvm]*, assets | Select-Object -First 20
 
    Source: C:\User\Documents\PSTree
 
 Mode            Length Hierarchy
 ----            ------ ---------
-d----         29.04 KB PSTree
--a---        137.00  B ├── .markdownlint.json
--a---          1.37 KB ├── build.ps1
--a---         18.31 KB ├── CHANGELOG.md
+d----         31.90 KB PSTree
+-a---          1.37 KB ├── build.ps1   
+-a---         19.34 KB ├── CHANGELOG.md
 -a---          1.07 KB ├── LICENSE
--a---          8.16 KB ├── README.md
+-a---         10.12 KB ├── README.md
 d----          0.00  B ├── docs
-d----         12.57 KB │   └── en-US
--a---          4.36 KB │       ├── about_TreeStyle.md
--a---          7.39 KB │       ├── Get-PSTree.md
--a---        848.00  B │       └── Get-PSTreeStyle.md
-d----         19.75 KB ├── module
--a---         14.74 KB │   ├── PSTree.Format.ps1xml
+d----         31.99 KB │   └── en-US
+-a---          7.25 KB │       ├── about_TreeStyle.md
+-a---         13.25 KB │       ├── Get-PSTree.md
+-a---         10.49 KB │       ├── Get-PSTreeRegistry.md
+-a---          1.00 KB │       └── Get-PSTreeStyle.md
+d----         22.10 KB ├── module
+-a---         17.08 KB │   ├── PSTree.Format.ps1xml
 -a---          5.01 KB │   └── PSTree.psd1
-d----        341.36 KB ├── output
+d----        513.42 KB ├── output
 -a---         22.70 KB │   ├── PSTree.2.1.11.nupkg
 -a---         24.21 KB │   ├── PSTree.2.1.12.nupkg
 -a---         24.22 KB │   ├── PSTree.2.1.13.nupkg
