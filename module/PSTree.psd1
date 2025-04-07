@@ -16,7 +16,7 @@
     }
 
     # Version number of this module.
-    ModuleVersion = '2.2.4'
+    ModuleVersion = '2.2.5'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -34,7 +34,7 @@
     Copyright = '(c) Santiago Squarzon. All rights reserved.'
 
     # Description of the functionality provided by this module
-    Description = 'tree like cmdlets for PowerShell'
+    Description = 'Tree-like cmdlets for file system and registry exploration!'
 
     # Minimum version of the PowerShell engine required by this module
     PowerShellVersion = '5.1'
@@ -114,6 +114,9 @@
                 'tree-structure'
                 'filesystem'
                 'registry'
+                'navigation'
+                'visualization'
+                'system-administration'
             )
 
             # A URL to the license for this module.
