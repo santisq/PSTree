@@ -9,6 +9,8 @@ public sealed class TreeRegistryValue : TreeRegistryBase
 {
     private readonly string _parentPath;
 
+    private readonly string _valueName;
+
     internal override bool Include { get; set; } = true;
 
     public RegistryValueKind Kind { get; }
@@ -22,14 +24,18 @@ public sealed class TreeRegistryValue : TreeRegistryBase
         base(string.Empty, source)
     {
         _parentPath = key.Name;
-        Kind = key.GetValueKind(value);
-        Hierarchy = GetColoredName(value, Kind).Indent(depth);
+        _valueName = value;
         Depth = depth;
-        Name = value;
+        Name = GetNameOrDefault(value);
+        Kind = key.GetValueKind(value);
+        Hierarchy = GetColoredName(Name, Kind).Indent(depth);
         PSParentPath = $"{_providerPath}{_parentPath}";
     }
 
-    public object? GetValue() => Registry.GetValue(_parentPath, Name, null);
+    private static string GetNameOrDefault(string value) =>
+        string.IsNullOrEmpty(value) ? "(Default)" : value;
+
+    public object? GetValue() => Registry.GetValue(_parentPath, _valueName, null);
 
     private static string GetColoredName(string name, RegistryValueKind kind) =>
         TreeStyle.Instance.Registry.GetColoredValue(name, kind);
