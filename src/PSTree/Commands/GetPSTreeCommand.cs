@@ -64,7 +64,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
     private TreeFileSystemInfo[] Traverse(TreeDirectory directory)
     {
         _cache.Clear();
-        _stack.Push(directory);
+        directory.PushToStack(_stack);
         string source = directory.FullName;
 
         while (_stack.Count > 0)
@@ -105,12 +105,11 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
                         if (keepProcessing)
                         {
-                            TreeFile file = TreeFile
+                            TreeFile
                                 .Create(fileInfo, source, level)
                                 .AddParent<TreeFile>(next)
-                                .SetIncludeFlagIf(WithInclude);
-
-                            _cache.Add(file);
+                                .SetIncludeFlagIf(WithInclude)
+                                .AddToCache(_cache);
                         }
 
                         continue;
@@ -121,16 +120,11 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                         continue;
                     }
 
-                    TreeDirectory dir = TreeDirectory
+                    TreeDirectory
                         .Create((DirectoryInfo)item, source, level)
-                        .AddParent<TreeDirectory>(next);
-
-                    if (keepProcessing && Directory || !WithInclude)
-                    {
-                        dir.Include = true;
-                    }
-
-                    _stack.Push(dir);
+                        .AddParent<TreeDirectory>(next)
+                        .SetIncludeFlagIf(keepProcessing && Directory || !WithInclude)
+                        .PushToStack(_stack);
                 }
 
                 next.Length = totalLength;
@@ -160,8 +154,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
         return GetTree(WithInclude && !Directory);
     }
 
-    private static bool IsHidden(FileSystemInfo item) =>
-        item.Attributes.HasFlag(FileAttributes.Hidden);
+    private static bool IsHidden(FileSystemInfo item) => item.Attributes.HasFlag(FileAttributes.Hidden);
 
     private TreeFileSystemInfo[] GetTree(bool includeCondition)
     {

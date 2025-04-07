@@ -52,18 +52,22 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
         }
     }
 
-    private TreeRegistryBase[] Traverse(RegistryKey key)
+    private TreeRegistryBase[] Traverse(RegistryKey registryKey)
     {
         _cache.Clear();
-        _stack.Push(key.CreateTreeKey(System.IO.Path.GetFileName(key.Name)));
-        string source = key.Name;
+
+        registryKey.
+            CreateTreeKey(System.IO.Path.GetFileName(registryKey.Name)).
+            PushToStack(_stack);
+
+        string source = registryKey.Name;
 
         while (_stack.Count > 0)
         {
-            (TreeRegistryKey tree, key) = _stack.Pop();
+            (TreeRegistryKey tree, registryKey) = _stack.Pop();
             int depth = tree.Depth + 1;
 
-            using (key)
+            using (registryKey)
             {
                 if (depth <= Depth)
                 {
@@ -72,22 +76,21 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
                         goto PushKeys;
                     }
 
-                    foreach (string value in key.GetValueNames())
+                    foreach (string value in registryKey.GetValueNames())
                     {
                         if (ShouldSkipValue(value))
                         {
                             continue;
                         }
 
-                        TreeRegistryValue treevalue = new(key, value, source, depth);
-
-                        _cache.Add(treevalue
+                        new TreeRegistryValue(registryKey, value, source, depth)
                             .AddParent<TreeRegistryValue>(tree)
-                            .SetIncludeFlagIf(WithInclude));
+                            .SetIncludeFlagIf(WithInclude)
+                            .AddToCache(_cache);
                     }
 
                 PushKeys:
-                    foreach (string keyname in key.GetSubKeyNames())
+                    foreach (string keyname in registryKey.GetSubKeyNames())
                     {
                         if (ShouldExclude(keyname))
                         {
@@ -96,22 +99,21 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 
                         try
                         {
-                            RegistryKey? subkey = key.OpenSubKey(keyname);
+                            RegistryKey? subkey = registryKey.OpenSubKey(keyname);
 
                             if (subkey is null)
                             {
                                 continue;
                             }
 
-                            (TreeRegistryKey, RegistryKey) treekey = subkey
+                            subkey
                                 .CreateTreeKey(keyname, source, depth)
-                                .AddParent(tree);
-
-                            _stack.Push(treekey);
+                                .AddParent(tree)
+                                .PushToStack(_stack);
                         }
                         catch (SecurityException exception)
                         {
-                            string path = System.IO.Path.Combine(key.Name, keyname);
+                            string path = System.IO.Path.Combine(registryKey.Name, keyname);
                             WriteError(exception.ToSecurityError(path));
                         }
                     }

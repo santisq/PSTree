@@ -84,6 +84,18 @@ internal static class TreeExtensions
         return tree;
     }
 
+    internal static void AddToCache<TBase, TLeaf>(this TLeaf leaf, Cache<TBase, TLeaf> cache)
+        where TLeaf : TBase
+        where TBase : ITree
+    {
+        cache.Add(leaf);
+    }
+
+    internal static void PushToStack(this TreeDirectory directory, Stack<TreeDirectory> stack)
+    {
+        stack.Push(directory);
+    }
+
 #if NETCOREAPP
     [SkipLocalsInit]
 #endif
@@ -186,6 +198,13 @@ internal static class TreeExtensions
     {
         treeKey.Item1.AddParent<TreeRegistryKey>(parent);
         return treeKey;
+    }
+
+    internal static void PushToStack(
+        this (TreeRegistryKey, RegistryKey) treeKey,
+        Stack<(TreeRegistryKey, RegistryKey)> stack)
+    {
+        stack.Push(treeKey);
     }
 
     internal static void Deconstruct(

@@ -74,4 +74,14 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
             i.Length += length;
         }
     }
+
+    internal TreeDirectory SetIncludeFlagIf(bool condition)
+    {
+        if (condition)
+        {
+            Include = true;
+        }
+
+        return this;
+    }
 }
