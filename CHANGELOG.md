@@ -1,5 +1,8 @@
 # CHANGELOG
 
+- __04/07/2025__
+  - Modifies the `Get-PSTreeRegistry` cmdlet to include registry default values (unnamed values displayed as `(Default)` in regedit), which were previously excluded due to a filter on empty value names.
+
 - __03/15/2025__
   - Optimized code to reduce memory allocations, improving performance for large data sets.
   - Added `-Include` and `-Exclude` parameters to the `Get-PSTreeRegistry` cmdlet:
