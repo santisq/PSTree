@@ -125,8 +125,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
         return _cache.GetResult(WithInclude && !KeysOnly).Format();
     }
 
-    private bool ShouldSkipValue(string value) =>
-        string.IsNullOrEmpty(value) || ShouldExclude(value) || !ShouldInclude(value);
+    private bool ShouldSkipValue(string value) => ShouldExclude(value) || !ShouldInclude(value);
 
     private bool TryGetKey(string path, [NotNullWhen(true)] out RegistryKey? key)
     {
