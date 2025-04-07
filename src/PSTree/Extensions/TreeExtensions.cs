@@ -91,7 +91,7 @@ internal static class TreeExtensions
         cache.Add(leaf);
     }
 
-    internal static void PushToStack(this TreeDirectory directory, Stack<TreeDirectory> stack)
+    internal static void PushToStack<T>(this T directory, Stack<T> stack)
     {
         stack.Push(directory);
     }
@@ -198,13 +198,6 @@ internal static class TreeExtensions
     {
         treeKey.Item1.AddParent<TreeRegistryKey>(parent);
         return treeKey;
-    }
-
-    internal static void PushToStack(
-        this (TreeRegistryKey, RegistryKey) treeKey,
-        Stack<(TreeRegistryKey, RegistryKey)> stack)
-    {
-        stack.Push(treeKey);
     }
 
     internal static void Deconstruct(
