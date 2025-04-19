@@ -65,13 +65,13 @@ public abstract class TreeCommandBase : PSCmdlet
     [Parameter]
     [SupportsWildcards]
     [ValidateNotNullOrEmpty]
-    [Alias("inc")]
+    [Alias("exc")]
     public string[]? Exclude { get; set; }
 
     [Parameter]
     [SupportsWildcards]
     [ValidateNotNullOrEmpty]
-    [Alias("exc")]
+    [Alias("inc")]
     public string[]? Include { get; set; }
 
     protected override void BeginProcessing()
