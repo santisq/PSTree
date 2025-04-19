@@ -121,7 +121,7 @@ Specifies the maximum depth of the registry traversal. Default value is 3. Use t
 ```yaml
 Type: Int32
 Parameter Sets: (All)
-Aliases:
+Aliases: p, dp
 
 Required: False
 Position: Named
@@ -137,7 +137,7 @@ Limits output to `TreeRegistryKey` objects only, excluding `TreeRegistryValue` o
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: k, key
 
 Required: False
 Position: Named
@@ -191,7 +191,7 @@ Enables recursive traversal of all subkeys under the specified registry path. Us
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: r, rec
 
 Required: False
 Position: Named
@@ -213,7 +213,7 @@ Specifies an array of one or more string patterns to exclude registry keys or va
 ```yaml
 Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: exc
 
 Required: False
 Position: Named
@@ -235,7 +235,7 @@ Specifies an array of one or more string patterns to include only matching regis
 ```yaml
 Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: inc
 
 Required: False
 Position: Named

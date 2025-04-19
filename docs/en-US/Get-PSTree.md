@@ -128,7 +128,7 @@ Specifies the maximum depth of the folder traversal. The default value is 3, lim
 ```yaml
 Type: Int32
 Parameter Sets: (All)
-Aliases:
+Aliases: p, dp
 
 Required: False
 Position: Named
@@ -144,7 +144,7 @@ Limits output to directories only, excluding files. When specified, the cmdlet d
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: d, dir
 
 Required: False
 Position: Named
@@ -165,7 +165,7 @@ Specifies an array of one or more string patterns to exclude items from the outp
 ```yaml
 Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: exc
 
 Required: False
 Position: Named
@@ -181,7 +181,7 @@ Allows the cmdlet to access items that would otherwise be inaccessible, such as 
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: f
 
 Required: False
 Position: Named
@@ -203,7 +203,7 @@ Specifies an array of one or more string patterns to include only matching items
 ```yaml
 Type: String[]
 Parameter Sets: (All)
-Aliases:
+Aliases: inc
 
 Required: False
 Position: Named
@@ -251,7 +251,7 @@ Enables recursive traversal of all subfolders under the specified path. Use this
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: r, rec
 
 Required: False
 Position: Named
@@ -269,7 +269,7 @@ By default, hidden and system items are excluded from recursive size calculation
 ```yaml
 Type: SwitchParameter
 Parameter Sets: (All)
-Aliases:
+Aliases: rs
 
 Required: False
 Position: Named
