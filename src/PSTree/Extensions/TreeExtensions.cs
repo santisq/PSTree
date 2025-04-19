@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.Win32;
+#if NETCOREAPP
+using System.Runtime.CompilerServices;
+#endif
 
 namespace PSTree.Extensions;
 

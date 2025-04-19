@@ -55,19 +55,23 @@ public abstract class TreeCommandBase : PSCmdlet
 
     [Parameter]
     [ValidateRange(0, int.MaxValue)]
+    [Alias("p", "dp")]
     public virtual int Depth { get; set; } = 3;
 
     [Parameter]
+    [Alias("rec", "r")]
     public SwitchParameter Recurse { get; set; }
 
     [Parameter]
     [SupportsWildcards]
     [ValidateNotNullOrEmpty]
+    [Alias("exc")]
     public string[]? Exclude { get; set; }
 
     [Parameter]
     [SupportsWildcards]
     [ValidateNotNullOrEmpty]
+    [Alias("inc")]
     public string[]? Include { get; set; }
 
     protected override void BeginProcessing()

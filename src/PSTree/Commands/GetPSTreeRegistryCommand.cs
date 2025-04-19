@@ -24,6 +24,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 #endif
 
     [Parameter]
+    [Alias("k", "key")]
     public SwitchParameter KeysOnly { get; set; }
 
     protected override void BeginProcessing()

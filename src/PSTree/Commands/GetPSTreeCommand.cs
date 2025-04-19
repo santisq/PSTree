@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Management.Automation;
 using Microsoft.PowerShell.Commands;
 using PSTree.Extensions;
@@ -20,12 +19,15 @@ public sealed class GetPSTreeCommand : TreeCommandBase
     private readonly TreeComparer _comparer = new();
 
     [Parameter]
+    [Alias("f")]
     public SwitchParameter Force { get; set; }
 
     [Parameter]
+    [Alias("dir", "d")]
     public SwitchParameter Directory { get; set; }
 
     [Parameter]
+    [Alias("rs")]
     public SwitchParameter RecursiveSize { get; set; }
 
     protected override void ProcessRecord()

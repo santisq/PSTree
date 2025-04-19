@@ -1,5 +1,8 @@
 # CHANGELOG
 
+- __04/19/2025__
+  - Adds parameter aliases for `Get-PSTree` and `Get-PSTreeRegistry`, issue #49.
+
 - __04/07/2025__
   - Modifies the `Get-PSTreeRegistry` cmdlet to include registry default values (unnamed values displayed as `(Default)` in regedit), which were previously excluded due to a filter on empty value names.
 
