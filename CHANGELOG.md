@@ -172,7 +172,7 @@
       ```powershell
       PS ..\PSTree> pstree -Directory -Depth 2
 
-        Source: D:\Zen\Documents\Scripts\PSTree
+        Source: D:\...\PSTree
 
       Mode            Length Hierarchy
       ----            ------ ---------
