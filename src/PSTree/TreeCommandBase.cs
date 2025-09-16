@@ -15,11 +15,11 @@ public abstract class TreeCommandBase : PSCmdlet
 
     private WildcardPattern[]? _includePatterns;
 
+    private string[]? _paths;
+
     protected const string PathSet = "Path";
 
     protected const string LiteralPathSet = "LiteralPath";
-
-    protected string[]? _paths;
 
     protected bool WithExclude { get; private set; }
 
@@ -29,6 +29,8 @@ public abstract class TreeCommandBase : PSCmdlet
     {
         get => MyInvocation.BoundParameters.ContainsKey(nameof(LiteralPath));
     }
+
+    protected bool Canceled { get; set; }
 
     [Parameter(
         ParameterSetName = PathSet,
@@ -97,6 +99,8 @@ public abstract class TreeCommandBase : PSCmdlet
             WithInclude = true;
         }
     }
+
+    protected override void StopProcessing() => Canceled = true;
 
     protected IEnumerable<(ProviderInfo, string)> EnumerateResolvedPaths()
     {

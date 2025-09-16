@@ -14,7 +14,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 {
     private readonly Stack<TreeDirectory> _stack = new();
 
-    private readonly Cache<TreeFileSystemInfo, TreeFile> _cache = new();
+    private readonly TreeBuilder<TreeFileSystemInfo, TreeFile> _builder = new();
 
     private readonly TreeComparer _comparer = new();
 
@@ -65,11 +65,11 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
     private TreeFileSystemInfo[] Traverse(TreeDirectory directory)
     {
-        _cache.Clear();
+        _builder.Clear();
         directory.PushToStack(_stack);
         string source = directory.FullName;
 
-        while (_stack.Count > 0)
+        while (_stack.Count > 0 && !Canceled)
         {
             TreeDirectory next = _stack.Pop();
             int level = next.Depth + 1;
@@ -111,7 +111,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                                 .Create(fileInfo, source, level)
                                 .AddParent<TreeFile>(next)
                                 .SetIncludeFlagIf(WithInclude)
-                                .AddToCache(_cache);
+                                .AddToCache(_builder);
                         }
 
                         continue;
@@ -138,15 +138,15 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
                 if (next.Depth <= Depth)
                 {
-                    _cache.Add(next);
-                    _cache.Flush();
+                    _builder.Add(next);
+                    _builder.Flush();
                 }
             }
             catch (Exception exception)
             {
                 if (next.Depth <= Depth)
                 {
-                    _cache.Add(next);
+                    _builder.Add(next);
                 }
 
                 WriteError(exception.ToEnumerationError(next));
@@ -160,7 +160,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
     private TreeFileSystemInfo[] GetTree(bool includeCondition)
     {
-        TreeFileSystemInfo[] result = _cache.GetResult(includeCondition);
+        TreeFileSystemInfo[] result = _builder.GetTree(includeCondition);
         return result.Format(GetItemCount(result));
     }
 

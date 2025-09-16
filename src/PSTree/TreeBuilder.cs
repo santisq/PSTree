@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace PSTree;
 
-internal sealed class Cache<TBase, TLeaf>
+internal sealed class TreeBuilder<TBase, TLeaf>
     where TLeaf : TBase
     where TBase : ITree
 {
@@ -15,7 +15,7 @@ internal sealed class Cache<TBase, TLeaf>
 
     internal void Add(TBase container) => _items.Add(container);
 
-    internal TBase[] GetResult(bool includeCondition) =>
+    internal TBase[] GetTree(bool includeCondition) =>
         includeCondition
             ? [.. _items.Where(static e => e.Include)]
             : [.. _items];

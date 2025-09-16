@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.Win32;
+using System.Linq;
 #if NETCOREAPP
 using System.Runtime.CompilerServices;
+#else
+using System.Text;
 #endif
 
 namespace PSTree.Extensions;
@@ -86,7 +88,7 @@ internal static class TreeExtensions
         return tree;
     }
 
-    internal static void AddToCache<TBase, TLeaf>(this TLeaf leaf, Cache<TBase, TLeaf> cache)
+    internal static void AddToCache<TBase, TLeaf>(this TLeaf leaf, TreeBuilder<TBase, TLeaf> cache)
         where TLeaf : TBase
         where TBase : ITree
     {
@@ -185,6 +187,13 @@ internal static class TreeExtensions
 
         return tree;
     }
+
+    internal static IEnumerable<string> EnumerateKeys(this RegistryKey registryKey) =>
+#if NET6_0_OR_GREATER
+        registryKey.GetSubKeyNames().OrderDescending();
+#else
+        registryKey.GetSubKeyNames().OrderByDescending(e => e);
+#endif
 
     internal static (TreeRegistryKey, RegistryKey) CreateTreeKey(
         this RegistryKey key, string name) =>
