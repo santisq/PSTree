@@ -185,13 +185,17 @@ Describe 'Get-PSTree' {
             $ps = [powershell]::Create().AddScript({
                 Import-Module $args[0]
 
-                Get-PSTree / -Recurse -ErrorAction SilentlyContinue
+                $roots = Get-PSDrive |
+                    Where-Object { $_.Provider.Name -eq 'FileSystem' } |
+                    ForEach-Object Root
+
+                Get-PSTree $roots -Recurse -ErrorAction SilentlyContinue
             }).AddArgument($manifestPath)
 
             $task = $ps.BeginInvoke()
             Start-Sleep 0.5
             $ps.Stop()
-            $ps.EndInvoke($task)
+            try { $ps.EndInvoke($task) } catch { }
         } | Should -BeLessThan ([timespan] '00:00:01')
     }
 }

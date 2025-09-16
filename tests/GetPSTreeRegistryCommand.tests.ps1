@@ -162,13 +162,17 @@ Describe 'Get-PSTreeRegistry.Windows' {
                 $ps = [powershell]::Create().AddScript({
                     Import-Module $args[0]
 
-                    Get-PSTreeRegistry HKCU:\ -Recurse -ErrorAction SilentlyContinue
+                    $roots = Get-PSDrive |
+                        Where-Object { $_.Provider.Name -eq 'Registry' } |
+                        ForEach-Object { 'Registry::' + $_.Root }
+
+                    Get-PSTreeRegistry $roots -Recurse -ErrorAction SilentlyContinue
                 }).AddArgument($manifestPath)
 
                 $task = $ps.BeginInvoke()
                 Start-Sleep 0.5
-                $null = $ps.Stop()
-                $ps.EndInvoke($task)
+                $ps.Stop()
+                try { $ps.EndInvoke($task) } catch { }
             } | Should -BeLessThan ([timespan] '00:00:01')
         }
     }
