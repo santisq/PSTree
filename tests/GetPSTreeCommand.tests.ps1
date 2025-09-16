@@ -176,4 +176,19 @@ Describe 'Get-PSTree' {
         $testHiddenFolder | Get-PSTree -Recurse -Force |
             Should -HaveCount 21
     }
+
+    It 'Should be able to Cancel the cmdlet' {
+        Measure-Command {
+            $ps = [powershell]::Create().AddScript({
+                Import-Module $args[0]
+
+                Get-PSTree / -Recurse -ErrorAction SilentlyContinue
+            }).AddArgument($manifestPath)
+
+            $task = $ps.BeginInvoke()
+            Start-Sleep 0.5
+            $null = $ps.Stop()
+            while (!$task.AsyncWaitHandle.WaitOne(200)) { }
+        } | Should -BeLessThan ([timespan] '00:00:01')
+    }
 }
