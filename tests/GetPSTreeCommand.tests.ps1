@@ -1,10 +1,13 @@
-﻿$ErrorActionPreference = 'Stop'
+﻿using namespace System.IO
+using namespace System.Linq
 
-$moduleName = (Get-Item ([IO.Path]::Combine($PSScriptRoot, '..', 'module', '*.psd1'))).BaseName
-$manifestPath = [IO.Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
+$ErrorActionPreference = 'Stop'
+
+$moduleName = (Get-Item ([Path]::Combine($PSScriptRoot, '..', 'module', '*.psd1'))).BaseName
+$manifestPath = [Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
 
 Import-Module $manifestPath
-Import-Module ([System.IO.Path]::Combine($PSScriptRoot, 'shared.psm1'))
+Import-Module ([Path]::Combine($PSScriptRoot, 'shared.psm1'))
 
 Describe 'Get-PSTree' {
     BeforeAll {
@@ -33,7 +36,7 @@ Describe 'Get-PSTree' {
             $newFolder
             New-Item @fileSplat
         } | ForEach-Object {
-            $_.Attributes = $_.Attributes -bor [System.IO.FileAttributes]::Hidden
+            $_.Attributes = $_.Attributes -bor [FileAttributes]::Hidden
         }
     }
 
@@ -109,9 +112,9 @@ Describe 'Get-PSTree' {
         $exclude = '*tools*', '*build*', '*.ps1'
         Get-PSTree $testPath -Exclude * | Should -HaveCount 1
         Get-PSTree $testPath -Exclude $exclude -Recurse | ForEach-Object {
-            [System.Linq.Enumerable]::Any(
+            [Enumerable]::Any(
                 [string[]] $exclude,
-                [System.Func[string, bool]] { $_.Name -like $args[0] })
+                [Func[string, bool]] { $_.Name -like $args[0] })
         } | Should -Not -BeTrue
 
         Get-ChildItem $testPath -Filter *.ps1 -Recurse |
@@ -122,9 +125,9 @@ Describe 'Get-PSTree' {
     It 'Includes child items with -Include parameter' {
         $include = '*.ps1', '*.cs'
         Get-PSTree $testPath -Include $include -Recurse | ForEach-Object {
-            [System.Linq.Enumerable]::Any(
+            [Enumerable]::Any(
                 [string[]] $include,
-                [System.Func[string, bool]] {
+                [Func[string, bool]] {
                     $_.Name -like $args[0] -or $_ -is [PSTree.TreeDirectory]
                 }
             )
@@ -187,8 +190,8 @@ Describe 'Get-PSTree' {
 
             $task = $ps.BeginInvoke()
             Start-Sleep 0.5
-            $null = $ps.Stop()
-            while (!$task.AsyncWaitHandle.WaitOne(200)) { }
+            $ps.Stop()
+            $ps.EndInvoke($task)
         } | Should -BeLessThan ([timespan] '00:00:01')
     }
 }

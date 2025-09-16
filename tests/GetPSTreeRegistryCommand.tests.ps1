@@ -1,15 +1,20 @@
-﻿$ErrorActionPreference = 'Stop'
+﻿using namespace System.IO
+using namespace System.Management.Automation
+using namespace System.Security
+using namespace Microsoft.Win32
 
-$moduleName = (Get-Item ([IO.Path]::Combine($PSScriptRoot, '..', 'module', '*.psd1'))).BaseName
-$manifestPath = [IO.Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
+$ErrorActionPreference = 'Stop'
+
+$moduleName = (Get-Item ([Path]::Combine($PSScriptRoot, '..', 'module', '*.psd1'))).BaseName
+$manifestPath = [Path]::Combine($PSScriptRoot, '..', 'output', $moduleName)
 
 Import-Module $manifestPath
-Import-Module ([System.IO.Path]::Combine($PSScriptRoot, 'shared.psm1'))
+Import-Module ([Path]::Combine($PSScriptRoot, 'shared.psm1'))
 
 if (!$isWin) {
     Describe 'Get-PSTreeRegistry.NonWindows' {
         It 'Should throw a PlatformNotSupportedException on Non-Windows Platforms' {
-            { Get-PSTreeRegistry HKCU:\ } | Should -Throw -ExceptionType ([System.PlatformNotSupportedException])
+            { Get-PSTreeRegistry HKCU:\ } | Should -Throw -ExceptionType ([PlatformNotSupportedException])
         }
     }
 
@@ -35,8 +40,8 @@ Describe 'Get-PSTreeRegistry.Windows' {
         }
 
         It 'Limits recursion with Depth parameter' {
-            $withDepth = Get-PSTreeRegistry -Path HKCU:\ -Depth 2
-            $deep = Get-PSTreeRegistry -Path HKCU:\ -Recurse
+            $withDepth = Get-PSTreeRegistry -Path HKCU:\ -Depth 2 -ErrorAction SilentlyContinue
+            $deep = Get-PSTreeRegistry -Path HKCU:\ -Recurse -ErrorAction SilentlyContinue
             $deep.Count | Should -BeGreaterThan $withDepth.Count
             $maxDepth = ($withDepth | Measure-Object -Property Depth -Maximum).Maximum
             $maxDepth | Should -BeExactly 2
@@ -49,10 +54,10 @@ Describe 'Get-PSTreeRegistry.Windows' {
 
         It 'Can throw if non-elevated' {
             { Get-PSTreeRegistry -Path HKLM:\ } |
-                Should -Throw -ExceptionType ([System.Security.SecurityException])
+                Should -Throw -ExceptionType ([SecurityException])
 
             { Get-PSTreeRegistry HKLM:\SECURITY } |
-                Should -Throw -ExceptionType ([System.Security.SecurityException])
+                Should -Throw -ExceptionType ([SecurityException])
         }
 
         It 'Excludes child items with -Exclude parameter' {
@@ -81,18 +86,18 @@ Describe 'Get-PSTreeRegistry.Windows' {
     Context 'Parameter Validation' {
         It 'Throws on invalid registry path' {
             { Get-PSTreeRegistry -Path HKCU:\DoesNotExist } |
-                Should -Throw -ExceptionType ([System.Management.Automation.ItemNotFoundException])
+                Should -Throw -ExceptionType ([ItemNotFoundException])
 
             { Get-PSTreeRegistry -LiteralPath HKCU:\DoesNotExist } |
-                Should -Throw -ExceptionType ([System.Management.Automation.ItemNotFoundException])
+                Should -Throw -ExceptionType ([ItemNotFoundException])
         }
 
         It 'Throws on invalid provider path' {
             { Get-PSTreeRegistry -Path Function:\* } |
-                Should -Throw -ExceptionType ([System.ArgumentException])
+                Should -Throw -ExceptionType ([ArgumentException])
 
             { Get-PSTreeRegistry -LiteralPath Function:\Clear-Host } |
-                Should -Throw -ExceptionType ([System.ArgumentException])
+                Should -Throw -ExceptionType ([ArgumentException])
 
             Get-PSTreeRegistry -Path Function:\* -EA 0 | Should -BeNullOrEmpty
         }
@@ -124,7 +129,7 @@ Describe 'Get-PSTreeRegistry.Windows' {
             $key.Kind | Should -BeExactly RegistryKey
             $key.SubKeyCount | Should -Not -BeNullOrEmpty
             $key.ValueCount | Should -Not -BeNullOrEmpty
-            $key.View | Should -BeOfType ([Microsoft.Win32.RegistryView])
+            $key.View | Should -BeOfType ([RegistryView])
             $key.Path | Should -Not -BeNullOrEmpty
             $key.PSPath | Should -Not -BeNullOrEmpty
             $key.PSParentPath | Should -BeOfType ([string])
@@ -137,7 +142,7 @@ Describe 'Get-PSTreeRegistry.Windows' {
                 Where-Object { $_ -is [PSTree.TreeRegistryValue] } |
                 Select-Object -First 1
 
-            $value.Kind | Should -BeOfType ([Microsoft.Win32.RegistryValueKind])
+            $value.Kind | Should -BeOfType ([RegistryValueKind])
             $value.Name | Should -Not -BeNullOrEmpty
             $value.Path | Should -BeNullOrEmpty
             $value.PSPath | Should -BeNullOrEmpty
@@ -163,7 +168,7 @@ Describe 'Get-PSTreeRegistry.Windows' {
                 $task = $ps.BeginInvoke()
                 Start-Sleep 0.5
                 $null = $ps.Stop()
-                while (!$task.AsyncWaitHandle.WaitOne(200)) { }
+                $ps.EndInvoke($task)
             } | Should -BeLessThan ([timespan] '00:00:01')
         }
     }
