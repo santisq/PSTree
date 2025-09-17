@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Management.Automation;
 using System.Security;
 using Microsoft.Win32;
@@ -18,7 +19,7 @@ namespace PSTree.Commands;
 public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 {
 #if WINDOWS
-    private readonly Cache<TreeRegistryBase, TreeRegistryValue> _cache = new();
+    private readonly TreeBuilder<TreeRegistryBase, TreeRegistryValue> _builder = new();
 
     private readonly Stack<(TreeRegistryKey, RegistryKey)> _stack = [];
 #endif
@@ -55,7 +56,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 
     private TreeRegistryBase[] Traverse(RegistryKey registryKey)
     {
-        _cache.Clear();
+        _builder.Clear();
 
         registryKey.
             CreateTreeKey(System.IO.Path.GetFileName(registryKey.Name)).
@@ -63,7 +64,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 
         string source = registryKey.Name;
 
-        while (_stack.Count > 0)
+        while (_stack.Count > 0 && !Canceled)
         {
             (TreeRegistryKey tree, registryKey) = _stack.Pop();
             int depth = tree.Depth + 1;
@@ -87,11 +88,11 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
                         new TreeRegistryValue(registryKey, value, source, depth)
                             .AddParent<TreeRegistryValue>(tree)
                             .SetIncludeFlagIf(WithInclude)
-                            .AddToCache(_cache);
+                            .AddToCache(_builder);
                     }
 
                 PushKeys:
-                    foreach (string keyname in registryKey.GetSubKeyNames())
+                    foreach (string keyname in registryKey.EnumerateKeys())
                     {
                         if (ShouldExclude(keyname))
                         {
@@ -121,11 +122,11 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
                 }
             }
 
-            _cache.Add(tree);
-            _cache.Flush();
+            _builder.Add(tree);
+            _builder.Flush();
         }
 
-        return _cache.GetResult(WithInclude && !KeysOnly).Format();
+        return _builder.GetTree(WithInclude && !KeysOnly).Format();
     }
 
     private bool ShouldSkipValue(string value) => ShouldExclude(value) || !ShouldInclude(value);
