@@ -189,7 +189,7 @@ internal static class TreeExtensions
     }
 
     internal static IEnumerable<string> EnumerateKeys(this RegistryKey registryKey) =>
-#if NET6_0_OR_GREATER
+#if NET8_0_OR_GREATER
         registryKey.GetSubKeyNames().OrderDescending();
 #else
         registryKey.GetSubKeyNames().OrderByDescending(e => e);

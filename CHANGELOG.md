@@ -1,8 +1,11 @@
 # CHANGELOG
 
+- __09/25/2025__
+  - Adds `LastWriteTime` Property to `TreeRegistryKey` class.
+
 - __09/16/2025__
-  - **Ctrl+C Cancellation**: Added support for gracefully canceling operations using <kbd>Ctrl+C</kbd> when the cmdlets are traversing a hierarchy. Previously, the only way to stop the process was by restarting the session.
-  - **Sort Order for Registry Keys**: Similar to issue #9 but for the `Get-PSTreeRegistry` cmdlet. It now sorts Registry Keys in ascending order.
+  - __Ctrl+C Cancellation__: Added support for gracefully canceling operations using <kbd>Ctrl+C</kbd> when the cmdlets are traversing a hierarchy. Previously, the only way to stop the process was by restarting the session.
+  - __Sort Order for Registry Keys__: Similar to issue #9 but for the `Get-PSTreeRegistry` cmdlet. It now sorts Registry Keys in ascending order.
 
 - __04/19/2025__
   - Adds parameter aliases for `Get-PSTree` and `Get-PSTreeRegistry`, issue #49.

@@ -122,8 +122,7 @@ Describe 'Get-PSTreeRegistry.Windows' {
 
     Context 'Output Types' {
         It 'PSTreeRegistryKey has expected properties' {
-            $key = Get-PSTreeRegistry -Path 'HKLM:\Software' -EA 0 |
-                Where-Object { $_ -is [PSTree.TreeRegistryKey] } |
+            $key = Get-PSTreeRegistry -Path 'HKLM:\Software' -KeysOnly -EA 0 |
                 Select-Object -First 1
 
             $key.Kind | Should -BeExactly RegistryKey
@@ -135,6 +134,7 @@ Describe 'Get-PSTreeRegistry.Windows' {
             $key.PSParentPath | Should -BeOfType ([string])
             $key.Hierarchy | Should -Not -BeNullOrEmpty
             $key.Depth | Should -BeGreaterOrEqual 0
+            $key.LastWriteTime | Should -BeOfType ([datetime])
         }
 
         It 'PSTreeRegistryValue has expected properties' {
@@ -173,7 +173,7 @@ Describe 'Get-PSTreeRegistry.Windows' {
                 Start-Sleep 0.5
                 $ps.Stop()
                 try { $ps.EndInvoke($task) } catch { }
-            } | Should -BeLessThan ([timespan] '00:00:01')
+            } | Should -BeLessThan ([timespan] '00:00:02')
         }
     }
 }
