@@ -21,6 +21,8 @@ Get-PSTreeRegistry
     [-Depth <Int32>]
     [-Recurse]
     [-KeysOnly]
+    [-Exclude <String[]>]
+    [-Include <String[]>]
     [<CommonParameters>]
 ```
 
@@ -32,6 +34,8 @@ Get-PSTreeRegistry
     [-Depth <Int32>]
     [-Recurse]
     [-KeysOnly]
+    [-Exclude <String[]>]
+    [-Include <String[]>]
     [<CommonParameters>]
 ```
 

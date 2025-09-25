@@ -36,7 +36,7 @@ internal static class ExceptionExtensions
 
     internal static string ThrowIfInvalidExtension(this string extension)
     {
-        #if NET6_0_OR_GREATER
+        #if NET8_0_OR_GREATER
         if (extension.StartsWith('.'))
         {
             return extension;
