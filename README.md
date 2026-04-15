@@ -24,6 +24,10 @@ PSTree is a PowerShell module that extends tree-style navigation to both file sy
 - **`Get-PSTreeRegistry`** *(Windows only)*  
   Explore the Windows Registry with a tree-like view of keys and values. This cmdlet simplifies navigation and troubleshooting by presenting registry structures in an intuitive format, ideal for system configuration tasks.
 
+- **`Get-PSTreeStyle`**  
+  Retrieves the singleton `TreeStyle` instance used to customize the colored, hierarchical output of `Get-PSTree` and `Get-PSTreeRegistry`.  
+  Allows you to change colors for directories, files (including by extension), registry keys, and registry value kinds, as well as apply accents and control ANSI output rendering.
+
 ## Documentation
 
 - Learn how to use the cmdlets in the [official documentation](./docs/en-US/).
