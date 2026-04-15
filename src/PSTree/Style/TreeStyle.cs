@@ -9,7 +9,7 @@ namespace PSTree.Style;
 
 public sealed class TreeStyle
 {
-    private const string s_esc = "\x1B";
+    private const string ESC = "\x1B";
 
     private static TreeStyle? s_instance;
 
@@ -25,7 +25,7 @@ public sealed class TreeStyle
 
     public Palette Palette { get; } = new();
 
-    public string Reset { get; } = "\x1B[0m";
+    public string Reset { get; } = $"{ESC}[0m";
 
     public static TreeStyle Instance { get => s_instance ??= new(); }
 
@@ -96,8 +96,8 @@ public sealed class TreeStyle
     }
 
     public string EscapeSequence(string vt) =>
-        $"{vt}{vt.Replace(s_esc, "`e")}{Reset}";
+        $"{vt}{vt.Replace(ESC, "`e")}{Reset}";
 
     private string EscapeSequence(string vt, int padding) =>
-        $"{vt}{vt.Replace(s_esc, "`e").PadRight(padding)}{Reset}";
+        $"{vt}{vt.Replace(ESC, "`e").PadRight(padding)}{Reset}";
 }

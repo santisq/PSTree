@@ -20,11 +20,9 @@ public sealed class Project
     {
         get => _info.PowerShellVersion is { Major: 5, Minor: 1 }
             ? TargetFrameworks
-                .Where(e => Regex.Match(e, "^net(?:4|standard)").Success)
-                .FirstOrDefault()
+                .FirstOrDefault(e => Regex.Match(e, "^net(?:4|standard)").Success)
             : TargetFrameworks
-                .Where(e => !e.StartsWith("net4"))
-                .FirstOrDefault();
+                .FirstOrDefault(e => !e.StartsWith("net4"));
     }
 
     private Configuration Configuration { get => _info.Configuration; }

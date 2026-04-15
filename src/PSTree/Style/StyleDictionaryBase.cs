@@ -52,10 +52,7 @@ public abstract class StyleDictionaryBase<TKey>(Dictionary<TKey, string> interna
 
     public override string? ToString()
     {
-        if (_internalDictionary.Count == 0)
-        {
-            return null;
-        }
+        if (_internalDictionary.Count == 0) return null;
 
         StringBuilder builder = new(_internalDictionary.Count);
         string[] keys = [.. Keys.Select(static e => e is string str ? str : e.ToString()!)];
