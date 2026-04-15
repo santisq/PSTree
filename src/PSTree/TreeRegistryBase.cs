@@ -2,17 +2,14 @@
 
 namespace PSTree;
 
-public abstract class TreeRegistryBase(
-    string hierarchy,
-    string source,
-    string? path = null)
+public abstract class TreeRegistryBase(string hierarchy, string source, string? path = null)
     : TreeBase<TreeRegistryKey>(hierarchy, source)
 {
     private string? _pspath;
 
     private string? _psparentpath;
 
-    protected const string _providerPath = @"Microsoft.PowerShell.Core\Registry::";
+    protected const string ProviderPath = @"Microsoft.PowerShell.Core\Registry::";
 
     public abstract string Name { get; }
 
@@ -23,10 +20,10 @@ public abstract class TreeRegistryBase(
     public virtual string? PSParentPath { get => _psparentpath ??= GetPSParentPath(Path); }
 
     private static string? GetPSPath(string? path) =>
-        string.IsNullOrEmpty(path) ? null : $"{_providerPath}{path}";
+        string.IsNullOrEmpty(path) ? null : $"{ProviderPath}{path}";
 
     private static string? GetPSParentPath(string? path) =>
         string.IsNullOrEmpty(path = System.IO.Path.GetDirectoryName(path))
-            ? null : $"{_providerPath}{path}";
+            ? null : $"{ProviderPath}{path}";
 }
 #endif

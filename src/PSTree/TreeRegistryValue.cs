@@ -29,7 +29,7 @@ public sealed class TreeRegistryValue : TreeRegistryBase
         Name = GetNameOrDefault(value);
         Kind = key.GetValueKind(value);
         Hierarchy = GetColoredName(Name, Kind).Indent(depth);
-        PSParentPath = $"{_providerPath}{_parentPath}";
+        PSParentPath = $"{ProviderPath}{_parentPath}";
     }
 
     private static string GetNameOrDefault(string value) =>

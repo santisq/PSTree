@@ -7,7 +7,7 @@ namespace PSTree.Extensions;
 
 internal static class ExceptionExtensions
 {
-    private static readonly bool _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+    private static readonly bool s_isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
     internal static ErrorRecord ToInvalidPathError(this string path) =>
         new(
@@ -38,15 +38,12 @@ internal static class ExceptionExtensions
     {
         #if NET8_0_OR_GREATER
         if (extension.StartsWith('.'))
-        {
-            return extension;
-        }
         #else
         if (extension.StartsWith("."))
+        #endif
         {
             return extension;
         }
-        #endif
 
         throw new ArgumentException(
             $"When adding or removing extensions, the extension must start with a period: '{extension}'.");
@@ -57,10 +54,7 @@ internal static class ExceptionExtensions
 
     internal static void ThrowIfNotSupportedPlatform(this PSCmdlet cmdlet)
     {
-        if (_isWindows)
-        {
-            return;
-        }
+        if (s_isWindows) return;
 
         PlatformNotSupportedException exception = new(
             "The 'Get-PSTreeRegistry' cmdlet is only supported on Windows.");

@@ -5,9 +5,9 @@ namespace PSTree.Style;
 
 public sealed class Extension : StyleDictionaryBase<string>
 {
-    private const string _red = "\x1B[31;1m";
+    private const string Red = "\x1B[31;1m";
 
-    private const string _yellow = "\x1B[33;1m";
+    private const string Yellow = "\x1B[33;1m";
 
     internal Extension() : base(GetExtensions())
     { }
@@ -16,19 +16,19 @@ public sealed class Extension : StyleDictionaryBase<string>
         new(TreeStyle.Comparer)
         {
             // Archive formats
-            [".zip"] = _red,
-            [".tgz"] = _red,
-            [".gz"] = _red,
-            [".tar"] = _red,
-            [".nupkg"] = _red,
-            [".cab"] = _red,
-            [".7z"] = _red,
+            [".zip"] = Red,
+            [".tgz"] = Red,
+            [".gz"] = Red,
+            [".tar"] = Red,
+            [".nupkg"] = Red,
+            [".cab"] = Red,
+            [".7z"] = Red,
 
             // PowerShell files
-            [".ps1"] = _yellow,
-            [".psd1"] = _yellow,
-            [".psm1"] = _yellow,
-            [".ps1xml"] = _yellow
+            [".ps1"] = Yellow,
+            [".psd1"] = Yellow,
+            [".psm1"] = Yellow,
+            [".ps1xml"] = Yellow
         };
 
     protected override string Validate(string key) => key.ThrowIfInvalidExtension();
