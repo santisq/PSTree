@@ -90,7 +90,8 @@ task PesterTests {
         dotnet @(
             'tool', 'install'
             '--global', 'coverlet.console'
-            if (-not $IsCoreCLR) { '--version', '6.0.4' })
+            if (-not $IsCoreCLR) { '--version', '6.0.4' }
+            else { '--version', '8.0.1' })
     }
 
     coverlet $ProjectInfo.Pester.GetTestArgs($PSVersionTable.PSVersion)
