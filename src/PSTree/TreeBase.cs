@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace PSTree;
 
 public abstract class TreeBase<TContainer>(string source) : ITree
