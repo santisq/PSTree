@@ -93,13 +93,13 @@ internal static class TreeExtensions
         where TLeaf : TBase
         where TBase : ITree
     {
-        internal void AddToCache(TreeBuilder<TBase, TLeaf> cache)
+        internal void AddTo(TreeBuilder<TBase, TLeaf> cache)
             => cache.Add(leaf);
     }
 
-    extension<T>(T container)
+    extension<TContainer>(TContainer item)
     {
-        internal void PushToStack(Stack<T> stack) => stack.Push(container);
+        internal void Push(Stack<TContainer> stack) => stack.Push(item);
     }
 
 #if !NETCOREAPP
@@ -169,7 +169,7 @@ internal static class TreeExtensions
 
     extension(RegistryKey key)
     {
-        internal (TreeRegistryKey, RegistryKey) CreateTreeKey(string name)
+        internal (TreeRegistryKey, RegistryKey) CreateKey(string name)
             => (new TreeRegistryKey(key, name, key.Name), key);
 
         internal (TreeRegistryKey, RegistryKey) CreateTreeKey(string name, string source, int depth)

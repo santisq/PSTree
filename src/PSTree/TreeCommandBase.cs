@@ -25,11 +25,6 @@ public abstract class TreeCommandBase : PSCmdlet
 
     protected bool WithInclude { get; private set; }
 
-    protected bool IsLiteral
-    {
-        get => MyInvocation.BoundParameters.ContainsKey(nameof(LiteralPath));
-    }
-
     protected bool Canceled { get; set; }
 
     [Parameter(
@@ -109,7 +104,7 @@ public abstract class TreeCommandBase : PSCmdlet
 
         foreach (string path in _paths ?? [SessionState.Path.CurrentLocation.Path])
         {
-            if (IsLiteral)
+            if (MyInvocation.BoundParameters.ContainsKey(nameof(LiteralPath)))
             {
                 string resolved = SessionState.Path.GetUnresolvedProviderPathFromPSPath(
                     path: path,
@@ -142,12 +137,7 @@ public abstract class TreeCommandBase : PSCmdlet
         WildcardPattern[] patterns)
     {
         foreach (WildcardPattern pattern in patterns)
-        {
-            if (pattern.IsMatch(name))
-            {
-                return true;
-            }
-        }
+            if (pattern.IsMatch(name)) return true;
 
         return false;
     }
