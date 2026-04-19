@@ -1,14 +1,11 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace PSTree.Style;
 
 public sealed class FileSystemStyle
 {
-    private string _directory = "\x1B[44;1m";
-
-    private string _executable = "\x1B[32;1m";
-
     private readonly HashSet<string> _exec = new(TreeStyle.Comparer)
     {
         ".com",
@@ -27,19 +24,22 @@ public sealed class FileSystemStyle
 
     public string Directory
     {
-        get => _directory;
-        set => _directory = TreeStyle.ThrowIfInvalidSequence(value);
-    }
+        get;
+        set => field = TreeStyle.ThrowIfInvalidSequence(value);
+    } = "\x1B[44;1m";
 
     public string Executable
     {
-        get => _executable;
-        set => _executable = TreeStyle.ThrowIfInvalidSequence(value);
-    }
+        get;
+        set => field = TreeStyle.ThrowIfInvalidSequence(value);
+    } = "\x1B[32;1m";
 
-    public Extension Extension { get; }
+    public Extension Extension { get; } = new();
 
-    internal FileSystemStyle() => Extension = new();
+    internal bool FileIsExecutable(TreeFile file) => _exec.Contains(file.Extension);
+
+    internal bool TryGetExtensionVt(TreeFile file, [NotNullWhen(true)] out string? vt)
+        => Extension.TryGetValue(file.Extension, out vt);
 
     internal string GetColoredName(FileInfo file)
     {

@@ -1,6 +1,6 @@
 namespace PSTree;
 
-public abstract class TreeBase<TContainer>(string hierarchy, string source) : ITree
+public abstract class TreeBase<TContainer>(string source) : ITree
     where TContainer : TreeBase<TContainer>
 {
     internal TContainer? ParentNode { get; private set; }
@@ -9,7 +9,7 @@ public abstract class TreeBase<TContainer>(string hierarchy, string source) : IT
 
     internal virtual bool Include { get; set; }
 
-    public string Hierarchy { get; internal set; } = hierarchy;
+    public string? Hierarchy { get; internal set; }
 
     public int Depth { get; protected set; }
 
@@ -17,7 +17,7 @@ public abstract class TreeBase<TContainer>(string hierarchy, string source) : IT
 
     bool ITree.Include { get => Include; }
 
-    string ITree.Hierarchy { get => Hierarchy; }
+    string? ITree.Hierarchy { get; set; }
 
     internal TSelf AddParent<TSelf>(TContainer parent)
         where TSelf : TreeBase<TContainer>
@@ -32,11 +32,7 @@ public abstract class TreeBase<TContainer>(string hierarchy, string source) : IT
 
         for (TContainer? i = ParentNode; i is not null; i = i.ParentNode)
         {
-            if (i.Include)
-            {
-                return;
-            }
-
+            if (i.Include) return;
             i.Include = true;
         }
     }

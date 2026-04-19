@@ -1,223 +1,197 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Win32;
+﻿using System.Collections.Generic;
 using System.Linq;
-#if NETCOREAPP
-using System.Runtime.CompilerServices;
-#else
 using System.Text;
+#if WINDOWS
+using Microsoft.Win32;
 #endif
 
 namespace PSTree.Extensions;
 
 internal static class TreeExtensions
 {
-#if !NETCOREAPP
-    [ThreadStatic]
-    private static StringBuilder? s_sb;
-#endif
+    private const string Vertical = "│   ";
+    private const string Space = "    ";
+    private const string Branch = "├── ";
+    private const string LastBranch = "└── ";
 
-    internal static string Indent(this string inputString, int indentation)
+    extension(TreeFileSystemInfo[] tree)
     {
-        const string corner = "└── ";
-        int repeatCount = (4 * indentation) - 4;
-        int capacity = repeatCount + 4 + inputString.Length;
-
-#if NETCOREAPP
-        return string.Create(
-            capacity, (repeatCount, corner, inputString),
-            static (buffer, state) =>
+        internal TreeFileSystemInfo[] Format(Dictionary<string, int> itemCounts)
         {
-            int count = state.repeatCount;
-            buffer[..count].Fill(' ');
-            state.corner.AsSpan().CopyTo(buffer[count..]);
-            state.inputString.AsSpan().CopyTo(buffer[(count + 4)..]);
-        });
-#else
-        s_sb ??= new StringBuilder(64);
-        s_sb.Clear().EnsureCapacity(capacity);
+            StringBuilder sb = new(256);
+            bool[] isLastChild = PrecomputeLastChild(tree);
+            List<bool> continues = new(32);
 
-        return s_sb
-            .Append(' ', repeatCount)
-            .Append(corner)
-            .Append(inputString)
-            .ToString();
-#endif
-    }
-
-    internal static TreeFileSystemInfo[] Format(
-        this TreeFileSystemInfo[] tree,
-        Dictionary<string, int> itemCounts)
-    {
-        int index;
-        for (int i = 0; i < tree.Length; i++)
-        {
-            TreeFileSystemInfo current = tree[i];
-
-            if (current is TreeDirectory directory &&
-                itemCounts.TryGetValue(directory.FullName, out int count))
+            for (int i = 0; i < tree.Length; i++)
             {
-                directory.IndexCount(count);
-            }
+                sb.Clear();
 
-            if ((index = current.Hierarchy.IndexOf('└')) == -1)
-            {
-                continue;
-            }
+                TreeFileSystemInfo current = tree[i];
+                int depth = current.Depth;
 
-            for (int z = i - 1; z >= 0; z--)
-            {
-                current = tree[z];
-                string hierarchy = current.Hierarchy;
-
-                if (char.IsWhiteSpace(hierarchy[index]))
+                if (current is TreeDirectory directory &&
+                    itemCounts.TryGetValue(directory.FullName, out int count))
                 {
-                    current.Hierarchy = hierarchy.ReplaceAt(index, '│');
+                    directory.IndexCount(count);
+                }
+
+                if (depth == 0)
+                {
+                    current.Hierarchy = sb.GetStyledName(current);
                     continue;
                 }
 
-                if (hierarchy[index] == '└')
-                {
-                    current.Hierarchy = hierarchy.ReplaceAt(index, '├');
-                }
+                AppendAncestorPrefix(sb, continues, depth);
+                bool isLast = isLastChild[i];
 
-                break;
+                current.Hierarchy = sb
+                    .Append(isLast ? LastBranch : Branch)
+                    .GetStyledName(current);
+
+                continues[depth] = !isLast;
+                TrimDeeperContinuations(continues, depth);
             }
-        }
 
-        return tree;
+            return tree;
+        }
     }
 
-    internal static void AddToCache<TBase, TLeaf>(this TLeaf leaf, TreeBuilder<TBase, TLeaf> cache)
+    private static bool[] PrecomputeLastChild(ITree[] tree)
+    {
+        bool[] isLastChild = new bool[tree.Length];
+
+        for (int i = 0; i < tree.Length; i++)
+        {
+            int d = tree[i].Depth;
+            int j = i + 1;
+
+            while (j < tree.Length && tree[j].Depth > d) j++;
+
+            isLastChild[i] = j == tree.Length || tree[j].Depth != d;
+        }
+
+        return isLastChild;
+    }
+
+    private static void AppendAncestorPrefix(
+        StringBuilder sb, List<bool> continues, int depth)
+    {
+        while (continues.Count <= depth)
+            continues.Add(false);
+
+        for (int lev = 1; lev < depth; lev++)
+            sb.Append(continues[lev] ? Vertical : Space);
+    }
+
+    private static void TrimDeeperContinuations(List<bool> continues, int depth)
+    {
+        if (continues.Count > depth + 1)
+            continues.RemoveRange(depth + 1, continues.Count - depth - 1);
+    }
+
+    extension<TBase, TLeaf>(TLeaf leaf)
         where TLeaf : TBase
         where TBase : ITree
     {
-        cache.Add(leaf);
+        internal void AddToCache(TreeBuilder<TBase, TLeaf> cache)
+            => cache.Add(leaf);
     }
 
-    internal static void PushToStack<T>(this T directory, Stack<T> stack)
+    extension<T>(T container)
     {
-        stack.Push(directory);
-    }
-
-#if NETCOREAPP
-    [SkipLocalsInit]
-#endif
-    private static unsafe string ReplaceAt(this string input, int index, char newChar)
-    {
-#if NETCOREAPP
-        return string.Create(
-            input.Length, (input, index, newChar),
-            static (buffer, state) =>
-        {
-            state.input.AsSpan().CopyTo(buffer);
-            buffer[state.index] = state.newChar;
-        });
-#else
-        if (input.Length > 0x200)
-        {
-            char[] chars = input.ToCharArray();
-            chars[index] = newChar;
-            return new string(chars);
-        }
-
-        char* pChars = stackalloc char[0x200];
-        fixed (char* source = input)
-        {
-            Buffer.MemoryCopy(
-                source,
-                pChars,
-                0x200 * sizeof(char),
-                input.Length * sizeof(char));
-        }
-
-        pChars[index] = newChar;
-        return new string(pChars, 0, input.Length);
-#endif
+        internal void PushToStack(Stack<T> stack) => stack.Push(container);
     }
 
 #if !NETCOREAPP
-    internal static bool TryAdd<TKey, TValue>(
-        this IDictionary<TKey, TValue> dictionary,
-        TKey key, TValue value)
+    extension<TKey, TValue>(IDictionary<TKey, TValue> dictionary)
     {
-        if (!dictionary.ContainsKey(key))
+        internal bool TryAdd(TKey key, TValue value)
         {
-            dictionary.Add(key, value);
-            return true;
-        }
+            if (!dictionary.ContainsKey(key))
+            {
+                dictionary.Add(key, value);
+                return true;
+            }
 
-        return false;
+            return false;
+        }
     }
 #endif
 
 #if WINDOWS
-    internal static TreeRegistryBase[] Format(
-        this TreeRegistryBase[] tree)
+    extension(TreeRegistryBase[] tree)
     {
-        int index;
-        for (int i = 0; i < tree.Length; i++)
+        internal TreeRegistryBase[] Format()
         {
-            TreeRegistryBase current = tree[i];
+            StringBuilder sb = new(256);
+            bool[] isLastChild = PrecomputeLastChild(tree);
+            List<bool> continues = new(32);
 
-            if ((index = current.Hierarchy.IndexOf('└')) == -1)
+            for (int i = 0; i < tree.Length; i++)
             {
-                continue;
-            }
+                sb.Clear();
 
-            for (int z = i - 1; z >= 0; z--)
-            {
-                current = tree[z];
-                string hierarchy = current.Hierarchy;
+                TreeRegistryBase current = tree[i];
+                int depth = current.Depth;
 
-                if (char.IsWhiteSpace(hierarchy[index]))
+                if (depth == 0)
                 {
-                    current.Hierarchy = hierarchy.ReplaceAt(index, '│');
+                    current.Hierarchy = sb.GetStyledName(current);
                     continue;
                 }
 
-                if (hierarchy[index] == '└')
-                {
-                    current.Hierarchy = hierarchy.ReplaceAt(index, '├');
-                }
+                AppendAncestorPrefix(sb, continues, depth);
 
-                break;
+                bool isLast = isLastChild[i];
+
+                current.Hierarchy = sb
+                    .Append(isLast ? LastBranch : Branch)
+                    .GetStyledName(current);
+
+                continues[depth] = !isLast;
+
+                TrimDeeperContinuations(continues, depth);
             }
+
+            return tree;
         }
-
-        return tree;
     }
 
-    internal static IEnumerable<string> EnumerateKeys(this RegistryKey registryKey) =>
+    extension(RegistryKey key)
+    {
+        internal IEnumerable<string> EnumerateKeys() =>
 #if NET8_0_OR_GREATER
-        registryKey.GetSubKeyNames().OrderDescending();
+            key.GetSubKeyNames().OrderDescending();
 #else
-        registryKey.GetSubKeyNames().OrderByDescending(e => e);
+            key.GetSubKeyNames().OrderByDescending(e => e);
 #endif
-
-    internal static (TreeRegistryKey, RegistryKey) CreateTreeKey(
-        this RegistryKey key, string name) =>
-        (new TreeRegistryKey(key, name, key.Name), key);
-
-    internal static (TreeRegistryKey, RegistryKey) CreateTreeKey(
-        this RegistryKey key, string name, string source, int depth) =>
-        (new TreeRegistryKey(key, name, source, depth), key);
-
-    internal static (TreeRegistryKey, RegistryKey) AddParent(
-        this (TreeRegistryKey, RegistryKey) treeKey,
-        TreeRegistryKey parent)
-    {
-        treeKey.Item1.AddParent<TreeRegistryKey>(parent);
-        return treeKey;
     }
 
-    internal static void Deconstruct(
-        this string[] strings,
-        out string baseKey,
-        out string? subKey)
+    extension(RegistryKey key)
     {
-        baseKey = strings[0];
-        subKey = strings.Length == 1 ? null : strings[1];
+        internal (TreeRegistryKey, RegistryKey) CreateTreeKey(string name)
+            => (new TreeRegistryKey(key, name, key.Name), key);
+
+        internal (TreeRegistryKey, RegistryKey) CreateTreeKey(string name, string source, int depth)
+            => (new TreeRegistryKey(key, name, source, depth), key);
+    }
+
+    extension((TreeRegistryKey, RegistryKey) treeKey)
+    {
+        internal (TreeRegistryKey, RegistryKey) AddParent(TreeRegistryKey parent)
+        {
+            treeKey.Item1.AddParent<TreeRegistryKey>(parent);
+            return treeKey;
+        }
+    }
+
+    extension(string[] strings)
+    {
+        internal void Deconstruct(out string baseKey, out string? subKey)
+        {
+            baseKey = strings[0];
+            subKey = strings.Length == 1 ? null : strings[1];
+        }
     }
 #endif
 }

@@ -1,9 +1,7 @@
 #if WINDOWS
 using System;
 using Microsoft.Win32;
-using PSTree.Extensions;
 using PSTree.Native;
-using PSTree.Style;
 
 namespace PSTree;
 
@@ -22,8 +20,8 @@ public sealed class TreeRegistryKey : TreeRegistryBase
     public DateTime? LastWriteTime { get; }
 
     internal TreeRegistryKey(
-        RegistryKey key, string name, string source, int depth) :
-        base(GetColoredName(name).Indent(depth), source, key.Name)
+        RegistryKey key, string name, string source, int depth)
+        : base(source, key.Name)
     {
         Name = name;
         Depth = depth;
@@ -34,8 +32,8 @@ public sealed class TreeRegistryKey : TreeRegistryBase
     }
 
     internal TreeRegistryKey(
-        RegistryKey key, string name, string source) :
-        base(GetColoredName(name), source, key.Name)
+        RegistryKey key, string name, string source)
+        : base(source, key.Name)
     {
         Name = name;
         SubKeyCount = key.SubKeyCount;
@@ -43,8 +41,5 @@ public sealed class TreeRegistryKey : TreeRegistryBase
         View = key.View;
         LastWriteTime = key.GetLastWriteTime();
     }
-
-    private static string GetColoredName(string name) =>
-        TreeStyle.Instance.Registry.GetColoredKey(name);
 }
 #endif

@@ -79,10 +79,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 
                     foreach (string value in registryKey.GetValueNames())
                     {
-                        if (ShouldSkipValue(value))
-                        {
-                            continue;
-                        }
+                        if (ShouldSkipValue(value)) continue;
 
                         new TreeRegistryValue(registryKey, value, source, depth)
                             .AddParent<TreeRegistryValue>(tree)

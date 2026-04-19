@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using PSTree.Extensions;
-using PSTree.Style;
 
 namespace PSTree;
 
@@ -14,14 +12,14 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
 
     public int TotalItemCount { get; internal set; }
 
-    private TreeDirectory(
-        DirectoryInfo dir, string hierarchy, string source, int depth)
-        : base(dir, hierarchy, source, depth)
+    internal TreeDirectory(
+        DirectoryInfo dir, string source, int depth)
+        : base(dir, source, depth)
     { }
 
-    private TreeDirectory(
-        DirectoryInfo dir, string hierarchy, string source)
-        : base(dir, hierarchy, source)
+    internal TreeDirectory(
+        DirectoryInfo dir, string source)
+        : base(dir, source)
     {
         Include = true;
     }
@@ -35,26 +33,11 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
     public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() =>
         Instance.EnumerateFileSystemInfos();
 
-    internal IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable(TreeComparer comparer) =>
+    internal IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable() =>
         Instance
             .EnumerateFileSystemInfos()
             .OrderBy(static e => e is DirectoryInfo)
-            .ThenBy(static e => e, comparer);
-
-    internal static TreeDirectory Create(string path) =>
-        Create(new DirectoryInfo(path), path);
-
-    internal static TreeDirectory Create(DirectoryInfo dir, string source)
-    {
-        string styled = TreeStyle.Instance.FileSystem.GetColoredName(dir);
-        return new TreeDirectory(dir, styled, source);
-    }
-
-    internal static TreeDirectory Create(DirectoryInfo dir, string source, int depth)
-    {
-        string styled = TreeStyle.Instance.FileSystem.GetColoredName(dir).Indent(depth);
-        return new TreeDirectory(dir, styled, source, depth);
-    }
+            .ThenBy(static e => e, TreeComparer.Value);
 
     internal void IndexCount(int count)
     {

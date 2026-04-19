@@ -7,21 +7,37 @@ using PSTree.Extensions;
 
 namespace PSTree.Style;
 
-public sealed class TreeStyle
+public sealed partial class TreeStyle
 {
     private const string ESC = "\x1B";
 
     private static TreeStyle? s_instance;
 
+#if NET8_0_OR_GREATER
+    [GeneratedRegex(@"^\x1B\[(?:[0-9]+;?){1,}m$", RegexOptions.Compiled)]
+    private static partial Regex ValidateRegex();
+
+    private static readonly Regex s_validate = ValidateRegex();
+#else
     private static readonly Regex s_validate = new(
         @"^\x1B\[(?:[0-9]+;?){1,}m$",
         RegexOptions.Compiled);
+#endif
+    internal bool ColoringDisabled { get; private set; }
 
     internal static StringComparer Comparer { get; } = StringComparer.InvariantCultureIgnoreCase;
 
     internal static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-    public OutputRendering OutputRendering { get; set; } = OutputRendering.Host;
+    public OutputRendering OutputRendering
+    {
+        get;
+        set
+        {
+            ColoringDisabled = value == OutputRendering.PlainText;
+            field = value;
+        }
+    } = OutputRendering.Host;
 
     public Palette Palette { get; } = new();
 

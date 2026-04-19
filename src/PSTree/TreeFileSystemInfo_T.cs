@@ -8,15 +8,13 @@ namespace PSTree;
 public abstract class TreeFileSystemInfo<T> : TreeFileSystemInfo
     where T : FileSystemInfo
 {
-    private PSObject? _pso;
-
-    private PSObject InstancePso => _pso ??= PSObject.AsPSObject(Instance);
+    private PSObject InstanceAsPSO { get => field ??= PSObject.AsPSObject(Instance); }
 
     protected T Instance { get; }
 
-    public string Name => Instance.Name;
+    public override string Name => Instance.Name;
 
-    public string Mode => FileSystemProvider.Mode(InstancePso);
+    public string Mode => FileSystemProvider.Mode(InstanceAsPSO);
 
     public string FullName => Instance.FullName;
 
@@ -37,16 +35,16 @@ public abstract class TreeFileSystemInfo<T> : TreeFileSystemInfo
     public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
 
     private protected TreeFileSystemInfo(
-        T fileSystemInfo, string hierarchy, string source, int depth)
-        : base(hierarchy, source)
+        T fileSystemInfo, string source, int depth)
+        : base(source)
     {
         Instance = fileSystemInfo;
         Depth = depth;
     }
 
     private protected TreeFileSystemInfo(
-        T fileSystemInfo, string hierarchy, string source)
-        : base(hierarchy, source)
+        T fileSystemInfo, string source)
+        : base(source)
     {
         Instance = fileSystemInfo;
     }

@@ -1,8 +1,10 @@
 namespace PSTree;
 
-public abstract class TreeFileSystemInfo(string hierarchy, string source)
-    : TreeBase<TreeDirectory>(hierarchy, source)
+public abstract class TreeFileSystemInfo(string source)
+    : TreeBase<TreeDirectory>(source)
 {
+    public abstract string Name { get; }
+
     public long Length { get; internal set; }
 
     public string GetFormattedLength() =>

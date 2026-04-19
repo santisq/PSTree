@@ -7,6 +7,8 @@ namespace PSTree;
 
 internal sealed class TreeComparer : IComparer<FileSystemInfo>
 {
+    internal static TreeComparer Value { get; } = new();
+
     public int Compare(FileSystemInfo x, FileSystemInfo y) =>
         x is DirectoryInfo && y is DirectoryInfo
             ? y.Name.CompareTo(x.Name)  // Directories in descending order

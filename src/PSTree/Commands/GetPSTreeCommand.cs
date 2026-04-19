@@ -16,8 +16,6 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
     private readonly TreeBuilder<TreeFileSystemInfo, TreeFile> _builder = new();
 
-    private readonly TreeComparer _comparer = new();
-
     [Parameter]
     [Alias("f")]
     public SwitchParameter Force { get; set; }
@@ -45,7 +43,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                 FileInfo file = new(path);
                 if (!ShouldExclude(file.Name) && ShouldInclude(file.Name))
                 {
-                    WriteObject(TreeFile.Create(file, path));
+                    WriteObject(new TreeFile(file, path));
                 }
 
                 continue;
@@ -58,7 +56,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
             }
 
             WriteObject(
-                Traverse(TreeDirectory.Create(path)),
+                Traverse(new TreeDirectory(new DirectoryInfo(path), path)),
                 enumerateCollection: true);
         }
     }
@@ -78,7 +76,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
             try
             {
                 bool keepProcessing = level <= Depth;
-                foreach (FileSystemInfo item in next.GetSortedEnumerable(_comparer))
+                foreach (FileSystemInfo item in next.GetSortedEnumerable())
                 {
                     if (!Force && IsHidden(item) || ShouldExclude(item.Name))
                     {
@@ -107,8 +105,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
                         if (keepProcessing)
                         {
-                            TreeFile
-                                .Create(fileInfo, source, level)
+                            new TreeFile(fileInfo, source, level)
                                 .AddParent<TreeFile>(next)
                                 .SetIncludeFlagIf(WithInclude)
                                 .AddToCache(_builder);
@@ -122,8 +119,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                         continue;
                     }
 
-                    TreeDirectory
-                        .Create((DirectoryInfo)item, source, level)
+                    new TreeDirectory((DirectoryInfo)item, source, level)
                         .AddParent<TreeDirectory>(next)
                         .SetIncludeFlagIf(keepProcessing && Directory || !WithInclude)
                         .PushToStack(_stack);
