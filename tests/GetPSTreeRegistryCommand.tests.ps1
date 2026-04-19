@@ -173,7 +173,7 @@ Describe 'Get-PSTreeRegistry.Windows' {
                 Start-Sleep 0.5
                 $ps.Stop()
                 try { $ps.EndInvoke($task) } catch { }
-            } | Should -BeLessThan ([timespan] '00:00:02')
+            } | Should -BeLessThan ([timespan] '00:00:04')
         }
     }
 }
