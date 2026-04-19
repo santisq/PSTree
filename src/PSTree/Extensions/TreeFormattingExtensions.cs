@@ -99,6 +99,6 @@ internal static class TreeFormattingExtension
                 .Append(value.Name)
                 .ToString();
         }
-    }
 #endif
+    }
 }
