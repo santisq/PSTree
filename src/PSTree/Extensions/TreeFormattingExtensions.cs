@@ -23,8 +23,10 @@ internal static class TreeFormattingExtension
             {
                 TreeDirectory dir => builder.GetStyledName(dir),
                 TreeFile file => builder.GetStyledName(file),
+#if WINDOWS
                 TreeRegistryKey key => builder.GetStyledName(key),
                 TreeRegistryValue value => builder.GetStyledName(value),
+#endif
                 _ => throw new ArgumentOutOfRangeException(nameof(tree))
             };
 
