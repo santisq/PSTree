@@ -21,22 +21,6 @@ internal static class TreeExtensions
         internal void Push(Stack<TContainer> stack) => stack.Push(item);
     }
 
-#if !NETCOREAPP
-    extension<TKey, TValue>(IDictionary<TKey, TValue> dictionary)
-    {
-        internal bool TryAdd(TKey key, TValue value)
-        {
-            if (!dictionary.ContainsKey(key))
-            {
-                dictionary.Add(key, value);
-                return true;
-            }
-
-            return false;
-        }
-    }
-#endif
-
 #if WINDOWS
     extension(RegistryKey key)
     {

@@ -36,11 +36,7 @@ public sealed class TreeRegistryValue : TreeRegistryBase
 
     internal TreeRegistryValue SetIncludeFlagIf(bool condition)
     {
-        if (condition)
-        {
-            ParentNode?.SetIncludeFlag();
-        }
-
+        if (condition) ParentNode!.SetIncludeFlag();
         return this;
     }
 }

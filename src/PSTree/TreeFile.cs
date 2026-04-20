@@ -26,11 +26,7 @@ public sealed class TreeFile : TreeFileSystemInfo<FileInfo>
 
     internal TreeFile SetIncludeFlagIf(bool condition)
     {
-        if (condition)
-        {
-            ParentNode?.SetIncludeFlag();
-        }
-
+        if (condition) ParentNode!.SetIncludeFlag();
         return this;
     }
 }

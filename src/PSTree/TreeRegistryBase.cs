@@ -1,5 +1,4 @@
 #if WINDOWS
-
 namespace PSTree;
 
 public abstract class TreeRegistryBase(string source, string? path = null)
