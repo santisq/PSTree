@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Management.Automation;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -25,6 +26,7 @@ internal static class ExceptionExtensions
         internal ErrorRecord ToResolvePathError(string path)
             => new(exception, "ResolvePath", ErrorCategory.NotSpecified, path);
 
+        [ExcludeFromCodeCoverage] // This error is very hard to reproduce
         internal ErrorRecord ToEnumerationError(TreeFileSystemInfo item)
             => new(exception, "EnumerationFailure", ErrorCategory.NotSpecified, item);
     }
@@ -62,6 +64,7 @@ internal static class ExceptionExtensions
 
     extension(PSCmdlet cmdlet)
     {
+        [ExcludeFromCodeCoverage]
         internal void ThrowIfNotSupportedPlatform()
         {
             if (s_isWindows) return;
