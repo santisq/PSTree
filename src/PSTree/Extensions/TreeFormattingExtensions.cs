@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using PSTree.Style;
 
@@ -17,12 +18,17 @@ internal static class TreeFormattingExtension
 
     extension(StringBuilder builder)
     {
-        internal string GetStyledName(TreeFileSystemInfo fs)
-            => fs is TreeDirectory dir
-                ? builder.GetStyledName(dir)
-                : builder.GetStyledName((TreeFile)fs);
+        internal string GetStyledName(ITree tree) =>
+            tree switch
+            {
+                TreeDirectory dir => builder.GetStyledName(dir),
+                TreeFile file => builder.GetStyledName(file),
+                TreeRegistryKey key => builder.GetStyledName(key),
+                TreeRegistryValue value => builder.GetStyledName(value),
+                _ => throw new ArgumentOutOfRangeException(nameof(tree))
+            };
 
-        internal string GetStyledName(TreeDirectory directory)
+        private string GetStyledName(TreeDirectory directory)
         {
             if (Style.ColoringDisabled)
                 return builder
@@ -36,7 +42,7 @@ internal static class TreeFormattingExtension
                 .ToString();
         }
 
-        internal string GetStyledName(TreeFile file)
+        private string GetStyledName(TreeFile file)
         {
             if (Style.ColoringDisabled)
                 return builder
@@ -63,12 +69,7 @@ internal static class TreeFormattingExtension
         }
 
 #if WINDOWS
-        internal string GetStyledName(TreeRegistryBase reg)
-            => reg is TreeRegistryKey key
-                ? builder.GetStyledName(key)
-                : builder.GetStyledName((TreeRegistryValue)reg);
-
-        internal string GetStyledName(TreeRegistryKey key)
+        private string GetStyledName(TreeRegistryKey key)
         {
             if (Style.ColoringDisabled)
                 return builder
@@ -82,7 +83,7 @@ internal static class TreeFormattingExtension
                 .ToString();
         }
 
-        internal string GetStyledName(TreeRegistryValue value)
+        private string GetStyledName(TreeRegistryValue value)
         {
             if (Style.ColoringDisabled)
                 return builder

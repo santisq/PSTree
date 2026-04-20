@@ -61,17 +61,20 @@ public sealed class GetPSTreeCommand : TreeCommandBase
         }
     }
 
-    private TreeFileSystemInfo[] Traverse(TreeDirectory directory)
+    private ITree[] Traverse(TreeDirectory directory)
     {
         _builder.Clear();
         directory.Push(_stack);
         string source = directory.FullName;
+        int maxDepth = 0;
 
         while (!Canceled && _stack.Count > 0)
         {
             TreeDirectory next = _stack.Pop();
+            int childCount = 0;
             int level = next.Depth + 1;
             long totalLength = 0;
+            maxDepth = Math.Max(maxDepth, level);
 
             try
             {
@@ -98,6 +101,8 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
                         if (processLevel)
                         {
+                            childCount++;
+
                             new TreeFile(fileInfo, source, level)
                                 .AddParent<TreeFile>(next)
                                 .SetIncludeFlagIf(WithInclude)
@@ -109,6 +114,8 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
                     if (!shouldContinue) continue;
 
+                    childCount++;
+
                     new TreeDirectory((DirectoryInfo)item, source, level)
                         .AddParent<TreeDirectory>(next)
                         .SetIncludeFlagIf(processLevel && Directory || !WithInclude)
@@ -116,11 +123,9 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                 }
 
                 next.Length = totalLength;
+                next.IndexCount(childCount);
 
-                if (RecursiveSize)
-                {
-                    next.IndexLength(totalLength);
-                }
+                if (RecursiveSize) next.IndexLength(totalLength);
 
                 if (next.Depth <= Depth)
                 {
@@ -135,30 +140,9 @@ public sealed class GetPSTreeCommand : TreeCommandBase
             }
         }
 
-        return GetTree(WithInclude && !Directory);
+        return _builder.GetTree(WithInclude && !Directory, maxDepth);
     }
 
     private static bool IsHidden(FileSystemInfo item)
         => item.Attributes.HasFlag(FileAttributes.Hidden);
-
-    private TreeFileSystemInfo[] GetTree(bool includeCondition)
-    {
-        TreeFileSystemInfo[] result = _builder.GetTree(includeCondition);
-        return result.Format(GetItemCount(result));
-    }
-
-    private static Dictionary<string, int> GetItemCount(TreeFileSystemInfo[] items)
-    {
-        Dictionary<string, int> counts = [];
-        foreach (TreeFileSystemInfo item in items)
-        {
-            string? path = item.ParentNode?.FullName;
-            if (path is not null && !counts.TryAdd(path, 1))
-            {
-                counts[path]++;
-            }
-        }
-
-        return counts;
-    }
 }

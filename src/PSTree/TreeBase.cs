@@ -17,7 +17,11 @@ public abstract class TreeBase<TContainer>(string source) : ITree
 
     bool ITree.Include { get => Include; }
 
-    string? ITree.Hierarchy { get; set; }
+    string? ITree.Hierarchy
+    {
+        get => Hierarchy;
+        set => Hierarchy = value;
+    }
 
     internal TSelf AddParent<TSelf>(TContainer parent)
         where TSelf : TreeBase<TContainer>

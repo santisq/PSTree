@@ -51,7 +51,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
         }
     }
 
-    private TreeRegistryBase[] Traverse(RegistryKey registryKey)
+    private ITree[] Traverse(RegistryKey registryKey)
     {
         _builder.Clear();
 
@@ -60,11 +60,13 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
             Push(_stack);
 
         string source = registryKey.Name;
-
+        int maxDepth = 0;
         while (!Canceled && _stack.Count > 0)
         {
             (TreeRegistryKey tree, registryKey) = _stack.Pop();
+
             int depth = tree.Depth + 1;
+            maxDepth = Math.Max(maxDepth, depth);
 
             using (registryKey)
             {
@@ -110,7 +112,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
             _builder.Flush();
         }
 
-        return _builder.GetTree(WithInclude && !KeysOnly).Format();
+        return _builder.GetTree(WithInclude && !KeysOnly, maxDepth);
     }
 
     private bool ShouldSkipValue(string value) => ShouldExclude(value) || !ShouldInclude(value);
