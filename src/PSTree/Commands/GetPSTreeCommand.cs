@@ -116,7 +116,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                     }
 
                     if (!shouldContinue) continue;
-                    // if (!withInclude) count++;
+
                     count++;
                     new TreeDirectory((DirectoryInfo)item, source, level)
                         .AddParent<TreeDirectory>(next)
@@ -140,9 +140,9 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
         if (withInclude)
         {
-            for (int i = _builder._items.Count - 1; i >= 0; i--)
+            for (int i = _builder.Items.Count - 1; i >= 0; i--)
             {
-                TreeFileSystemInfo current = _builder._items[i];
+                TreeFileSystemInfo current = _builder.Items[i];
                 if (!current.Include) current.RecursiveDecrement();
             }
         }

@@ -17,25 +17,25 @@ internal sealed class TreeBuilder<TBase, TLeaf>
     private const string Branch = "├── ";
     private const string LastBranch = "└── ";
 
-    internal readonly List<TBase> _items = [];
+    internal List<TBase> Items { get; } = [];
 
     private readonly List<TLeaf> _leaves = [];
 
     internal void Add(TLeaf leaf) => _leaves.Add(leaf);
 
-    internal void Add(TBase container) => _items.Add(container);
+    internal void Add(TBase container) => Items.Add(container);
 
     internal TBase[] GetTree(bool withInclude, int maxDepth)
     {
-        if (withInclude) _items.RemoveAll(e => !e.Include);
+        if (withInclude) Items.RemoveAll(e => !e.Include);
 
         StringBuilder sb = new(256);
         bool[] continues = new bool[maxDepth + 1];
 
 #if NET8_0_OR_GREATER
-        Span<TBase> tree = CollectionsMarshal.AsSpan(_items);
+        Span<TBase> tree = CollectionsMarshal.AsSpan(Items);
 #else
-        TBase[] tree = [.. _items];
+        TBase[] tree = [.. Items];
 #endif
 
         for (int i = 0; i < tree.Length; i++)
@@ -75,7 +75,7 @@ internal sealed class TreeBuilder<TBase, TLeaf>
     {
         if (_leaves.Count > 0)
         {
-            _items.AddRange([.. _leaves]);
+            Items.AddRange([.. _leaves]);
             _leaves.Clear();
         }
     }
@@ -83,6 +83,6 @@ internal sealed class TreeBuilder<TBase, TLeaf>
     internal void Clear()
     {
         _leaves.Clear();
-        _items.Clear();
+        Items.Clear();
     }
 }
