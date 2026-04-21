@@ -17,7 +17,7 @@ internal sealed class TreeBuilder<TBase, TLeaf>
     private const string Branch = "├── ";
     private const string LastBranch = "└── ";
 
-    private readonly List<TBase> _items = [];
+    internal readonly List<TBase> _items = [];
 
     private readonly List<TLeaf> _leaves = [];
 
@@ -35,7 +35,7 @@ internal sealed class TreeBuilder<TBase, TLeaf>
 #if NET8_0_OR_GREATER
         Span<TBase> tree = CollectionsMarshal.AsSpan(_items);
 #else
-        TBase[] tree = _items.ToArray();
+        TBase[] tree = [.. _items];
 #endif
 
         for (int i = 0; i < tree.Length; i++)

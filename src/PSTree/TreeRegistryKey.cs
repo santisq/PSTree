@@ -20,7 +20,10 @@ public sealed class TreeRegistryKey : TreeRegistryBase
     public DateTime? LastWriteTime { get; }
 
     internal TreeRegistryKey(
-        RegistryKey key, string name, string source, int depth)
+        RegistryKey key,
+        string name,
+        string source,
+        int depth)
         : base(source, key.Name)
     {
         Name = name;
@@ -32,7 +35,9 @@ public sealed class TreeRegistryKey : TreeRegistryBase
     }
 
     internal TreeRegistryKey(
-        RegistryKey key, string name, string source)
+        RegistryKey key,
+        string name,
+        string source)
         : base(source, key.Name)
     {
         Name = name;

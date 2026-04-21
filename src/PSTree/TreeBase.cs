@@ -3,11 +3,11 @@ namespace PSTree;
 public abstract class TreeBase<TContainer>(string source) : ITree
     where TContainer : TreeBase<TContainer>
 {
-    internal TContainer? ParentNode { get; private set; }
+    internal TContainer? Container { get; private set; }
 
     internal string Source { get; } = source;
 
-    internal virtual bool Include { get; set; }
+    internal bool Include { get; set; }
 
     public string? Hierarchy { get; internal set; }
 
@@ -23,18 +23,17 @@ public abstract class TreeBase<TContainer>(string source) : ITree
         set => Hierarchy = value;
     }
 
-    internal TSelf AddParent<TSelf>(TContainer parent)
-        where TSelf : TreeBase<TContainer>
+    internal TOut AddParent<TOut>(TContainer parent)
+        where TOut : TreeBase<TContainer>
     {
-        ParentNode = parent;
-        return (TSelf)this;
+        Container = parent;
+        return (TOut)this;
     }
 
     internal void SetIncludeFlag()
     {
         Include = true;
-
-        for (TContainer? i = ParentNode; i is not null; i = i.ParentNode)
+        for (TContainer? i = Container; i is not null; i = i.Container)
         {
             if (i.Include) return;
             i.Include = true;

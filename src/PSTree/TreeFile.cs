@@ -4,29 +4,27 @@ namespace PSTree;
 
 public sealed class TreeFile : TreeFileSystemInfo<FileInfo>
 {
-    internal override bool Include { get; set; } = true;
+    public DirectoryInfo? Directory { get => Instance.Directory; }
 
-    public DirectoryInfo? Directory => Instance.Directory;
+    public string? DirectoryName { get => Instance.DirectoryName; }
 
-    public string? DirectoryName => Instance.DirectoryName;
-
-    internal TreeFile(
-        FileInfo file, string source)
+    internal TreeFile(FileInfo file, string source)
         : base(file, source)
     {
         Length = file.Length;
+        Include = true;
     }
 
-    internal TreeFile(
-        FileInfo file, string source, int depth)
+    internal TreeFile(FileInfo file, string source, int depth)
         : base(file, source, depth)
     {
         Length = file.Length;
+        Include = true;
     }
 
-    internal TreeFile SetIncludeFlagIf(bool condition)
+    internal TreeFile PropagateIncludeFlagIf(bool condition)
     {
-        if (condition) ParentNode!.SetIncludeFlag();
+        if (condition) Container!.SetIncludeFlag();
         return this;
     }
 }

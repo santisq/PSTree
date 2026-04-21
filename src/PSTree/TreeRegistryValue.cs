@@ -9,8 +9,6 @@ public sealed class TreeRegistryValue : TreeRegistryBase
 
     private readonly string _valueName;
 
-    internal override bool Include { get; set; } = true;
-
     public RegistryValueKind Kind { get; }
 
     public override string Name { get; }
@@ -18,7 +16,10 @@ public sealed class TreeRegistryValue : TreeRegistryBase
     public override string? PSParentPath { get; }
 
     internal TreeRegistryValue(
-        RegistryKey key, string value, string source, int depth)
+        RegistryKey key,
+        string value,
+        string source,
+        int depth)
         : base(source)
     {
         _parentPath = key.Name;
@@ -27,6 +28,7 @@ public sealed class TreeRegistryValue : TreeRegistryBase
         Name = GetNameOrDefault(value);
         Kind = key.GetValueKind(value);
         PSParentPath = $"{ProviderPath}{_parentPath}";
+        Include = true;
     }
 
     private static string GetNameOrDefault(string value) =>
@@ -36,7 +38,7 @@ public sealed class TreeRegistryValue : TreeRegistryBase
 
     internal TreeRegistryValue SetIncludeFlagIf(bool condition)
     {
-        if (condition) ParentNode!.SetIncludeFlag();
+        if (condition) Container!.SetIncludeFlag();
         return this;
     }
 }

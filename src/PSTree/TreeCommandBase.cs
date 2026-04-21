@@ -21,10 +21,6 @@ public abstract class TreeCommandBase : PSCmdlet
 
     protected const string LiteralPathSet = "LiteralPath";
 
-    protected bool WithExclude { get; private set; }
-
-    protected bool WithInclude { get; private set; }
-
     protected bool Canceled { get; set; }
 
     [Parameter(
@@ -74,25 +70,17 @@ public abstract class TreeCommandBase : PSCmdlet
     protected override void BeginProcessing()
     {
         if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
-        {
             Depth = int.MaxValue;
-        }
 
         const WildcardOptions options = WildcardOptions.Compiled
             | WildcardOptions.CultureInvariant
             | WildcardOptions.IgnoreCase;
 
         if (Exclude is not null)
-        {
             _excludePatterns = [.. Exclude.Select(e => new WildcardPattern(e, options))];
-            WithExclude = true;
-        }
 
         if (Include is not null)
-        {
             _includePatterns = [.. Include.Select(e => new WildcardPattern(e, options))];
-            WithInclude = true;
-        }
     }
 
     protected override void StopProcessing() => Canceled = true;
@@ -143,8 +131,8 @@ public abstract class TreeCommandBase : PSCmdlet
     }
 
     protected bool ShouldInclude(string item) =>
-        !WithInclude || MatchAny(item, _includePatterns!);
+        _includePatterns is null || MatchAny(item, _includePatterns);
 
     protected bool ShouldExclude(string item) =>
-        WithExclude && MatchAny(item, _excludePatterns!);
+        _excludePatterns is not null && MatchAny(item, _excludePatterns);
 }

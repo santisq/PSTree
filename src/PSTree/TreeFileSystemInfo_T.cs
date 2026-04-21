@@ -12,27 +12,27 @@ public abstract class TreeFileSystemInfo<T> : TreeFileSystemInfo
 
     protected T Instance { get; }
 
-    public override string Name => Instance.Name;
+    public override string Name { get => Instance.Name; }
 
-    public string Mode => FileSystemProvider.Mode(InstanceAsPSO);
+    public string Mode { get => FileSystemProvider.Mode(InstanceAsPSO); }
 
-    public string FullName => Instance.FullName;
+    public string FullName { get => Instance.FullName; }
 
-    public string Extension => Instance.Extension;
+    public string Extension { get => Instance.Extension; }
 
-    public FileAttributes Attributes => Instance.Attributes;
+    public FileAttributes Attributes { get => Instance.Attributes; }
 
-    public DateTime CreationTime => Instance.CreationTime;
+    public DateTime CreationTime { get => Instance.CreationTime; }
 
-    public DateTime CreationTimeUtc => Instance.CreationTimeUtc;
+    public DateTime CreationTimeUtc { get => Instance.CreationTimeUtc; }
 
-    public DateTime LastWriteTime => Instance.LastWriteTime;
+    public DateTime LastWriteTime { get => Instance.LastWriteTime; }
 
-    public DateTime LastWriteTimeUtc => Instance.LastWriteTimeUtc;
+    public DateTime LastWriteTimeUtc { get => Instance.LastWriteTimeUtc; }
 
-    public DateTime LastAccessTime => Instance.LastAccessTime;
+    public DateTime LastAccessTime { get => Instance.LastAccessTime; }
 
-    public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
+    public DateTime LastAccessTimeUtc { get => Instance.LastAccessTimeUtc; }
 
     private protected TreeFileSystemInfo(
         T fileSystemInfo, string source, int depth)

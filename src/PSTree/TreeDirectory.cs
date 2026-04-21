@@ -6,20 +6,18 @@ namespace PSTree;
 
 public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
 {
-    public DirectoryInfo? Parent => Instance.Parent;
+    public DirectoryInfo? Parent { get => Instance.Parent; }
 
     public int ItemCount { get; internal set; }
 
     public int TotalItemCount { get; internal set; }
 
-    internal TreeDirectory(
-        DirectoryInfo dir, string source, int depth)
+    internal TreeDirectory(DirectoryInfo dir, string source, int depth)
         : base(dir, source, depth)
     { }
 
-    internal TreeDirectory(
-        DirectoryInfo dir, string source)
-        : base(dir, source)
+    internal TreeDirectory(string path)
+        : base(new DirectoryInfo(path), path)
     {
         Include = true;
     }
@@ -39,32 +37,16 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
             .OrderBy(static e => e is DirectoryInfo)
             .ThenBy(static e => e, TreeComparer.Value);
 
-    internal void IndexCount(int count)
+    internal void AggregateUp(int count, long length, bool recursive)
     {
         ItemCount = count;
         TotalItemCount = count;
+        Length = length;
 
-        for (TreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
+        for (TreeDirectory? i = Container; i is not null; i = i.Container)
         {
-            i.TotalItemCount += count;
+            if (recursive) i.Length += length;
+            i.TotalItemCount += ItemCount;
         }
-    }
-
-    internal void IndexLength(long length)
-    {
-        for (TreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
-        {
-            i.Length += length;
-        }
-    }
-
-    internal TreeDirectory SetIncludeFlagIf(bool condition)
-    {
-        if (condition)
-        {
-            Include = true;
-        }
-
-        return this;
     }
 }

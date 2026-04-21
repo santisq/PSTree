@@ -2,11 +2,11 @@ namespace PSTree;
 
 public interface ITree
 {
-    internal string Source { get; }
+    string Source { get; }
 
-    internal bool Include { get; }
+    bool Include { get; }
 
-    public string? Hierarchy { get; internal set; }
+    string? Hierarchy { get; internal set; }
 
-    public int Depth { get; }
+    int Depth { get; }
 }

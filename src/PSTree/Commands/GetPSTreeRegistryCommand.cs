@@ -53,14 +53,16 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 
     private ITree[] Traverse(RegistryKey registryKey)
     {
+        string source = registryKey.Name;
+        int maxDepth = 0;
+        bool withInclude = Include is not null;
+
         _builder.Clear();
 
         registryKey.
             CreateKey(System.IO.Path.GetFileName(registryKey.Name)).
             Push(_stack);
 
-        string source = registryKey.Name;
-        int maxDepth = 0;
         while (!Canceled && _stack.Count > 0)
         {
             (TreeRegistryKey tree, registryKey) = _stack.Pop();
@@ -80,7 +82,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
 
                         new TreeRegistryValue(registryKey, value, source, depth)
                             .AddParent<TreeRegistryValue>(tree)
-                            .SetIncludeFlagIf(WithInclude)
+                            .SetIncludeFlagIf(withInclude)
                             .AddTo(_builder);
                     }
 
@@ -112,7 +114,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
             _builder.Flush();
         }
 
-        return _builder.GetTree(WithInclude && !KeysOnly, maxDepth);
+        return _builder.GetTree(withInclude && !KeysOnly, maxDepth);
     }
 
     private bool ShouldSkipValue(string value) => ShouldExclude(value) || !ShouldInclude(value);
