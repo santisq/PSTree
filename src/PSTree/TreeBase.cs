@@ -30,7 +30,7 @@ public abstract class TreeBase<TContainer>(string source) : ITree
         return (TOut)this;
     }
 
-    internal void SetIncludeFlag()
+    internal void PropagateInclude()
     {
         Include = true;
         for (TContainer? i = Container; i is not null; i = i.Container)

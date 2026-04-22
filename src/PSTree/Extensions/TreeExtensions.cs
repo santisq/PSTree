@@ -34,10 +34,10 @@ internal static class TreeExtensions
 
     extension(RegistryKey key)
     {
-        internal (TreeRegistryKey, RegistryKey) CreateKey(string name)
+        internal (TreeRegistryKey, RegistryKey) AsTreeKey(string name)
             => (new TreeRegistryKey(key, name, key.Name), key);
 
-        internal (TreeRegistryKey, RegistryKey) CreateTreeKey(string name, string source, int depth)
+        internal (TreeRegistryKey, RegistryKey) AsTreeKey(string name, string source, int depth)
             => (new TreeRegistryKey(key, name, source, depth), key);
     }
 

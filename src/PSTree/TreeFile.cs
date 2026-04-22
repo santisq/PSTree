@@ -21,10 +21,4 @@ public sealed class TreeFile : TreeFileSystemInfo<FileInfo>
         Length = file.Length;
         Include = true;
     }
-
-    internal TreeFile PropagateIncludeFlagIf(bool condition)
-    {
-        if (condition) Container!.SetIncludeFlag();
-        return this;
-    }
 }

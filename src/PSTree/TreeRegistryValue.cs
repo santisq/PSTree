@@ -35,11 +35,5 @@ public sealed class TreeRegistryValue : TreeRegistryBase
         string.IsNullOrEmpty(value) ? "(Default)" : value;
 
     public object? GetValue() => Registry.GetValue(_parentPath, _valueName, null);
-
-    internal TreeRegistryValue SetIncludeFlagIf(bool condition)
-    {
-        if (condition) Container!.SetIncludeFlag();
-        return this;
-    }
 }
 #endif

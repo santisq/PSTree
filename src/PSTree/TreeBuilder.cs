@@ -17,13 +17,15 @@ internal sealed class TreeBuilder<TBase, TLeaf>
     private const string Branch = "├── ";
     private const string LastBranch = "└── ";
 
-    internal List<TBase> Items { get; } = [];
-
     private readonly List<TLeaf> _leaves = [];
+
+    internal List<TBase> Items { get; } = [];
 
     internal void Add(TLeaf leaf) => _leaves.Add(leaf);
 
     internal void Add(TBase container) => Items.Add(container);
+
+    internal bool HasLeaf() => _leaves.Count > 0;
 
     internal TBase[] GetTree(bool withInclude, int maxDepth)
     {

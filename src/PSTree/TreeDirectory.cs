@@ -37,15 +37,16 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
             .OrderBy(static e => e is DirectoryInfo)
             .ThenBy(static e => e, TreeComparer.Value);
 
-    internal void AggregateUp(int count, long length, bool recursive)
+    internal void AggregateUp(long length, bool recursive, bool propagateInclude)
     {
-        ItemCount = count;
-        TotalItemCount = count;
+        TotalItemCount = ItemCount;
         Length = length;
+        if (propagateInclude) Include = true;
 
         for (TreeDirectory? i = Container; i is not null; i = i.Container)
         {
             if (recursive) i.Length += length;
+            if (propagateInclude) i.Include = true;
             i.TotalItemCount += ItemCount;
         }
     }
