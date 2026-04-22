@@ -87,10 +87,12 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                     if (!Force && IsHidden(item) || ShouldExclude(item.Name))
                         continue;
 
-                    if (item is DirectoryInfo dir && shouldContinue)
+                    if (item is DirectoryInfo dir)
                     {
+                        if (!shouldContinue) continue;
+
                         next.ItemCount++;
-                        new TreeDirectory((DirectoryInfo)item, source, level)
+                        new TreeDirectory(dir, source, level)
                             .AddParent<TreeDirectory>(next)
                             .Push(_stack);
 
