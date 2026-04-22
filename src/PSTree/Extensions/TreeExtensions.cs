@@ -12,8 +12,7 @@ internal static class TreeExtensions
         where TLeaf : TBase
         where TBase : ITree
     {
-        internal void AddTo(TreeBuilder<TBase, TLeaf> cache)
-            => cache.Add(leaf);
+        internal void AddTo(TreeBuilder<TBase, TLeaf> cache) => cache.Add(leaf);
     }
 
     extension<TContainer>(TContainer item)

@@ -35,7 +35,7 @@ public sealed class FileSystemStyle
 
     public Extension Extension { get; } = new();
 
-    internal bool FileIsExecutable(TreeFile file) => _exec.Contains(file.Extension);
+    internal bool IsExecutable(TreeFile file) => _exec.Contains(file.Extension);
 
     internal bool TryGetExtensionVt(TreeFile file, [NotNullWhen(true)] out string? vt)
         => Extension.TryGetValue(file.Extension, out vt);

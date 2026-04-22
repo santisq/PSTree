@@ -56,19 +56,16 @@ public sealed partial class TreeStyle
 
     internal static string ThrowIfInvalidSequence(string vt)
     {
-        if (!s_validate.IsMatch(vt))
-        {
-            vt.ThrowInvalidSequence();
-        }
-
+        if (!s_validate.IsMatch(vt)) vt.ThrowInvalidSequence();
         return vt;
     }
 
     internal static string FormatType(object instance)
     {
+        int i = 1;
+        const string reset = $"{ESC}[0m";
         PropertyInfo[] properties = instance.GetType().GetProperties();
         StringBuilder builder = new(properties.Length);
-        int i = 1;
 
         foreach (PropertyInfo property in properties)
         {
@@ -77,14 +74,9 @@ public sealed partial class TreeStyle
                 padding: 10);
 
             builder.Append(value);
-
-            if (i++ % 4 == 0)
-            {
-                builder.AppendLine(Instance.Reset);
-                continue;
-            }
-
-            builder.Append(Instance.Reset);
+            builder = i++ % 4 == 0
+                ? builder.AppendLine(reset)
+                : builder.Append(reset);
         }
 
         return builder.ToString();

@@ -9,11 +9,9 @@ public sealed class Extension : StyleDictionaryBase<string>
 
     private const string Yellow = "\x1B[33;1m";
 
-    internal Extension() : base(GetExtensions())
-    { }
-
-    private static Dictionary<string, string> GetExtensions() =>
-        new(TreeStyle.Comparer)
+    private static Dictionary<string, string> Extensions
+    {
+        get => new(TreeStyle.Comparer)
         {
             // Archive formats
             [".zip"] = Red,
@@ -30,6 +28,10 @@ public sealed class Extension : StyleDictionaryBase<string>
             [".psm1"] = Yellow,
             [".ps1xml"] = Yellow
         };
+    }
+
+    internal Extension() : base(Extensions)
+    { }
 
     protected override string Validate(string key) => key.ThrowIfInvalidExtension();
 }

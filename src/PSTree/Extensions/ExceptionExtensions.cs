@@ -64,7 +64,6 @@ internal static class ExceptionExtensions
 
     extension(PSCmdlet cmdlet)
     {
-        [ExcludeFromCodeCoverage]
         internal void ThrowIfNotSupportedPlatform()
         {
             if (s_isWindows) return;

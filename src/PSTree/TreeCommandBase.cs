@@ -119,9 +119,7 @@ public abstract class TreeCommandBase : PSCmdlet
             }
 
             foreach (string resolved in resolvedPaths)
-            {
                 yield return (provider, resolved);
-            }
         }
     }
 

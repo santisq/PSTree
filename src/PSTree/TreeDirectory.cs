@@ -41,6 +41,7 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
     {
         TotalItemCount = ItemCount;
         Length = length;
+
         if (propagateInclude) Include = true;
 
         for (TreeDirectory? i = Container; i is not null; i = i.Container)

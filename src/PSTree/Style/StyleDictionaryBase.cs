@@ -26,13 +26,13 @@ public abstract class StyleDictionaryBase<TKey>(Dictionary<TKey, string> interna
         set => _internalDictionary[Validate(key)] = TreeStyle.ThrowIfInvalidSequence(value);
     }
 
-    public bool TryGetValue(TKey key, [NotNullWhen(true)] out string? sequence) =>
-        _internalDictionary.TryGetValue(key, out sequence);
+    public bool TryGetValue(TKey key, [NotNullWhen(true)] out string? sequence)
+        => _internalDictionary.TryGetValue(key, out sequence);
 
     public bool ContainsKey(TKey key) => _internalDictionary.ContainsKey(key);
 
-    public void Add(TKey key, string vt) =>
-        _internalDictionary.Add(Validate(key), TreeStyle.ThrowIfInvalidSequence(vt));
+    public void Add(TKey key, string vt)
+        => _internalDictionary.Add(Validate(key), TreeStyle.ThrowIfInvalidSequence(vt));
 
     public bool Remove(TKey key) => _internalDictionary.Remove(Validate(key));
 
@@ -55,7 +55,7 @@ public abstract class StyleDictionaryBase<TKey>(Dictionary<TKey, string> interna
         if (_internalDictionary.Count == 0) return null;
 
         StringBuilder builder = new(_internalDictionary.Count);
-        string[] keys = [.. Keys.Select(static e => e is string str ? str : e.ToString()!)];
+        string[] keys = [.. Keys.Select(e => e is string str ? str : $"{e}")];
         int max = keys.Max(e => e.Length);
         int idx = 0;
 

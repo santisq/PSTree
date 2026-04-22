@@ -67,7 +67,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
         directory.Push(_stack);
 
         string source = directory.FullName;
-        int maxdp = 0;
+        int maxDp = 0;
 
         while (!Canceled && _stack.Count > 0)
         {
@@ -75,7 +75,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
             long length = 0;
             int level = next.Depth + 1;
-            maxdp = Math.Max(maxdp, level);
+            maxDp = Math.Max(maxDp, level);
 
             try
             {
@@ -89,12 +89,13 @@ public sealed class GetPSTreeCommand : TreeCommandBase
 
                     if (item is DirectoryInfo dir)
                     {
-                        if (!shouldContinue) continue;
-
-                        next.ItemCount++;
-                        new TreeDirectory(dir, source, level)
-                            .AddParent<TreeDirectory>(next)
-                            .Push(_stack);
+                        if (shouldContinue)
+                        {
+                            next.ItemCount++;
+                            new TreeDirectory(dir, source, level)
+                                .AddParent<TreeDirectory>(next)
+                                .Push(_stack);
+                        }
 
                         continue;
                     }
@@ -145,7 +146,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase
             }
         }
 
-        return _builder.GetTree(WithInclude && !Directory, maxdp);
+        return _builder.GetTree(WithInclude && !Directory, maxDp);
     }
 
     private static bool IsHidden(FileSystemInfo item)

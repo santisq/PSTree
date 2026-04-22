@@ -58,7 +58,7 @@ internal static class TreeFormattingExtension
                     .Append(Reset)
                     .ToString();
 
-            if (TreeStyle.IsWindows && FileSystemStyle.FileIsExecutable(file))
+            if (TreeStyle.IsWindows && FileSystemStyle.IsExecutable(file))
                 return builder
                     .Append(FileSystemStyle.Executable)
                     .Append(file.Name)

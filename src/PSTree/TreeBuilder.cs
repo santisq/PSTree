@@ -17,9 +17,9 @@ internal sealed class TreeBuilder<TBase, TLeaf>
     private const string Branch = "├── ";
     private const string LastBranch = "└── ";
 
-    private readonly List<TLeaf> _leaves = [];
+    private readonly List<TLeaf> _leaves = new(256);
 
-    internal List<TBase> Items { get; } = [];
+    internal List<TBase> Items { get; } = new(4096);
 
     internal void Add(TLeaf leaf) => _leaves.Add(leaf);
 
