@@ -1,27 +1,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using PSTree.Extensions;
-using PSTree.Style;
 
 namespace PSTree;
 
 public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
 {
-    public DirectoryInfo? Parent => Instance.Parent;
+    public DirectoryInfo? Parent { get => Instance.Parent; }
 
     public int ItemCount { get; internal set; }
 
     public int TotalItemCount { get; internal set; }
 
-    private TreeDirectory(
-        DirectoryInfo dir, string hierarchy, string source, int depth)
-        : base(dir, hierarchy, source, depth)
+    internal TreeDirectory(DirectoryInfo dir, string source, int depth)
+        : base(dir, source, depth)
     { }
 
-    private TreeDirectory(
-        DirectoryInfo dir, string hierarchy, string source)
-        : base(dir, hierarchy, source)
+    internal TreeDirectory(string path)
+        : base(new DirectoryInfo(path), path)
     {
         Include = true;
     }
@@ -35,53 +31,24 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
     public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() =>
         Instance.EnumerateFileSystemInfos();
 
-    internal IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable(TreeComparer comparer) =>
+    internal IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable() =>
         Instance
             .EnumerateFileSystemInfos()
             .OrderBy(static e => e is DirectoryInfo)
-            .ThenBy(static e => e, comparer);
+            .ThenBy(static e => e, TreeComparer.Value);
 
-    internal static TreeDirectory Create(string path) =>
-        Create(new DirectoryInfo(path), path);
-
-    internal static TreeDirectory Create(DirectoryInfo dir, string source)
+    internal void AggregateUp(long length, bool recursive, bool propagateInclude)
     {
-        string styled = TreeStyle.Instance.FileSystem.GetColoredName(dir);
-        return new TreeDirectory(dir, styled, source);
-    }
+        TotalItemCount = ItemCount;
+        Length = length;
 
-    internal static TreeDirectory Create(DirectoryInfo dir, string source, int depth)
-    {
-        string styled = TreeStyle.Instance.FileSystem.GetColoredName(dir).Indent(depth);
-        return new TreeDirectory(dir, styled, source, depth);
-    }
+        if (propagateInclude) Include = true;
 
-    internal void IndexCount(int count)
-    {
-        ItemCount = count;
-        TotalItemCount = count;
-
-        for (TreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
+        for (TreeDirectory? i = Container; i is not null; i = i.Container)
         {
-            i.TotalItemCount += count;
+            if (recursive) i.Length += length;
+            if (propagateInclude) i.Include = true;
+            i.TotalItemCount += ItemCount;
         }
-    }
-
-    internal void IndexLength(long length)
-    {
-        for (TreeDirectory? i = ParentNode; i is not null; i = i.ParentNode)
-        {
-            i.Length += length;
-        }
-    }
-
-    internal TreeDirectory SetIncludeFlagIf(bool condition)
-    {
-        if (condition)
-        {
-            Include = true;
-        }
-
-        return this;
     }
 }

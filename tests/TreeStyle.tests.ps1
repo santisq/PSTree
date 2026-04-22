@@ -16,6 +16,10 @@ Describe 'TreeStyle Type' {
         $style | Out-Null
     }
 
+    It 'OutputRendering Enum' {
+        $style.OutputRendering | Should -BeOfType ([PSTree.Style.OutputRendering])
+    }
+
     It 'CombineSequence() can combine 2 VT Sequences' {
         $vt = $style.CombineSequence(
             $style.Palette.Background.BrightRed,

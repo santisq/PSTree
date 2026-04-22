@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Management.Automation;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -9,38 +10,44 @@ internal static class ExceptionExtensions
 {
     private static readonly bool s_isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-    internal static ErrorRecord ToInvalidPathError(this string path) =>
-        new(
-            new ItemNotFoundException(
-                $"Cannot find path '{path}' because it does not exist."),
-            "InvalidPath", ErrorCategory.InvalidArgument, path);
+    extension(ProviderInfo provider)
+    {
+        internal ErrorRecord ToInvalidProviderError(string path, string expected = "FileSystem")
+        {
+            ArgumentException exception = new(
+                $"The resolved path '{path}' is not a {expected} path but '{provider.Name}'.");
 
-    internal static ErrorRecord ToInvalidProviderError(
-        this ProviderInfo provider,
-        string path,
-        string expected = "FileSystem") =>
-        new(
-            new ArgumentException(
-                $"The resolved path '{path}' is not a {expected} path but '{provider.Name}'."),
-            "InvalidProvider", ErrorCategory.InvalidArgument, path);
+            return new(exception, "InvalidProvider", ErrorCategory.InvalidArgument, path);
+        }
+    }
 
-    internal static ErrorRecord ToResolvePathError(this Exception exception, string path) =>
-        new(exception, "ResolvePath", ErrorCategory.NotSpecified, path);
+    extension(Exception exception)
+    {
+        internal ErrorRecord ToResolvePathError(string path)
+            => new(exception, "ResolvePath", ErrorCategory.NotSpecified, path);
 
-    internal static ErrorRecord ToEnumerationError(this Exception exception, TreeFileSystemInfo item) =>
-        new(exception, "EnumerationFailure", ErrorCategory.NotSpecified, item);
+        [ExcludeFromCodeCoverage] // This error is very hard to reproduce
+        internal ErrorRecord ToEnumerationError(TreeFileSystemInfo item)
+            => new(exception, "EnumerationFailure", ErrorCategory.NotSpecified, item);
+    }
 
-    internal static void ThrowInvalidSequence(this string vt) =>
-        throw new ArgumentException(
+    internal static ErrorRecord ToInvalidPathError(this string path)
+    {
+        ItemNotFoundException exception = new($"Cannot find path '{path}' because it does not exist.");
+        return new(exception,"InvalidPath", ErrorCategory.InvalidArgument, path);
+    }
+
+    internal static void ThrowInvalidSequence(this string vt)
+        => throw new ArgumentException(
             $"The specified string contains printable content when it should only contain ANSI escape sequences: '{vt}'.");
 
     internal static string ThrowIfInvalidExtension(this string extension)
     {
-        #if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER
         if (extension.StartsWith('.'))
-        #else
+#else
         if (extension.StartsWith("."))
-        #endif
+#endif
         {
             return extension;
         }
@@ -49,17 +56,23 @@ internal static class ExceptionExtensions
             $"When adding or removing extensions, the extension must start with a period: '{extension}'.");
     }
 
-    internal static ErrorRecord ToSecurityError(this SecurityException exception, string path) =>
-        new(exception, "SecurityException", ErrorCategory.OpenError, path);
-
-    internal static void ThrowIfNotSupportedPlatform(this PSCmdlet cmdlet)
+    extension(SecurityException exception)
     {
-        if (s_isWindows) return;
+        internal ErrorRecord ToSecurityError(string path)
+            => new(exception, "SecurityException", ErrorCategory.OpenError, path);
+    }
 
-        PlatformNotSupportedException exception = new(
-            "The 'Get-PSTreeRegistry' cmdlet is only supported on Windows.");
+    extension(PSCmdlet cmdlet)
+    {
+        internal void ThrowIfNotSupportedPlatform()
+        {
+            if (s_isWindows) return;
 
-        cmdlet.ThrowTerminatingError(new ErrorRecord(
-            exception, "NotSupportedPlatform", ErrorCategory.InvalidOperation, null));
+            PlatformNotSupportedException exception = new(
+                "The 'Get-PSTreeRegistry' cmdlet is only supported on Windows.");
+
+            cmdlet.ThrowTerminatingError(new ErrorRecord(
+                exception, "NotSupportedPlatform", ErrorCategory.InvalidOperation, null));
+        }
     }
 }

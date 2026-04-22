@@ -1,10 +1,26 @@
+using PSTree.Internal;
+
 namespace PSTree;
 
-public abstract class TreeFileSystemInfo(string hierarchy, string source)
-    : TreeBase<TreeDirectory>(hierarchy, source)
+public abstract class TreeFileSystemInfo(string source)
+    : TreeBase<TreeDirectory>(source)
 {
+    public abstract string Name { get; }
+
     public long Length { get; internal set; }
 
-    public string GetFormattedLength() =>
-        Internal._FormattingInternals.GetFormattedLength(Length);
+    public string GetFormattedLength()
+        => _FormattingInternals.GetFormattedLength(Length);
+
+    internal void RecursiveDecrement()
+    {
+        TreeDirectory? parent = Container;
+        if (parent is null) return;
+
+        parent.ItemCount--;
+        parent.TotalItemCount--;
+
+        for (parent = parent.Container; parent is not null; parent = parent.Container)
+            parent.TotalItemCount--;
+    }
 }

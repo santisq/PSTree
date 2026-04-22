@@ -8,45 +8,43 @@ namespace PSTree;
 public abstract class TreeFileSystemInfo<T> : TreeFileSystemInfo
     where T : FileSystemInfo
 {
-    private PSObject? _pso;
-
-    private PSObject InstancePso => _pso ??= PSObject.AsPSObject(Instance);
+    private PSObject InstanceAsPSO { get => field ??= PSObject.AsPSObject(Instance); }
 
     protected T Instance { get; }
 
-    public string Name => Instance.Name;
+    public override string Name { get => Instance.Name; }
 
-    public string Mode => FileSystemProvider.Mode(InstancePso);
+    public string Mode { get => FileSystemProvider.Mode(InstanceAsPSO); }
 
-    public string FullName => Instance.FullName;
+    public string FullName { get => Instance.FullName; }
 
-    public string Extension => Instance.Extension;
+    public string Extension { get => Instance.Extension; }
 
-    public FileAttributes Attributes => Instance.Attributes;
+    public FileAttributes Attributes { get => Instance.Attributes; }
 
-    public DateTime CreationTime => Instance.CreationTime;
+    public DateTime CreationTime { get => Instance.CreationTime; }
 
-    public DateTime CreationTimeUtc => Instance.CreationTimeUtc;
+    public DateTime CreationTimeUtc { get => Instance.CreationTimeUtc; }
 
-    public DateTime LastWriteTime => Instance.LastWriteTime;
+    public DateTime LastWriteTime { get => Instance.LastWriteTime; }
 
-    public DateTime LastWriteTimeUtc => Instance.LastWriteTimeUtc;
+    public DateTime LastWriteTimeUtc { get => Instance.LastWriteTimeUtc; }
 
-    public DateTime LastAccessTime => Instance.LastAccessTime;
+    public DateTime LastAccessTime { get => Instance.LastAccessTime; }
 
-    public DateTime LastAccessTimeUtc => Instance.LastAccessTimeUtc;
+    public DateTime LastAccessTimeUtc { get => Instance.LastAccessTimeUtc; }
 
     private protected TreeFileSystemInfo(
-        T fileSystemInfo, string hierarchy, string source, int depth)
-        : base(hierarchy, source)
+        T fileSystemInfo, string source, int depth)
+        : base(source)
     {
         Instance = fileSystemInfo;
         Depth = depth;
     }
 
     private protected TreeFileSystemInfo(
-        T fileSystemInfo, string hierarchy, string source)
-        : base(hierarchy, source)
+        T fileSystemInfo, string source)
+        : base(source)
     {
         Instance = fileSystemInfo;
     }
