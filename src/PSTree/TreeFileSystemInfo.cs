@@ -2,8 +2,8 @@ using PSTree.Internal;
 
 namespace PSTree;
 
-public abstract class TreeFileSystemInfo(string source)
-    : TreeBase<TreeDirectory>(source)
+public abstract class TreeFileSystemInfo(string source, int depth = 0)
+    : TreeBase<TreeDirectory, TreeFileSystemInfo>(source, depth)
 {
     public abstract string Name { get; }
 

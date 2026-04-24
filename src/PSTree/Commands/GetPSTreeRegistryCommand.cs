@@ -16,12 +16,10 @@ namespace PSTree.Commands;
 [ExcludeFromCodeCoverage]
 #endif
 [Alias("pstreereg")]
-public sealed class GetPSTreeRegistryCommand : TreeCommandBase
+public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
 {
 #if WINDOWS
     private readonly TreeBuilder<TreeRegistryBase, TreeRegistryValue> _builder = new();
-
-    private readonly Stack<(TreeRegistryKey, RegistryKey)> _stack = [];
 #endif
 
     [Parameter]
@@ -48,74 +46,68 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase
             if (!TryGetKey(path, out RegistryKey? key))
                 continue;
 
-            WriteObject(Traverse(key), enumerateCollection: true);
+            WriteObject(
+                Traverse(new TreeRegistryKey(key)),
+                enumerateCollection: true);
         }
     }
 
-    private ITree[] Traverse(RegistryKey regkey)
+    protected override ITree Traverse(TreeRegistryKey key)
     {
         _builder.Clear();
+        Push(key);
 
-        string source = regkey.Name;
+        string source = key.Path!;
         int maxDepth = 0;
 
-        regkey.
-            AsTreeKey(IOPath.GetFileName(regkey.Name)).
-            Push(_stack);
-
-        while (!Canceled && _stack.Count > 0)
+        while (ShouldContinue())
         {
-            (TreeRegistryKey tree, regkey) = _stack.Pop();
+            TreeRegistryKey next = Pop();
 
-            int level = tree.Depth + 1;
+            int level = next.Depth + 1;
             maxDepth = Math.Max(maxDepth, level);
 
-            using (regkey)
+            using (next)
             {
                 if (level > Depth) goto Build;
                 if (KeysOnly) goto PushKeys;
 
-                foreach (string value in regkey.GetValueNames())
+                foreach (string value in next.GetValueNames())
                 {
                     if (ShouldSkipValue(value)) continue;
 
-                    new TreeRegistryValue(regkey, value, source, level)
-                        .AddParent<TreeRegistryValue>(tree)
+                    next.CreateValue(value, source)
                         .AddTo(_builder);
                 }
 
             PushKeys:
-                foreach (string keyname in regkey.EnumerateKeys())
+                foreach (string name in next.EnumerateKeys())
                 {
-                    if (ShouldExclude(keyname)) continue;
+                    if (ShouldExclude(name)) continue;
 
                     try
                     {
-                        RegistryKey? subkey = regkey.OpenSubKey(keyname);
-                        if (subkey is null) continue;
-
-                        subkey
-                            .AsTreeKey(keyname, source, level)
-                            .AddParent(tree)
-                            .Push(_stack);
+                        if (next.TryCreateKey(name, source, out TreeRegistryKey? subKey))
+                            Push(subKey);
                     }
                     catch (SecurityException exception)
                     {
-                        string path = IOPath.Combine(regkey.Name, keyname);
+                        string path = IOPath.Combine(key.Name, name);
                         WriteError(exception.ToSecurityError(path));
                     }
                 }
 
                 if (WithInclude && _builder.HasLeaf())
-                    tree.PropagateInclude();
+                    next.PropagateInclude();
             }
 
         Build:
-            _builder.Add(tree);
+            _builder.Add(next);
             _builder.Flush();
         }
 
-        return _builder.GetTree(WithInclude && !KeysOnly, maxDepth);
+        return _builder.Items[0];
+        // return _builder.GetTree(WithInclude && !KeysOnly, maxDepth);
     }
 
     private bool ShouldSkipValue(string value) => ShouldExclude(value) || !ShouldInclude(value);

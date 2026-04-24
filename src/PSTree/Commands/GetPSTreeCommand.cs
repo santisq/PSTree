@@ -10,10 +10,8 @@ namespace PSTree.Commands;
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = PathSet)]
 [OutputType(typeof(TreeDirectory), typeof(TreeFile))]
 [Alias("pstree")]
-public sealed class GetPSTreeCommand : TreeCommandBase
+public sealed class GetPSTreeCommand : TreeCommandBase<TreeDirectory>
 {
-    private readonly Stack<TreeDirectory> _stack = new();
-
     private readonly TreeBuilder<TreeFileSystemInfo, TreeFile> _builder = new();
 
     [Parameter]
@@ -61,17 +59,17 @@ public sealed class GetPSTreeCommand : TreeCommandBase
         }
     }
 
-    private ITree[] Traverse(TreeDirectory directory)
+    protected override ITree Traverse(TreeDirectory directory)
     {
         _builder.Clear();
-        directory.Push(_stack);
+        Push(directory);
 
         string source = directory.FullName;
         int maxDp = 0;
 
-        while (!Canceled && _stack.Count > 0)
+        while (ShouldContinue())
         {
-            TreeDirectory next = _stack.Pop();
+            TreeDirectory next = Pop();
 
             long length = 0;
             int level = next.Depth + 1;
@@ -92,9 +90,13 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                         if (shouldContinue)
                         {
                             next.ItemCount++;
-                            new TreeDirectory(dir, source, level)
-                                .AddParent<TreeDirectory>(next)
-                                .Push(_stack);
+                            TreeDirectory treedir = new(dir, source, level)
+                            {
+                                Container = next
+                            };
+
+                            next.AddChild(treedir);
+                            Push(treedir);
                         }
 
                         continue;
@@ -114,9 +116,12 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                     if (!processLevel) continue;
 
                     next.ItemCount++;
-                    new TreeFile(file, source, level)
-                        .AddParent<TreeFile>(next)
-                        .AddTo(_builder);
+                    TreeFile treefile = new(file, source, level)
+                    {
+                        Container = next
+                    };
+
+                    next.AddChild(treefile);
                 }
 
                 next.AggregateUp(
@@ -124,11 +129,11 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                     recursive: RecursiveSize,
                     propagateInclude: WithInclude && _builder.HasLeaf());
 
-                if (next.Depth <= Depth)
-                {
-                    _builder.Add(next);
-                    _builder.Flush();
-                }
+                // if (next.Depth <= Depth)
+                // {
+                //     _builder.Add(next);
+                //     _builder.Flush();
+                // }
             }
             catch (Exception exception)
             {
@@ -145,8 +150,8 @@ public sealed class GetPSTreeCommand : TreeCommandBase
                 if (!current.Include) current.RecursiveDecrement();
             }
         }
-
-        return _builder.GetTree(WithInclude && !Directory, maxDp);
+        return directory;
+        // return _builder.GetTree(WithInclude && !Directory, maxDp);
     }
 
     private static bool IsHidden(FileSystemInfo item)

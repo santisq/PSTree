@@ -16,15 +16,16 @@ public sealed class TreeRegistryValue : TreeRegistryBase
     public override string? PSParentPath { get; }
 
     internal TreeRegistryValue(
-        RegistryKey key,
+        TreeRegistryKey key,
         string value,
         string source,
         int depth)
-        : base(source)
+        : base(source, depth)
     {
         _parentPath = key.Name;
         _valueName = value;
-        Depth = depth;
+        Container = key;
+        // Depth = depth;
         Name = GetNameOrDefault(value);
         Kind = key.GetValueKind(value);
         PSParentPath = $"{ProviderPath}{_parentPath}";

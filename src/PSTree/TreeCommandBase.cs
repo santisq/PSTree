@@ -9,8 +9,11 @@ using PSTree.Extensions;
 namespace PSTree;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class TreeCommandBase : PSCmdlet
+public abstract class TreeCommandBase<TContainer> : PSCmdlet
+    where TContainer : ITree
 {
+    private readonly Stack<TContainer> _stack = [];
+
     private WildcardPattern[]? _excludePatterns;
 
     private WildcardPattern[]? _includePatterns;
@@ -87,6 +90,14 @@ public abstract class TreeCommandBase : PSCmdlet
             WithInclude = true;
         }
     }
+
+    protected void Push(TContainer container) => _stack.Push(container);
+
+    protected TContainer Pop() => _stack.Pop();
+
+    protected bool ShouldContinue() => !Canceled && _stack.Count > 0;
+
+    protected abstract ITree Traverse(TContainer container);
 
     protected override void StopProcessing() => Canceled = true;
 

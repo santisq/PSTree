@@ -40,14 +40,14 @@ internal static class TreeExtensions
             => (new TreeRegistryKey(key, name, source, depth), key);
     }
 
-    extension((TreeRegistryKey, RegistryKey) treeKey)
-    {
-        internal (TreeRegistryKey, RegistryKey) AddParent(TreeRegistryKey parent)
-        {
-            treeKey.Item1.AddParent<TreeRegistryKey>(parent);
-            return treeKey;
-        }
-    }
+    // extension((TreeRegistryKey, RegistryKey) treeKey)
+    // {
+    //     internal (TreeRegistryKey, RegistryKey) AddParent(TreeRegistryKey parent)
+    //     {
+    //         treeKey.Item1.AddParent<TreeRegistryKey>(parent);
+    //         return treeKey;
+    //     }
+    // }
 
     extension(string[] strings)
     {

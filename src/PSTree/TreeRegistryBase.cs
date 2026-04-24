@@ -1,8 +1,8 @@
 #if WINDOWS
 namespace PSTree;
 
-public abstract class TreeRegistryBase(string source, string? path = null)
-    : TreeBase<TreeRegistryKey>(source)
+public abstract class TreeRegistryBase(string source, int depth = 0, string? path = null)
+    : TreeBase<TreeRegistryKey, TreeRegistryBase>(source, depth)
 {
     protected const string ProviderPath = @"Microsoft.PowerShell.Core\Registry::";
 

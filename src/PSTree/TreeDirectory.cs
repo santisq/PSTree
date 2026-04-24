@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace PSTree;
 
@@ -31,11 +30,10 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
     public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() =>
         Instance.EnumerateFileSystemInfos();
 
-    internal IOrderedEnumerable<FileSystemInfo> GetSortedEnumerable() =>
+    internal IEnumerable<FileSystemInfo> GetSortedEnumerable() =>
         Instance
-            .EnumerateFileSystemInfos()
-            .OrderBy(static e => e is DirectoryInfo)
-            .ThenBy(static e => e, TreeComparer.Value);
+            .EnumerateFileSystemInfos();
+            // .OrderBy(static e => e, TreeComparer.Value);
 
     internal void AggregateUp(long length, bool recursive, bool propagateInclude)
     {
