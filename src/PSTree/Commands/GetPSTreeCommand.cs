@@ -59,7 +59,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase<TreeDirectory>
         }
     }
 
-    protected override ITree Traverse(TreeDirectory directory)
+    protected override IEnumerable<ITree> Traverse(TreeDirectory directory)
     {
         _builder.Clear();
         Push(directory);
@@ -152,24 +152,9 @@ public sealed class GetPSTreeCommand : TreeCommandBase<TreeDirectory>
             }
         }
 
-        directory.MaxDepth = maxDp;
-        return directory;
+        return directory.Enumerate(maxDp);
         // return _builder.GetTree(WithInclude && !Directory, maxDp);
     }
-
-    // private IEnumerable<TreeFileSystemInfo> GetTree(TreeDirectory directory)
-    // {
-    //     const string Vertical = "│   ";
-    //     const string Space = "    ";
-    //     const string Branch = "├── ";
-    //     const string LastBranch = "└── ";
-
-    //     foreach (TreeFileSystemInfo info in directory.Enumerate())
-    //     {
-
-    //     }
-    // }
-
 
     private static bool IsHidden(FileSystemInfo item)
         => item.Attributes.HasFlag(FileAttributes.Hidden);

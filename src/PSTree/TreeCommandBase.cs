@@ -97,7 +97,7 @@ public abstract class TreeCommandBase<TContainer> : PSCmdlet
 
     protected bool ShouldContinue() => !Canceled && _stack.Count > 0;
 
-    protected abstract ITree Traverse(TContainer container);
+    protected abstract IEnumerable<ITree> Traverse(TContainer container);
 
     protected override void StopProcessing() => Canceled = true;
 

@@ -8,8 +8,6 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
     where TContainer : TBase
     where TBase : TreeBase<TContainer, TBase>
 {
-    internal int MaxDepth { get; set; }
-
     internal TContainer? Container { get; set; }
 
     internal List<TBase>? Children { get; set; }
@@ -38,16 +36,16 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
 
     private bool IsLast()
         => Container?.Children is { Count: > 0 } children
-            && this == children[children.Count - 1];
+            && ReferenceEquals(this, children[children.Count - 1]);
 
-    public IEnumerable<ITree> Enumerate()
+    public IEnumerable<ITree> Enumerate(int maxDepth)
     {
         const string Vertical = "│   ";
         const string Space = "    ";
         const string Branch = "├── ";
         const string LastBranch = "└── ";
 
-        bool[] continues = new bool[MaxDepth + 1];
+        bool[] continues = new bool[maxDepth + 1];
         StringBuilder sb = new(256);
         Stack<TreeBase<TContainer, TBase>> stack = [];
         stack.Push(this);
@@ -72,29 +70,14 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
             continues[depth] = !isLast;
             yield return current;
 
-            List<TBase>? children = current.Children;
-            if (children is null) continue;
-
-            for (int i = children.Count - 1; i >= 0; i--)
+            if (current.Children is { Count: > 0 } children)
             {
-                TBase child = children[i];
-
-                // if (withInclude && !child.Include)
-                //     continue;
-                // bool childIsLast = child.IsLast(); // <- Here where?
-                stack.Push(child);
+                for (int i = children.Count - 1; i >= 0; i--)
+                {
+                    TBase child = children[i];
+                    stack.Push(child);
+                }
             }
-
-            // foreach (TBase child in current.Children)
-            // {
-            //     if (child is TContainer container)
-            //     {
-            //         stack.Push(container);
-            //         continue;
-            //     }
-
-            //     yield return child;
-            // }
         }
     }
 

@@ -52,20 +52,20 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
         }
     }
 
-    protected override ITree Traverse(TreeRegistryKey key)
+    protected override IEnumerable<ITree> Traverse(TreeRegistryKey key)
     {
         _builder.Clear();
         Push(key);
 
         string source = key.Path!;
-        int maxDepth = 0;
+        int maxDp = 0;
 
         while (ShouldContinue())
         {
             TreeRegistryKey next = Pop();
 
             int level = next.Depth + 1;
-            maxDepth = Math.Max(maxDepth, level);
+            maxDp = Math.Max(maxDp, level);
 
             using (next)
             {
@@ -106,7 +106,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
             _builder.Flush();
         }
 
-        return _builder.Items[0];
+        return key.Enumerate(maxDp);
         // return _builder.GetTree(WithInclude && !KeysOnly, maxDepth);
     }
 
