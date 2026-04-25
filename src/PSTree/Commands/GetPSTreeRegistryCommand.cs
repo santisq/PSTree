@@ -4,7 +4,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Management.Automation;
 using System.Security;
 using Microsoft.Win32;
+using PSTree.Comparers;
 using PSTree.Extensions;
+using PSTree.Interfaces;
+using PSTree.Nodes;
+using PSTree.Registry;
 using IOPath = System.IO.Path;
 
 namespace PSTree.Commands;
@@ -18,13 +22,15 @@ namespace PSTree.Commands;
 [Alias("pstreereg")]
 public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
 {
-#if WINDOWS
-    private readonly TreeBuilder<TreeRegistryBase, TreeRegistryValue> _builder = new();
-#endif
-
     [Parameter]
     [Alias("k", "key")]
     public SwitchParameter KeysOnly { get; set; }
+
+#if WINDOWS
+    [Parameter]
+    [Alias("sb")]
+    public RegistrySortMode SortBy { get; set; } = RegistrySortMode.ValuesFirst;
+#endif
 
     protected override void BeginProcessing()
     {
@@ -47,47 +53,43 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
                 continue;
 
             WriteObject(
-                Traverse(new TreeRegistryKey(key)),
+                BuildTree(new TreeRegistryKey(key)),
                 enumerateCollection: true);
         }
     }
 
-    protected override IEnumerable<ITree> Traverse(TreeRegistryKey key)
+    protected override IEnumerable<ITree> BuildTree(TreeRegistryKey key)
     {
-        _builder.Clear();
-        Push(key);
-
         string source = key.Path!;
         int maxDp = 0;
 
+        Push(key);
         while (ShouldContinue())
         {
-            TreeRegistryKey next = Pop();
+            TreeRegistryKey current = Pop();
 
-            int level = next.Depth + 1;
+            int level = current.Depth + 1;
             maxDp = Math.Max(maxDp, level);
 
-            using (next)
+            using (current)
             {
-                if (level > Depth) goto Build;
+                if (level > Depth) continue;
                 if (KeysOnly) goto PushKeys;
 
-                foreach (string value in next.GetValueNames())
+                foreach (string value in current.GetValueNames())
                 {
-                    if (ShouldSkipValue(value)) continue;
-
-                    next.CreateValue(value, source)
-                        .AddTo(_builder);
+                    if (!ShouldSkipValue(value))
+                        current.AddValue(value, source);
                 }
 
             PushKeys:
-                foreach (string name in next.EnumerateKeys())
+                foreach (string name in current.EnumerateKeys())
                 {
                     if (ShouldExclude(name)) continue;
 
                     try
                     {
-                        if (next.TryCreateKey(name, source, out TreeRegistryKey? subKey))
+                        if (current.TryAddSubKey(name, source, out TreeRegistryKey? subKey))
                             Push(subKey);
                     }
                     catch (SecurityException exception)
@@ -97,16 +99,16 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
                     }
                 }
 
-                if (WithInclude && _builder.HasLeaf())
-                    next.PropagateInclude();
+                // if (WithInclude && _builder.HasLeaf())
+                //     current.PropagateInclude();
             }
 
-        Build:
-            _builder.Add(next);
-            _builder.Flush();
+            // Build:
+            //     _builder.Add(current);
+            //     _builder.Flush();
         }
 
-        return key.Enumerate(maxDp);
+        return key.Render(maxDp, TreeRegistryComparer.For(SortBy));
         // return _builder.GetTree(WithInclude && !KeysOnly, maxDepth);
     }
 
@@ -114,17 +116,17 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
 
     private bool TryGetKey(string path, [NotNullWhen(true)] out RegistryKey? key)
     {
-        (string @base, string? subkey) = path.Split(['\\'], 2);
+        string[] tokens = path.Split(['\\'], 2);
         key = default;
 
-        if (!RegistryMappings.TryGetKey(@base, out RegistryKey? value))
+        if (!RegistryMappings.TryGetKey(tokens[0], out RegistryKey? value))
             return false;
 
-        if (!string.IsNullOrWhiteSpace(subkey))
+        if (tokens.Length == 2 && !string.IsNullOrWhiteSpace(tokens[1]))
         {
             try
             {
-                if ((key = value.OpenSubKey(subkey)) is null)
+                if ((key = value.OpenSubKey(tokens[1])) is null)
                 {
                     WriteError(path.ToInvalidPathError());
                     return false;

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using PSTree.Nodes;
 
 namespace PSTree.Style;
 

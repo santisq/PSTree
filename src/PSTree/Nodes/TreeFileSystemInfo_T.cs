@@ -3,7 +3,7 @@ using System.IO;
 using System.Management.Automation;
 using Microsoft.PowerShell.Commands;
 
-namespace PSTree;
+namespace PSTree.Nodes;
 
 public abstract class TreeFileSystemInfo<T> : TreeFileSystemInfo
     where T : FileSystemInfo

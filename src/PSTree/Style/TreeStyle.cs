@@ -29,6 +29,8 @@ public sealed partial class TreeStyle
 
     internal static bool IsWindows { get; } = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
+    internal RenderingSet RenderingSet { get; private set; } = RenderingSet.Fancy;
+
     public OutputRendering OutputRendering
     {
         get;
@@ -42,6 +44,21 @@ public sealed partial class TreeStyle
     public Palette Palette { get; } = new();
 
     public string Reset { get; } = $"{ESC}[0m";
+
+    public RenderingStyle RenderingStyle
+    {
+        get;
+        set
+        {
+            RenderingSet = value switch
+            {
+                RenderingStyle.Fancy => RenderingSet.Fancy,
+                _ => throw new ArgumentOutOfRangeException(nameof(RenderingStyle))
+            };
+
+            field = value;
+        }
+    } = RenderingStyle.Fancy;
 
     public static TreeStyle Instance { get => s_instance ??= new(); }
 

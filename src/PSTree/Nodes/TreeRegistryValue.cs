@@ -1,13 +1,15 @@
 #if WINDOWS
 using Microsoft.Win32;
 
-namespace PSTree;
+namespace PSTree.Nodes;
 
 public sealed class TreeRegistryValue : TreeRegistryBase
 {
     private readonly string _parentPath;
 
     private readonly string _valueName;
+
+    internal override bool IsContainer { get; } = false;
 
     public RegistryValueKind Kind { get; }
 
@@ -35,6 +37,7 @@ public sealed class TreeRegistryValue : TreeRegistryBase
     private static string GetNameOrDefault(string value) =>
         string.IsNullOrEmpty(value) ? "(Default)" : value;
 
-    public object? GetValue() => Registry.GetValue(_parentPath, _valueName, null);
+    public object? GetValue()
+        => Microsoft.Win32.Registry.GetValue(_parentPath, _valueName, null);
 }
 #endif

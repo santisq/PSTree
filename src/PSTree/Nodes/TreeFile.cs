@@ -1,9 +1,11 @@
 using System.IO;
 
-namespace PSTree;
+namespace PSTree.Nodes;
 
 public sealed class TreeFile : TreeFileSystemInfo<FileInfo>
 {
+    internal override bool IsContainer { get; } = false;
+
     public DirectoryInfo? Directory { get => Instance.Directory; }
 
     public string? DirectoryName { get => Instance.DirectoryName; }

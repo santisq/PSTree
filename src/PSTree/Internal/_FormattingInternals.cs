@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Management.Automation;
+using PSTree.Interfaces;
 
 namespace PSTree.Internal;
 

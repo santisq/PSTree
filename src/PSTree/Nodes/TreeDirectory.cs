@@ -1,17 +1,19 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace PSTree;
+namespace PSTree.Nodes;
 
 public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
 {
+    internal override bool IsContainer { get; } = true;
+
     public DirectoryInfo? Parent { get => Instance.Parent; }
 
     public int ItemCount { get; internal set; }
 
     public int TotalItemCount { get; internal set; }
 
-    internal TreeDirectory(DirectoryInfo dir, string source, int depth)
+    private TreeDirectory(DirectoryInfo dir, string source, int depth)
         : base(dir, source, depth)
     { }
 
@@ -30,10 +32,11 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
     public IEnumerable<FileSystemInfo> EnumerateFileSystemInfos() =>
         Instance.EnumerateFileSystemInfos();
 
-    internal IEnumerable<FileSystemInfo> GetSortedEnumerable() =>
-        Instance
-            .EnumerateFileSystemInfos();
-    // .OrderBy(static e => e, TreeComparer.Value);
+    internal TreeDirectory CreateDirectory(DirectoryInfo dir, string source)
+        => new(dir, source, Depth + 1) { Container = this };
+
+    internal TreeFile CreateFile(FileInfo file, string source)
+        => new(file, source, Depth + 1) { Container = this };
 
     internal void AggregateUp(long length, bool recursive, bool propagateInclude)
     {

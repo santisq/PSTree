@@ -1,12 +1,11 @@
+using PSTree.Interfaces;
 using PSTree.Internal;
 
-namespace PSTree;
+namespace PSTree.Nodes;
 
 public abstract class TreeFileSystemInfo(string source, int depth = 0)
-    : TreeBase<TreeDirectory, TreeFileSystemInfo>(source, depth)
+    : TreeBase<TreeDirectory, TreeFileSystemInfo>(source, depth), IFileSystemNode
 {
-    public abstract string Name { get; }
-
     public long Length { get; internal set; }
 
     public string GetFormattedLength()

@@ -1,5 +1,7 @@
 using System;
 using System.Text;
+using PSTree.Interfaces;
+using PSTree.Nodes;
 using PSTree.Style;
 
 namespace PSTree.Extensions;
@@ -18,8 +20,8 @@ internal static class TreeFormattingExtension
 
     extension(StringBuilder builder)
     {
-        internal string GetStyledName(ITree tree) =>
-            tree switch
+        internal void SetStyledName(ITree tree)
+            => tree.Hierarchy = tree switch
             {
                 TreeDirectory dir => builder.GetStyledName(dir),
                 TreeFile file => builder.GetStyledName(file),

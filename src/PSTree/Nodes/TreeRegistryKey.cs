@@ -4,14 +4,16 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Win32;
-using PSTree.Native;
+using PSTree.Registry;
 using IOPath = System.IO.Path;
 
-namespace PSTree;
+namespace PSTree.Nodes;
 
 public sealed class TreeRegistryKey : TreeRegistryBase, IDisposable
 {
     private readonly RegistryKey _key;
+
+    internal override bool IsContainer { get; } = true;
 
     public string Kind { get; } = "RegistryKey";
 
@@ -29,7 +31,7 @@ public sealed class TreeRegistryKey : TreeRegistryBase, IDisposable
         : this(key, IOPath.GetFileName(key.Name), key.Name)
     { }
 
-    internal TreeRegistryKey(
+    private TreeRegistryKey(
         RegistryKey key,
         string name,
         string source,
@@ -53,30 +55,26 @@ public sealed class TreeRegistryKey : TreeRegistryBase, IDisposable
         _key.GetSubKeyNames().OrderByDescending(e => e);
 #endif
 
-    internal bool TryCreateKey(
+    internal bool TryAddSubKey(
         string name,
         string source,
-        [NotNullWhen(true)] out TreeRegistryKey? tree)
+        [NotNullWhen(true)] out TreeRegistryKey? treeKey)
     {
-        tree = null;
-        if (_key.OpenSubKey(name) is not RegistryKey treeKey)
+        treeKey = null;
+        if (_key.OpenSubKey(name) is not RegistryKey key)
             return false;
 
-        tree = new(treeKey, name, source, Depth + 1)
+        treeKey = new(key, name, source, Depth + 1)
         {
             Container = this
         };
 
-        AddChild(tree);
+        AddChild(treeKey);
         return true;
     }
 
-    internal TreeRegistryValue CreateValue(string value, string source)
-    {
-        TreeRegistryValue tvalue = new(this, value, source, Depth + 1);
-        AddChild(tvalue);
-        return tvalue;
-    }
+    internal void AddValue(string value, string source)
+        => AddChild(new TreeRegistryValue(this, value, source, Depth + 1));
 
     internal RegistryValueKind GetValueKind(string value) => _key.GetValueKind(value);
 
