@@ -67,11 +67,16 @@ public sealed class TreeRegistryKey : TreeRegistryBase, IDisposable
             Container = this
         };
 
+        AddChild(tree);
         return true;
     }
 
     internal TreeRegistryValue CreateValue(string value, string source)
-        => new(this, value, source, Depth + 1);
+    {
+        TreeRegistryValue tvalue = new(this, value, source, Depth + 1);
+        AddChild(tvalue);
+        return tvalue;
+    }
 
     internal RegistryValueKind GetValueKind(string value) => _key.GetValueKind(value);
 

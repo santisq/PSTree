@@ -129,6 +129,7 @@ public sealed class GetPSTreeCommand : TreeCommandBase<TreeDirectory>
                     recursive: RecursiveSize,
                     propagateInclude: WithInclude && _builder.HasLeaf());
 
+                // next.Children?.Sort(TreeComparer.Value);
                 // if (next.Depth <= Depth)
                 // {
                 //     _builder.Add(next);
@@ -150,9 +151,25 @@ public sealed class GetPSTreeCommand : TreeCommandBase<TreeDirectory>
                 if (!current.Include) current.RecursiveDecrement();
             }
         }
+
+        directory.MaxDepth = maxDp;
         return directory;
         // return _builder.GetTree(WithInclude && !Directory, maxDp);
     }
+
+    // private IEnumerable<TreeFileSystemInfo> GetTree(TreeDirectory directory)
+    // {
+    //     const string Vertical = "│   ";
+    //     const string Space = "    ";
+    //     const string Branch = "├── ";
+    //     const string LastBranch = "└── ";
+
+    //     foreach (TreeFileSystemInfo info in directory.Enumerate())
+    //     {
+
+    //     }
+    // }
+
 
     private static bool IsHidden(FileSystemInfo item)
         => item.Attributes.HasFlag(FileAttributes.Hidden);

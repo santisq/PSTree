@@ -33,7 +33,7 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
     internal IEnumerable<FileSystemInfo> GetSortedEnumerable() =>
         Instance
             .EnumerateFileSystemInfos();
-            // .OrderBy(static e => e, TreeComparer.Value);
+    // .OrderBy(static e => e, TreeComparer.Value);
 
     internal void AggregateUp(long length, bool recursive, bool propagateInclude)
     {
