@@ -13,7 +13,8 @@ namespace PSTree.Commands;
 [Cmdlet(VerbsCommon.Get, "PSTree", DefaultParameterSetName = PathSet)]
 [OutputType(typeof(TreeDirectory), typeof(TreeFile))]
 [Alias("pstree")]
-public sealed class GetPSTreeCommand : TreeCommandBase<TreeDirectory>
+public sealed class GetPSTreeCommand
+    : TreeCommandBase<TreeDirectory, TreeFileSystemInfo, FileSystemSortMode>
 {
     [Parameter]
     [Alias("f")]
@@ -26,10 +27,6 @@ public sealed class GetPSTreeCommand : TreeCommandBase<TreeDirectory>
     [Parameter]
     [Alias("rs")]
     public SwitchParameter RecursiveSize { get; set; }
-
-    [Parameter]
-    [Alias("sb")]
-    public FileSystemSortMode SortBy { get; set; } = FileSystemSortMode.FilesFirst;
 
     protected override void ProcessRecord()
     {
@@ -59,12 +56,12 @@ public sealed class GetPSTreeCommand : TreeCommandBase<TreeDirectory>
             }
 
             WriteObject(
-                BuildTree(new TreeDirectory(path)),
+                Build(new TreeDirectory(path)),
                 enumerateCollection: true);
         }
     }
 
-    protected override IEnumerable<ITree> BuildTree(TreeDirectory directory)
+    protected override IEnumerable<ITree> Build(TreeDirectory directory)
     {
         string source = directory.FullName;
         int maxDp = 0;
@@ -130,10 +127,18 @@ public sealed class GetPSTreeCommand : TreeCommandBase<TreeDirectory>
         //     }
         // }
 
-        return directory.Render(maxDp, TreeFileSystemComparer.For(SortBy));
+        return directory.Render(maxDp, Comparer);
         // return _builder.GetTree(WithInclude && !Directory, maxDp);
     }
 
     private static bool IsHidden(FileSystemInfo item)
         => item.Attributes.HasFlag(FileAttributes.Hidden);
+
+    protected override IComparer<TreeFileSystemInfo> GetComparer() => SortBy switch
+    {
+        FileSystemSortMode.FilesFirst => TreeFileSystemComparer.ByFile,
+        FileSystemSortMode.DirectoriesFirst => TreeFileSystemComparer.ByDirectory,
+        FileSystemSortMode.Size => TreeFileSystemComparer.BySize,
+        _ => throw new ArgumentOutOfRangeException(nameof(SortBy))
+    };
 }

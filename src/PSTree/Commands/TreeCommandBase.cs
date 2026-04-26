@@ -10,10 +10,14 @@ using PSTree.Interfaces;
 namespace PSTree.Commands;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class TreeCommandBase<TContainer> : PSCmdlet
-    where TContainer : ITree
+public abstract class TreeCommandBase<TContainer, TBase, TSort> : PSCmdlet
+    where TContainer : TBase
+    where TBase : ITree
+    where TSort : struct, Enum
 {
-    private readonly Stack<TContainer> _stack = [];
+    private bool _canceled = false;
+
+    private readonly Stack<TContainer> _stack = new(32);
 
     private WildcardPattern[]? _excludePatterns;
 
@@ -27,7 +31,7 @@ public abstract class TreeCommandBase<TContainer> : PSCmdlet
 
     protected bool WithInclude { get; private set; }
 
-    protected bool Canceled { get; set; }
+    protected IComparer<TBase>? Comparer { get; private set; }
 
     [Parameter(
         ParameterSetName = PathSet,
@@ -73,6 +77,10 @@ public abstract class TreeCommandBase<TContainer> : PSCmdlet
     [Alias("inc")]
     public string[]? Include { get; set; }
 
+    [Parameter]
+    [Alias("sb")]
+    public TSort SortBy { get; set; }
+
     protected override void BeginProcessing()
     {
         if (Recurse && !MyInvocation.BoundParameters.ContainsKey(nameof(Depth)))
@@ -90,17 +98,21 @@ public abstract class TreeCommandBase<TContainer> : PSCmdlet
             _includePatterns = [.. Include.Select(e => new WildcardPattern(e, options))];
             WithInclude = true;
         }
+
+        Comparer = GetComparer();
     }
 
     protected void Push(TContainer container) => _stack.Push(container);
 
     protected TContainer Pop() => _stack.Pop();
 
-    protected bool ShouldContinue() => !Canceled && _stack.Count > 0;
+    protected bool ShouldContinue() => !_canceled && _stack.Count > 0;
 
-    protected abstract IEnumerable<ITree> BuildTree(TContainer container);
+    protected abstract IEnumerable<ITree> Build(TContainer container);
 
-    protected override void StopProcessing() => Canceled = true;
+    protected abstract IComparer<TBase> GetComparer();
+
+    protected override void StopProcessing() => _canceled = true;
 
     protected IEnumerable<(ProviderInfo, string)> EnumerateResolvedPaths()
     {

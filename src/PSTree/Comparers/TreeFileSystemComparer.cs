@@ -9,19 +9,12 @@ namespace PSTree.Comparers;
 internal sealed class TreeFileSystemComparer : IComparer<TreeFileSystemInfo>
 {
     private readonly FileSystemSortMode _mode;
-    private static readonly TreeFileSystemComparer s_byDir = new(FileSystemSortMode.DirectoriesFirst);
-    private static readonly TreeFileSystemComparer s_byFile = new(FileSystemSortMode.FilesFirst);
-    private static readonly TreeFileSystemComparer s_bySize = new(FileSystemSortMode.Size);
+
+    internal static TreeFileSystemComparer ByFile { get; } = new(FileSystemSortMode.FilesFirst);
+    internal static TreeFileSystemComparer ByDirectory { get; } = new(FileSystemSortMode.DirectoriesFirst);
+    internal static TreeFileSystemComparer BySize { get; } = new(FileSystemSortMode.Size);
 
     private TreeFileSystemComparer(FileSystemSortMode mode) => _mode = mode;
-
-    public static TreeFileSystemComparer For(FileSystemSortMode mode) => mode switch
-    {
-        FileSystemSortMode.DirectoriesFirst => s_byDir,
-        FileSystemSortMode.FilesFirst => s_byFile,
-        FileSystemSortMode.Size => s_bySize,
-        _ => throw new ArgumentOutOfRangeException(nameof(mode))
-    };
 
     public int Compare(TreeFileSystemInfo x, TreeFileSystemInfo y) => _mode switch
     {

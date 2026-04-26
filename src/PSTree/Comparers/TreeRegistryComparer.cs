@@ -10,22 +10,16 @@ namespace PSTree.Comparers;
 internal sealed class TreeRegistryComparer : IComparer<TreeRegistryBase>
 {
     private readonly RegistrySortMode _mode;
-    private static readonly TreeRegistryComparer s_byKey = new(RegistrySortMode.KeysFirst);
-    private static readonly TreeRegistryComparer s_byValue = new(RegistrySortMode.ValuesFirst);
+
+    internal static TreeRegistryComparer ByValue { get; } = new(RegistrySortMode.ValuesFirst);
+    internal static TreeRegistryComparer ByKey { get; } = new(RegistrySortMode.KeysFirst);
 
     private TreeRegistryComparer(RegistrySortMode mode) => _mode = mode;
 
-    public static TreeRegistryComparer For(RegistrySortMode mode) => mode switch
-    {
-        RegistrySortMode.KeysFirst => s_byKey,
-        RegistrySortMode.ValuesFirst => s_byValue,
-        _ => throw new ArgumentOutOfRangeException(nameof(mode))
-    };
-
     public int Compare(TreeRegistryBase x, TreeRegistryBase y) => _mode switch
     {
-        RegistrySortMode.KeysFirst => TreeComparers.ByContainersFirst(x, y),
         RegistrySortMode.ValuesFirst => TreeComparers.ByLeavesFirst(x, y),
+        RegistrySortMode.KeysFirst => TreeComparers.ByContainersFirst(x, y),
         _ => throw new ArgumentOutOfRangeException(nameof(_mode)) // Unreachable
     };
 }

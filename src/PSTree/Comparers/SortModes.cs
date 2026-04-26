@@ -7,10 +7,9 @@ public enum FileSystemSortMode
     Size
 }
 
-#if WINDOWS
 public enum RegistrySortMode
 {
     ValuesFirst,
     KeysFirst
 }
-#endif
+

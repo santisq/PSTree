@@ -44,12 +44,12 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
 
     internal IEnumerable<ITree> Render(
         int maxDepth,
-        IComparer<TBase>? comparer = null)
+        IComparer<TBase>? comparer)
     {
         RenderingSet set = TreeStyle.Instance.RenderingSet;
         bool[] continues = new bool[maxDepth + 1];
         StringBuilder builder = new(256);
-        Stack<TreeBase<TContainer, TBase>> stack = new(64);
+        Stack<TreeBase<TContainer, TBase>> stack = new(32);
 
         stack.Push(this);
         while (stack.Count > 0)

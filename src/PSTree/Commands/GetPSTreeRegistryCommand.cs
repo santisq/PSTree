@@ -20,17 +20,12 @@ namespace PSTree.Commands;
 [ExcludeFromCodeCoverage]
 #endif
 [Alias("pstreereg")]
-public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
+public sealed class GetPSTreeRegistryCommand
+    : TreeCommandBase<TreeRegistryKey, TreeRegistryBase, RegistrySortMode>
 {
     [Parameter]
     [Alias("k", "key")]
     public SwitchParameter KeysOnly { get; set; }
-
-#if WINDOWS
-    [Parameter]
-    [Alias("sb")]
-    public RegistrySortMode SortBy { get; set; } = RegistrySortMode.ValuesFirst;
-#endif
 
     protected override void BeginProcessing()
     {
@@ -53,12 +48,12 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
                 continue;
 
             WriteObject(
-                BuildTree(new TreeRegistryKey(key)),
+                Build(new TreeRegistryKey(key)),
                 enumerateCollection: true);
         }
     }
 
-    protected override IEnumerable<ITree> BuildTree(TreeRegistryKey key)
+    protected override IEnumerable<ITree> Build(TreeRegistryKey key)
     {
         string source = key.Path!;
         int maxDp = 0;
@@ -108,7 +103,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
             //     _builder.Flush();
         }
 
-        return key.Render(maxDp, TreeRegistryComparer.For(SortBy));
+        return key.Render(maxDp, Comparer);
         // return _builder.GetTree(WithInclude && !KeysOnly, maxDepth);
     }
 
@@ -144,5 +139,12 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
         key = value;
         return true;
     }
+
+    protected override IComparer<TreeRegistryBase> GetComparer() => SortBy switch
+    {
+        RegistrySortMode.ValuesFirst => TreeRegistryComparer.ByValue,
+        RegistrySortMode.KeysFirst => TreeRegistryComparer.ByKey,
+        _ => throw new ArgumentOutOfRangeException(nameof(SortBy))
+    };
 #endif
 }
