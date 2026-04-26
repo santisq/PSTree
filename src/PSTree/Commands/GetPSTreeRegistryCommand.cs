@@ -94,7 +94,7 @@ public sealed class GetPSTreeRegistryCommand : TreeCommandBase<TreeRegistryKey>
                     }
                     catch (SecurityException exception)
                     {
-                        string path = IOPath.Combine(key.Name, name);
+                        string path = IOPath.Combine(current.Name, name);
                         WriteError(exception.ToSecurityError(path));
                     }
                 }

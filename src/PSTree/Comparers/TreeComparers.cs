@@ -7,16 +7,18 @@ internal static class TreeComparers
     internal static int ByContainersFirst<T>(T x, T y)
         where T : ITree
     {
-        if (x.IsContainer && !y.IsContainer) return -1;
-        if (!x.IsContainer && y.IsContainer) return 1;
+        if (x.IsContainer != y.IsContainer)
+            return x.IsContainer ? -1 : 1;
+
         return x.Name.CompareTo(y.Name);
     }
 
     internal static int ByLeavesFirst<T>(T x, T y)
         where T : ITree
     {
-        if (x.IsContainer && !y.IsContainer) return 1;
-        if (!x.IsContainer && y.IsContainer) return -1;
+        if (x.IsContainer != y.IsContainer)
+            return x.IsContainer ? 1 : -1;
+
         return x.Name.CompareTo(y.Name);
     }
 

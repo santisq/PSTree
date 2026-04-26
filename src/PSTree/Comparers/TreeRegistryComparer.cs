@@ -22,14 +22,11 @@ internal sealed class TreeRegistryComparer : IComparer<TreeRegistryBase>
         _ => throw new ArgumentOutOfRangeException(nameof(mode))
     };
 
-    public int Compare(TreeRegistryBase x, TreeRegistryBase y)
+    public int Compare(TreeRegistryBase x, TreeRegistryBase y) => _mode switch
     {
-        return _mode switch
-        {
-            RegistrySortMode.KeysFirst => TreeComparers.ByContainersFirst(x, y),
-            RegistrySortMode.ValuesFirst => TreeComparers.ByLeavesFirst(x, y),
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
+        RegistrySortMode.KeysFirst => TreeComparers.ByContainersFirst(x, y),
+        RegistrySortMode.ValuesFirst => TreeComparers.ByLeavesFirst(x, y),
+        _ => throw new ArgumentOutOfRangeException(nameof(_mode)) // Unreachable
+    };
 }
 #endif

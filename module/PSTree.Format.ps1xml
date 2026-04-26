@@ -4,7 +4,7 @@
     <View>
       <Name>treeviewfs</Name>
       <ViewSelectedBy>
-        <TypeName>PSTree.TreeFileSystemInfo</TypeName>
+        <TypeName>PSTree.Nodes.TreeFileSystemInfo</TypeName>
       </ViewSelectedBy>
       <GroupBy>
         <ScriptBlock>[PSTree.Internal._FormattingInternals]::GetSource($_)</ScriptBlock>
@@ -47,7 +47,7 @@
     <View>
       <Name>treeviewreg</Name>
       <ViewSelectedBy>
-        <TypeName>PSTree.TreeRegistryBase</TypeName>
+        <TypeName>PSTree.Nodes.TreeRegistryBase</TypeName>
       </ViewSelectedBy>
       <GroupBy>
         <ScriptBlock>[PSTree.Internal._FormattingInternals]::GetSource($_)</ScriptBlock>

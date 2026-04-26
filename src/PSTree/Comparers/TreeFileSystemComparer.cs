@@ -23,14 +23,11 @@ internal sealed class TreeFileSystemComparer : IComparer<TreeFileSystemInfo>
         _ => throw new ArgumentOutOfRangeException(nameof(mode))
     };
 
-    public int Compare(TreeFileSystemInfo x, TreeFileSystemInfo y)
+    public int Compare(TreeFileSystemInfo x, TreeFileSystemInfo y) => _mode switch
     {
-        return _mode switch
-        {
-            FileSystemSortMode.FilesFirst => TreeComparers.ByLeavesFirst(x, y),
-            FileSystemSortMode.DirectoriesFirst => TreeComparers.ByContainersFirst(x, y),
-            FileSystemSortMode.Size => TreeComparers.BySize(x, y),
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
+        FileSystemSortMode.FilesFirst => TreeComparers.ByLeavesFirst(x, y),
+        FileSystemSortMode.DirectoriesFirst => TreeComparers.ByContainersFirst(x, y),
+        FileSystemSortMode.Size => TreeComparers.BySize(x, y),
+        _ => throw new ArgumentOutOfRangeException(nameof(_mode)) // Unreachable
+    };
 }
