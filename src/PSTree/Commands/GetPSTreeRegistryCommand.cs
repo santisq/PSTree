@@ -6,7 +6,6 @@ using System.Security;
 using Microsoft.Win32;
 using PSTree.Comparers;
 using PSTree.Extensions;
-using PSTree.Interfaces;
 using PSTree.Nodes;
 using PSTree.Registry;
 using IOPath = System.IO.Path;
@@ -51,11 +50,11 @@ public sealed class GetPSTreeRegistryCommand
         }
     }
 
-    protected override void BuildOne(TreeRegistryKey current)
+    protected override void BuildOne(TreeRegistryKey current, int depth)
     {
         using (current)
         {
-            if (CurrentDepth > Depth) return;
+            if (depth > Depth) return;
             if (!KeysOnly)
             {
                 foreach (string value in current.GetValueNames())

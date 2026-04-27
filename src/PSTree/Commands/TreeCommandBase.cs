@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Management.Automation;
 using PSTree.Extensions;
-using PSTree.Interfaces;
 using PSTree.Nodes;
 
 namespace PSTree.Commands;
@@ -17,8 +16,6 @@ public abstract class TreeCommandBase<TContainer, TBase, TSort> : PSCmdlet
     where TSort : struct, Enum
 {
     private bool _canceled = false;
-
-    private int _maxDepth;
 
     private readonly Stack<TContainer> _stack = new(32);
 
@@ -35,16 +32,6 @@ public abstract class TreeCommandBase<TContainer, TBase, TSort> : PSCmdlet
     protected bool WithInclude { get; private set; }
 
     protected string CurrentSource { get; private set; } = null!;
-
-    protected int CurrentDepth
-    {
-        get;
-        private set
-        {
-            _maxDepth = Math.Max(_maxDepth, value);
-            field = value;
-        }
-    }
 
     [Parameter(
         ParameterSetName = PathSet,
@@ -148,24 +135,26 @@ public abstract class TreeCommandBase<TContainer, TBase, TSort> : PSCmdlet
 
     protected void ProcessTree(TContainer container)
     {
+        int depth, maxdp = 0;
         CurrentSource = container.Source;
         Push(container);
         while (!_canceled && _stack.Count > 0)
         {
             TContainer current = _stack.Pop();
-            CurrentDepth = current.Depth + 1;
-            BuildOne(current);
+            depth = current.Depth + 1;
+            maxdp = Math.Max(maxdp, depth);
+            BuildOne(current, depth);
         }
 
         IComparer<TBase>? comparer = GetComparer();
         WriteObject(
-            container.Render(_maxDepth, WithInclude, comparer),
+            container.Render(maxdp, WithInclude, comparer),
             enumerateCollection: true);
     }
 
-    protected void Push(TContainer container) => _stack.Push(container);
+    protected abstract void BuildOne(TContainer current, int depth);
 
-    protected abstract void BuildOne(TContainer current);
+    protected void Push(TContainer container) => _stack.Push(container);
 
     protected abstract IComparer<TBase>? GetComparer();
 

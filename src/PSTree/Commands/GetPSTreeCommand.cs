@@ -5,7 +5,6 @@ using System.Management.Automation;
 using Microsoft.PowerShell.Commands;
 using PSTree.Comparers;
 using PSTree.Extensions;
-using PSTree.Interfaces;
 using PSTree.Nodes;
 
 namespace PSTree.Commands;
@@ -59,10 +58,10 @@ public sealed class GetPSTreeCommand
         }
     }
 
-    protected override void BuildOne(TreeDirectory current)
+    protected override void BuildOne(TreeDirectory current, int depth)
     {
         long length = 0;
-        bool include = CurrentDepth <= Depth;
+        bool include = depth <= Depth;
         bool traverse = include || RecursiveSize;
 
         try
