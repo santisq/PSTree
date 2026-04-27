@@ -36,10 +36,14 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
         => new(dir, source, Depth + 1) { Container = this };
 
     internal TreeFile CreateFile(FileInfo file, string source)
-        => new(file, source, Depth + 1) { Container = this };
+    {
+        Include = true;
+        return new(file, source, Depth + 1) { Container = this };
+    }
 
     internal void AggregateUp(long length, bool recursive, bool propagateInclude)
     {
+        ItemCount = Children?.Count ?? 0;
         TotalItemCount = ItemCount;
         Length = length;
 

@@ -18,6 +18,8 @@ public abstract class TreeCommandBase<TContainer, TBase, TSort> : PSCmdlet
 {
     private bool _canceled = false;
 
+    private int _maxDepth;
+
     private readonly Stack<TContainer> _stack = new(32);
 
     private WildcardPattern[]? _excludePatterns;
@@ -31,6 +33,18 @@ public abstract class TreeCommandBase<TContainer, TBase, TSort> : PSCmdlet
     protected const string LiteralPathSet = "LiteralPath";
 
     protected bool WithInclude { get; private set; }
+
+    protected string CurrentSource { get; private set; } = null!;
+
+    protected int CurrentDepth
+    {
+        get;
+        private set
+        {
+            _maxDepth = Math.Max(_maxDepth, value);
+            field = value;
+        }
+    }
 
     [Parameter(
         ParameterSetName = PathSet,
@@ -134,29 +148,24 @@ public abstract class TreeCommandBase<TContainer, TBase, TSort> : PSCmdlet
 
     protected void ProcessTree(TContainer container)
     {
-        string source = container.Source;
-        int maxDepth = 0;
-
+        CurrentSource = container.Source;
         Push(container);
         while (!_canceled && _stack.Count > 0)
         {
-            TContainer current = Pop();
-            int level = current.Depth + 1;
-            maxDepth = Math.Max(maxDepth, level);
-            BuildOne(current, source, level);
+            TContainer current = _stack.Pop();
+            CurrentDepth = current.Depth + 1;
+            BuildOne(current);
         }
 
         IComparer<TBase>? comparer = GetComparer();
         WriteObject(
-            container.Render(maxDepth, comparer),
+            container.Render(_maxDepth, WithInclude, comparer),
             enumerateCollection: true);
     }
 
     protected void Push(TContainer container) => _stack.Push(container);
 
-    protected TContainer Pop() => _stack.Pop();
-
-    protected abstract void BuildOne(TContainer current, string source, int level);
+    protected abstract void BuildOne(TContainer current);
 
     protected abstract IComparer<TBase>? GetComparer();
 

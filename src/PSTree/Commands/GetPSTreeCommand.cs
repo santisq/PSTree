@@ -59,13 +59,10 @@ public sealed class GetPSTreeCommand
         }
     }
 
-    protected override void BuildOne(
-        TreeDirectory current,
-        string source,
-        int level)
+    protected override void BuildOne(TreeDirectory current)
     {
         long length = 0;
-        bool include = level <= Depth;
+        bool include = CurrentDepth <= Depth;
         bool traverse = include || RecursiveSize;
 
         try
@@ -77,9 +74,7 @@ public sealed class GetPSTreeCommand
 
                 if (item is DirectoryInfo dir)
                 {
-                    TreeDirectory treedir = current.CreateDirectory(dir, source);
-                    current.ItemCount++;
-
+                    TreeDirectory treedir = current.CreateDirectory(dir, CurrentSource);
                     if (include) current.AddChild(treedir);
                     if (traverse) Push(treedir);
                     continue;
@@ -92,16 +87,12 @@ public sealed class GetPSTreeCommand
                 length += file.Length;
                 if (!Directory && include)
                 {
-                    current.ItemCount++;
-                    TreeFile treefile = current.CreateFile(file, source);
+                    TreeFile treefile = current.CreateFile(file, CurrentSource);
                     current.AddChild(treefile);
                 }
             }
 
-            current.AggregateUp(
-                length: length,
-                recursive: RecursiveSize,
-                propagateInclude: WithInclude);
+            current.AggregateUp(length, RecursiveSize, WithInclude);
         }
         catch (Exception exception)
         {

@@ -44,6 +44,7 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
 
     internal IEnumerable<ITree> Render(
         int maxDepth,
+        bool withInclude,
         IComparer<TBase>? comparer)
     {
         RenderingSet set = TreeStyle.Instance.RenderingSet;
@@ -55,6 +56,8 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
         while (stack.Count > 0)
         {
             TreeBase<TContainer, TBase> current = stack.Pop();
+            if (withInclude && !current.Include) continue;
+
             int dp = current.Depth;
             builder.Clear();
 

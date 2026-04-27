@@ -51,20 +51,17 @@ public sealed class GetPSTreeRegistryCommand
         }
     }
 
-    protected override void BuildOne(
-        TreeRegistryKey current,
-        string source,
-        int level)
+    protected override void BuildOne(TreeRegistryKey current)
     {
         using (current)
         {
-            if (level > Depth) return;
+            if (CurrentDepth > Depth) return;
             if (!KeysOnly)
             {
                 foreach (string value in current.GetValueNames())
                 {
                     if (!ShouldSkipValue(value))
-                        current.AddValue(value, source);
+                        current.AddValue(value, CurrentSource);
                 }
             }
 
@@ -74,7 +71,7 @@ public sealed class GetPSTreeRegistryCommand
 
                 try
                 {
-                    if (current.TryAddSubKey(name, source, out TreeRegistryKey? subKey))
+                    if (current.TryAddSubKey(name, CurrentSource, out TreeRegistryKey? subKey))
                         Push(subKey);
                 }
                 catch (SecurityException exception)
