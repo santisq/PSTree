@@ -19,9 +19,7 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
 
     internal TreeDirectory(string path)
         : base(new DirectoryInfo(path), path)
-    {
-        Include = true;
-    }
+    { }
 
     public IEnumerable<FileInfo> EnumerateFiles() =>
         Instance.EnumerateFiles();
@@ -36,23 +34,19 @@ public sealed class TreeDirectory : TreeFileSystemInfo<DirectoryInfo>
         => new(dir, source, Depth + 1) { Container = this };
 
     internal TreeFile CreateFile(FileInfo file, string source)
-    {
-        Include = true;
-        return new(file, source, Depth + 1) { Container = this };
-    }
+        => new(file, source, Depth + 1) { Container = this };
 
-    internal void AggregateUp(long length, bool recursive, bool propagateInclude)
+    internal void AggregateUp(long length, bool recursive, bool include)
     {
+        if (include) Include = include;
         ItemCount = Children?.Count ?? 0;
         TotalItemCount = ItemCount;
         Length = length;
 
-        if (propagateInclude) Include = true;
-
         for (TreeDirectory? i = Container; i is not null; i = i.Container)
         {
             if (recursive) i.Length += length;
-            if (propagateInclude) i.Include = true;
+            if (include) i.Include = include;
             i.TotalItemCount += ItemCount;
         }
     }

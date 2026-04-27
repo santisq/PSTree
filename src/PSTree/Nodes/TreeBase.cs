@@ -18,7 +18,7 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
 
     internal string Source { get; } = source;
 
-    internal bool Include { get; set; }
+    internal virtual bool Include { get; set; }
 
     public abstract string Name { get; }
 
@@ -29,7 +29,6 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
     bool ITree.IsContainer { get => IsContainer; }
     ITree? ITree.Container { get => Container; }
     string ITree.Source { get => Source; }
-    // bool ITree.Include { get => Include; set => Include = value; }
     string? ITree.Hierarchy { get => Hierarchy; set => Hierarchy = value; }
     int ITree.Depth { get => Depth; }
     string ITree.Name { get => Name; }
@@ -44,7 +43,6 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
 
     internal IEnumerable<ITree> Render(
         int maxDepth,
-        bool withInclude,
         IComparer<TBase>? comparer)
     {
         RenderingSet set = TreeStyle.Instance.RenderingSet;
@@ -56,8 +54,6 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
         while (stack.Count > 0)
         {
             TreeBase<TContainer, TBase> current = stack.Pop();
-            if (withInclude && !current.Include) continue;
-
             int dp = current.Depth;
             builder.Clear();
 
@@ -89,6 +85,26 @@ public abstract class TreeBase<TContainer, TBase>(string source, int depth = 0) 
     {
         Children ??= [];
         Children.Add(child);
+    }
+
+    internal void PruneNonIncluded()
+    {
+        if (Children is not { Count: > 0 } children)
+            return;
+
+        for (int i = children.Count - 1; i >= 0; i--)
+        {
+            if (children[i] is TContainer container)
+            {
+                container.PruneNonIncluded();
+                if (container.Include) continue;
+
+                if (container is TreeDirectory dir)
+                    dir.RecursiveDecrement();
+
+                children.RemoveAt(i);
+            }
+        }
     }
 
     internal void PropagateInclude()

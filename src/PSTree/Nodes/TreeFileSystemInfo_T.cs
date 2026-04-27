@@ -5,12 +5,12 @@ using Microsoft.PowerShell.Commands;
 
 namespace PSTree.Nodes;
 
-public abstract class TreeFileSystemInfo<T> : TreeFileSystemInfo
-    where T : FileSystemInfo
+public abstract class TreeFileSystemInfo<T>(T fsinfo, string source, int depth = 0)
+    : TreeFileSystemInfo(source, depth) where T : FileSystemInfo
 {
     private PSObject InstanceAsPSO { get => field ??= PSObject.AsPSObject(Instance); }
 
-    protected T Instance { get; }
+    protected T Instance { get; } = fsinfo;
 
     public override string Name { get => Instance.Name; }
 
@@ -33,12 +33,6 @@ public abstract class TreeFileSystemInfo<T> : TreeFileSystemInfo
     public DateTime LastAccessTime { get => Instance.LastAccessTime; }
 
     public DateTime LastAccessTimeUtc { get => Instance.LastAccessTimeUtc; }
-
-    private protected TreeFileSystemInfo(T fileSystemInfo, string source, int depth = 0)
-        : base(source, depth)
-    {
-        Instance = fileSystemInfo;
-    }
 
     public bool HasFlag(FileAttributes flag) => Instance.Attributes.HasFlag(flag);
 

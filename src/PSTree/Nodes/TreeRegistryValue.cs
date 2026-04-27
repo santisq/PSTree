@@ -9,6 +9,8 @@ public sealed class TreeRegistryValue : TreeRegistryBase
 
     private readonly string _valueName;
 
+    internal override bool Include { get; set; } = true;
+
     internal override bool IsContainer { get; } = false;
 
     public RegistryValueKind Kind { get; }
@@ -30,7 +32,6 @@ public sealed class TreeRegistryValue : TreeRegistryBase
         Name = GetNameOrDefault(value);
         Kind = key.GetValueKind(value);
         PSParentPath = $"{ProviderPath}{_parentPath}";
-        Include = true;
     }
 
     private static string GetNameOrDefault(string value) =>

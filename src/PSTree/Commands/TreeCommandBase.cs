@@ -147,8 +147,10 @@ public abstract class TreeCommandBase<TContainer, TBase, TSort> : PSCmdlet
         }
 
         IComparer<TBase>? comparer = GetComparer();
+        if (WithInclude) container.PruneNonIncluded();
+
         WriteObject(
-            container.Render(maxdp, WithInclude, comparer),
+            container.Render(maxdp, comparer),
             enumerateCollection: true);
     }
 

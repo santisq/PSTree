@@ -54,13 +54,17 @@ public sealed class GetPSTreeRegistryCommand
     {
         using (current)
         {
+            bool hasValue = false;
             if (depth > Depth) return;
             if (!KeysOnly)
             {
                 foreach (string value in current.GetValueNames())
                 {
                     if (!ShouldSkipValue(value))
+                    {
                         current.AddValue(value, CurrentSource);
+                        hasValue = true;
+                    }
                 }
             }
 
@@ -80,8 +84,8 @@ public sealed class GetPSTreeRegistryCommand
                 }
             }
 
-            // if (WithInclude && _builder.HasLeaf())
-            //     current.PropagateInclude();
+            if (WithInclude && hasValue)
+                current.PropagateInclude();
         }
     }
 
@@ -122,8 +126,7 @@ public sealed class GetPSTreeRegistryCommand
     {
         RegistrySortMode.ValuesFirst => TreeRegistryComparer.ByValue,
         RegistrySortMode.KeysFirst => TreeRegistryComparer.ByKey,
-        RegistrySortMode.None => null,
-        _ => throw new ArgumentOutOfRangeException(nameof(SortBy))
+        _ => null // None
     };
 #endif
 }

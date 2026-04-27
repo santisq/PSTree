@@ -60,9 +60,10 @@ public sealed class GetPSTreeCommand
 
     protected override void BuildOne(TreeDirectory current, int depth)
     {
-        long length = 0;
-        bool include = depth <= Depth;
-        bool traverse = include || RecursiveSize;
+        long accumulatedLength = 0;
+        bool showThisLevel = depth <= Depth;
+        bool shouldTraverse = showThisLevel || RecursiveSize;
+        bool hasFile = false;
 
         try
         {
@@ -74,38 +75,39 @@ public sealed class GetPSTreeCommand
                 if (item is DirectoryInfo dir)
                 {
                     TreeDirectory treedir = current.CreateDirectory(dir, CurrentSource);
-                    if (include) current.AddChild(treedir);
-                    if (traverse) Push(treedir);
+
+                    if (showThisLevel)
+                        current.AddChild(treedir);
+
+                    if (shouldTraverse)
+                        Push(treedir);
+
                     continue;
                 }
 
                 FileInfo file = (FileInfo)item;
-                if (!traverse && !ShouldInclude(file.Name))
+                if (!shouldTraverse || !ShouldInclude(file.Name))
                     continue;
 
-                length += file.Length;
-                if (!Directory && include)
-                {
-                    TreeFile treefile = current.CreateFile(file, CurrentSource);
-                    current.AddChild(treefile);
-                }
+                accumulatedLength += file.Length;
+
+                if (Directory || !showThisLevel)
+                    continue;
+
+                hasFile = true;
+                TreeFile treefile = current.CreateFile(file, CurrentSource);
+                current.AddChild(treefile);
             }
 
-            current.AggregateUp(length, RecursiveSize, WithInclude);
+            current.AggregateUp(
+                accumulatedLength,
+                RecursiveSize,
+                WithInclude && hasFile);
         }
         catch (Exception exception)
         {
             WriteError(exception.ToEnumerationError(current));
         }
-
-        // if (WithInclude)
-        // {
-        //     for (int i = _builder.Items.Count - 1; i >= 0; i--)
-        //     {
-        //         TreeFileSystemInfo current = _builder.Items[i];
-        //         if (!current.Include) current.RecursiveDecrement();
-        //     }
-        // }
     }
 
     private static bool IsHidden(FileSystemInfo item)
@@ -116,7 +118,6 @@ public sealed class GetPSTreeCommand
         FileSystemSortMode.FilesFirst => TreeFileSystemComparer.ByFile,
         FileSystemSortMode.DirectoriesFirst => TreeFileSystemComparer.ByDirectory,
         FileSystemSortMode.Size => TreeFileSystemComparer.BySize,
-        FileSystemSortMode.None => null,
-        _ => throw new ArgumentOutOfRangeException(nameof(SortBy))
+        _ => null // None
     };
 }
