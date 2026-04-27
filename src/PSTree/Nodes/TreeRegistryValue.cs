@@ -27,7 +27,6 @@ public sealed class TreeRegistryValue : TreeRegistryBase
         _parentPath = key.Name;
         _valueName = value;
         Container = key;
-        // Depth = depth;
         Name = GetNameOrDefault(value);
         Kind = key.GetValueKind(value);
         PSParentPath = $"{ProviderPath}{_parentPath}";

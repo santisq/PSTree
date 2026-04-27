@@ -38,15 +38,7 @@ public abstract class TreeFileSystemInfo<T> : TreeFileSystemInfo
         : base(source, depth)
     {
         Instance = fileSystemInfo;
-        // Depth = depth;
     }
-
-    // private protected TreeFileSystemInfo(
-    //     T fileSystemInfo, string source)
-    //     : base(source)
-    // {
-    //     Instance = fileSystemInfo;
-    // }
 
     public bool HasFlag(FileAttributes flag) => Instance.Attributes.HasFlag(flag);
 

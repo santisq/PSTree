@@ -47,64 +47,46 @@ public sealed class GetPSTreeRegistryCommand
             if (!TryGetKey(path, out RegistryKey? key))
                 continue;
 
-            WriteObject(
-                Build(new TreeRegistryKey(key)),
-                enumerateCollection: true);
+            ProcessTree(new TreeRegistryKey(key));
         }
     }
 
-    protected override IEnumerable<ITree> Build(TreeRegistryKey key)
+    protected override void BuildOne(
+        TreeRegistryKey current,
+        string source,
+        int level)
     {
-        string source = key.Path!;
-        int maxDp = 0;
-
-        Push(key);
-        while (ShouldContinue())
+        using (current)
         {
-            TreeRegistryKey current = Pop();
-
-            int level = current.Depth + 1;
-            maxDp = Math.Max(maxDp, level);
-
-            using (current)
+            if (level > Depth) return;
+            if (!KeysOnly)
             {
-                if (level > Depth) continue;
-                if (KeysOnly) goto PushKeys;
-
                 foreach (string value in current.GetValueNames())
                 {
                     if (!ShouldSkipValue(value))
                         current.AddValue(value, source);
                 }
-
-            PushKeys:
-                foreach (string name in current.EnumerateKeys())
-                {
-                    if (ShouldExclude(name)) continue;
-
-                    try
-                    {
-                        if (current.TryAddSubKey(name, source, out TreeRegistryKey? subKey))
-                            Push(subKey);
-                    }
-                    catch (SecurityException exception)
-                    {
-                        string path = IOPath.Combine(current.Name, name);
-                        WriteError(exception.ToSecurityError(path));
-                    }
-                }
-
-                // if (WithInclude && _builder.HasLeaf())
-                //     current.PropagateInclude();
             }
 
-            // Build:
-            //     _builder.Add(current);
-            //     _builder.Flush();
-        }
+            foreach (string name in current.EnumerateKeys())
+            {
+                if (ShouldExclude(name)) continue;
 
-        return key.Render(maxDp, Comparer);
-        // return _builder.GetTree(WithInclude && !KeysOnly, maxDepth);
+                try
+                {
+                    if (current.TryAddSubKey(name, source, out TreeRegistryKey? subKey))
+                        Push(subKey);
+                }
+                catch (SecurityException exception)
+                {
+                    string path = IOPath.Combine(current.Name, name);
+                    WriteError(exception.ToSecurityError(path));
+                }
+            }
+
+            // if (WithInclude && _builder.HasLeaf())
+            //     current.PropagateInclude();
+        }
     }
 
     private bool ShouldSkipValue(string value) => ShouldExclude(value) || !ShouldInclude(value);
@@ -140,10 +122,11 @@ public sealed class GetPSTreeRegistryCommand
         return true;
     }
 
-    protected override IComparer<TreeRegistryBase> GetComparer() => SortBy switch
+    protected override IComparer<TreeRegistryBase>? GetComparer() => SortBy switch
     {
         RegistrySortMode.ValuesFirst => TreeRegistryComparer.ByValue,
         RegistrySortMode.KeysFirst => TreeRegistryComparer.ByKey,
+        RegistrySortMode.None => null,
         _ => throw new ArgumentOutOfRangeException(nameof(SortBy))
     };
 #endif

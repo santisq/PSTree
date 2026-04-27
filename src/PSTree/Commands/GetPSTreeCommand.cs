@@ -55,67 +55,57 @@ public sealed class GetPSTreeCommand
                 continue;
             }
 
-            WriteObject(
-                Build(new TreeDirectory(path)),
-                enumerateCollection: true);
+            ProcessTree(new TreeDirectory(path));
         }
     }
 
-    protected override IEnumerable<ITree> Build(TreeDirectory directory)
+    protected override void BuildOne(
+        TreeDirectory current,
+        string source,
+        int level)
     {
-        string source = directory.FullName;
-        int maxDp = 0;
+        long length = 0;
+        bool include = level <= Depth;
+        bool traverse = include || RecursiveSize;
 
-        Push(directory);
-        while (ShouldContinue())
+        try
         {
-            TreeDirectory current = Pop();
-
-            long length = 0;
-            int level = current.Depth + 1;
-            maxDp = Math.Max(maxDp, level);
-
-            try
+            foreach (FileSystemInfo item in current.EnumerateFileSystemInfos())
             {
-                bool include = level <= Depth;
-                bool traverse = include || RecursiveSize;
+                if (!Force && IsHidden(item) || ShouldExclude(item.Name))
+                    continue;
 
-                foreach (FileSystemInfo item in current.EnumerateFileSystemInfos())
+                if (item is DirectoryInfo dir)
                 {
-                    if (!Force && IsHidden(item) || ShouldExclude(item.Name))
-                        continue;
+                    TreeDirectory treedir = current.CreateDirectory(dir, source);
+                    current.ItemCount++;
 
-                    if (item is DirectoryInfo dir)
-                    {
-                        TreeDirectory treedir = current.CreateDirectory(dir, source);
-                        current.ItemCount++;
-
-                        if (include) current.AddChild(treedir);
-                        if (traverse) Push(treedir);
-                        continue;
-                    }
-
-                    FileInfo file = (FileInfo)item;
-                    if (traverse && ShouldInclude(file.Name))
-                    {
-                        length += file.Length;
-                        if (Directory || !include) continue;
-
-                        current.ItemCount++;
-                        TreeFile treefile = current.CreateFile(file, source);
-                        current.AddChild(treefile);
-                    }
+                    if (include) current.AddChild(treedir);
+                    if (traverse) Push(treedir);
+                    continue;
                 }
 
-                current.AggregateUp(
-                    length: length,
-                    recursive: RecursiveSize,
-                    propagateInclude: WithInclude);
+                FileInfo file = (FileInfo)item;
+                if (!traverse && !ShouldInclude(file.Name))
+                    continue;
+
+                length += file.Length;
+                if (!Directory && include)
+                {
+                    current.ItemCount++;
+                    TreeFile treefile = current.CreateFile(file, source);
+                    current.AddChild(treefile);
+                }
             }
-            catch (Exception exception)
-            {
-                WriteError(exception.ToEnumerationError(current));
-            }
+
+            current.AggregateUp(
+                length: length,
+                recursive: RecursiveSize,
+                propagateInclude: WithInclude);
+        }
+        catch (Exception exception)
+        {
+            WriteError(exception.ToEnumerationError(current));
         }
 
         // if (WithInclude)
@@ -126,19 +116,17 @@ public sealed class GetPSTreeCommand
         //         if (!current.Include) current.RecursiveDecrement();
         //     }
         // }
-
-        return directory.Render(maxDp, Comparer);
-        // return _builder.GetTree(WithInclude && !Directory, maxDp);
     }
 
     private static bool IsHidden(FileSystemInfo item)
         => item.Attributes.HasFlag(FileAttributes.Hidden);
 
-    protected override IComparer<TreeFileSystemInfo> GetComparer() => SortBy switch
+    protected override IComparer<TreeFileSystemInfo>? GetComparer() => SortBy switch
     {
         FileSystemSortMode.FilesFirst => TreeFileSystemComparer.ByFile,
         FileSystemSortMode.DirectoriesFirst => TreeFileSystemComparer.ByDirectory,
         FileSystemSortMode.Size => TreeFileSystemComparer.BySize,
+        FileSystemSortMode.None => null,
         _ => throw new ArgumentOutOfRangeException(nameof(SortBy))
     };
 }

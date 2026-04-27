@@ -4,12 +4,14 @@ public enum FileSystemSortMode
 {
     FilesFirst,
     DirectoriesFirst,
-    Size
+    Size,
+    None
 }
 
 public enum RegistrySortMode
 {
     ValuesFirst,
-    KeysFirst
+    KeysFirst,
+    None
 }
 
