@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## v3.0.2
+
+### Fixed
+
+- Added a check to skip `ReparsePoint` directories in `Get-PSTree` to prevent infinite loops during directory traversal.
+- Fixed a .NET Framework targeting issue that prevented the module from building correctly on Linux environments.
+
+### Changed
+
+- Updated GitHub CI actions (`actions/checkout` and `codecov/codecov-action`) to `@v7`.
+- Bumped required development module versions (`InvokeBuild` and `Pester`).
+- Bumped module version.
+
 ## v3.0.1
 
 ### Fixed

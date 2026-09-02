@@ -110,7 +110,7 @@ public sealed class GetPSTreeCommand
                     if (showThisLevel)
                         current.AddChild(treedir);
 
-                    if (shouldTraverse)
+                    if (shouldTraverse && !IsReparsePoint(dir))
                         Push(treedir);
 
                     continue;
@@ -143,6 +143,9 @@ public sealed class GetPSTreeCommand
 
     private static bool IsHidden(FileSystemInfo item)
         => item.Attributes.HasFlag(FileAttributes.Hidden);
+
+    private static bool IsReparsePoint(DirectoryInfo dir)
+        => dir.Attributes.HasFlag(FileAttributes.ReparsePoint);
 
     protected override IComparer<TreeFileSystemInfo>? GetComparer()
         => TreeComparerFactory.Get(SortBy);

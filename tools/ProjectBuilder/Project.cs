@@ -54,6 +54,7 @@ public sealed class Project
                 framework,
                 "publish"));
 
+            if (!buildFolder.Exists) continue;
             string binFolder = Path.Combine(Release, "bin", framework);
             buildFolder.CopyRecursive(binFolder);
         }
